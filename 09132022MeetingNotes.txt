@@ -1,0 +1,20 @@
+I just wanted to quickly jot down the preliminary ideas we had tonight. Please correct anything I got wrong.
+
+Main Project: A competitive stock trading portfolio application that allows users to vie for the highest positions
+Value Statement: Make investing more fun
+
+Features (thus far):
+- Log In Page
+- Home Page
+  - Portfolios
+    - Up to 4 portfolios per user, only 1 at a time may be submitted for competition
+    - Pie chart for portfolio performance
+    - Allows copying of previous quarter's portfolio to new quarter
+  - Stock Info 
+  - Market's Biggest "Winners"/"Losers" at Present
+  - Profile
+    - Ranking (promotions, demotions, quarterly rank, all-time rank)
+    
+Ethical Concerns:
+  - How do we address the risk factor?
+  - How do we address the addictiveness?
