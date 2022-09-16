@@ -1,0 +1,23 @@
+#header-div {
+    text-align: left;
+    display: flex;
+}
+
+#menu-wrapper {
+    flex: 1
+}
+
+#header-contents {
+    display: flex;
+    align-items:center
+}
+
+#icon-wrapper {
+    margin-right: 2vw;
+    transform: scale(1.2);
+}
+
+#header-profile-avatar {
+    border: 1px solid gray;
+    object-fit: cover;
+}

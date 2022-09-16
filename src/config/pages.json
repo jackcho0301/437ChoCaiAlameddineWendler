@@ -1,0 +1,14 @@
+{
+    "portfolio": {
+        "text": "My Portfolio",
+        "active": true
+    },
+    "ranking": {
+        "text": "My Ranking",
+        "active": false
+    },
+    "leaderboard": {
+        "text": "Top Earners",
+        "active": false
+    }
+}

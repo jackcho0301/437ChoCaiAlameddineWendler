@@ -1,0 +1,8 @@
+.header-item {
+    margin-left: 5vw !important;
+}
+
+.header-item-text {
+    color: white;
+    white-space: nowrap
+}   
