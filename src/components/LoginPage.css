@@ -1,0 +1,49 @@
+#login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.login-text {
+    margin: 1vh !important;
+    width: 17vw;
+}
+
+.login-textfields {
+    display: flex;
+    flex-direction: column;
+}
+
+#sign-in-or-register-div {
+    display: flex;
+}
+
+#sign-in-or-register-div Button {
+    margin: 2%;
+    width: 8.5vw;
+    font-size: 1vw;
+}
+
+.sign-in-register-divider {
+    background-color: black;
+}
+
+#login-page-form-div {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(240,240,240);
+    padding: 1vw;
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.5);
+    width: 20vw;
+}
+
+#login-form-control {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#login-chart-icon-container {
+
+}

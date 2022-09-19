@@ -1,9 +1,17 @@
 import React from 'react'
 import { AppBar, IconButton, Avatar } from '@mui/material'
+import HomeIcon from '@mui/icons-material/Home';
 import HeaderItem from './HeaderItem'
 import './Header.css'
 
 export default function Header(props) {
+    const homeButton = (
+    <IconButton
+        id='home-button'
+    >
+        <HomeIcon/>
+    </IconButton>
+    )
 
     return (
         <div id='header-div'>
@@ -14,12 +22,22 @@ export default function Header(props) {
                 <div id='header-contents'>
                     <div id='menu-wrapper'>
                         {Object.keys(props.pageState).map((page, idx) => {
+                            const text = props.pageState[page].text
+                            if(text) {
+                                return (
+                                    <HeaderItem
+                                        setPage={() => props.setPage(page)}
+                                        key={idx}
+                                        text={text}
+                                    />)
+                            } else {
                             return (
                                 <HeaderItem
                                     setPage={() => props.setPage(page)}
                                     key={idx}
-                                    text={props.pageState[page].text}
+                                    content={homeButton}
                                 />)
+                            }
                         })}
                     </div>
 

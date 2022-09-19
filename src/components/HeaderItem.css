@@ -1,8 +1,10 @@
 .header-item {
     margin-left: 5vw !important;
+    display: flex;
+
 }
 
 .header-item-text {
     color: white;
-    white-space: nowrap
+    white-space: nowrap;
 }   

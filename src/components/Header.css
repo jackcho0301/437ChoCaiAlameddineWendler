@@ -4,12 +4,14 @@
 }
 
 #menu-wrapper {
-    flex: 1
+    flex: 1;
+    display: flex
 }
 
 #header-contents {
     display: flex;
     align-items:center
+
 }
 
 #icon-wrapper {
@@ -20,4 +22,13 @@
 #header-profile-avatar {
     border: 1px solid gray;
     object-fit: cover;
+}
+
+#home-button {
+    margin-left: -3vw; /* 2vw total (5vw-3vw) */
+}
+
+#home-button * {
+    fill: white;
+    font-size: 50px;
 }

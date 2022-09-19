@@ -3,15 +3,27 @@ import { Button } from '@mui/material'
 import './HeaderItem.css'
 
 export default function HeaderItem(props) {
+    const content = () => {
+        if (props.text) {
+            return (
+                <Button
+                    className='header-item-button'
+                    onClick={props.setPage}
+                >
+                    <h1 className='header-item-text'>
+                        {props.text}
+                    </h1>
+                </Button>
+
+            )
+        } else if (props.content) {
+            return props.content
+        }
+    }
 
     return (
-        <Button
-            className='header-item'
-            onClick={props.setPage}
-            >
-            <h1 className='header-item-text'>
-                {props.text}
-            </h1>
-        </Button>
+        <div className='header-item'>
+            {content()}
+        </div>
     )
 }

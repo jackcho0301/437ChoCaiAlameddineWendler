@@ -1,7 +1,11 @@
 {
+    "home": {
+        "text": false,
+        "active": true
+    },
     "portfolio": {
         "text": "My Portfolio",
-        "active": true
+        "active": false
     },
     "ranking": {
         "text": "My Ranking",
