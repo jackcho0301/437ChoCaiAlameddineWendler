@@ -1,0 +1,81 @@
+RETRIEVE PORTFOLIO INFO (PSEUDOCODE)
+Use the user ID and and Portfolio number to retrieve the Portfolio
+Return a list of all Stock Names/Number of Units/Initial Cost Per Unit documents from the Portfolio
+
+
+RETRIEVE CURRENT INFO (PSEUDOCODE)
+Use the user ID and and Portfolio number to retrieve the Portfolio
+Retrieve a list of all Stock Names/Number of Units/Initial Cost Per Unit documents from the Portfolio
+Use the Stock Names to retrieve Current Cost (i.e. Price) from API of each Stock Name
+Return the Stock Names/Current Cost
+
+
+COI (Cost of Investment) ALGORITHM (PSEUDOCODE)
+Run RETRIEVE PORTFOLIO INFO
+
+// Calculate the Cost of Investment
+Set COI to 0
+For each Stock Name
+	Multiply Number of Units by Initial Cost
+	Add to COI
+Return COI
+
+
+TOTAL RETURN ALGORITHM (PSEUDOCODE)
+Run COI ALGORITHM to get COI
+Run RETRIEVE CURRENT INFO
+
+// Calculate the Initial Value
+Set IV to COI
+// Fairly simple...the only way this will get more complicated is if we add things like trading commissions, which might be a way to penalize users trading too much...
+
+// Calculate the Final Value
+Set FV to 0
+For each Stock Name
+	Multiply Number of Units by Current Cost
+	Add to FV
+// Again, fairly simple...but this would get more complicated if we added things like dividends
+
+// Calculate the Net Value
+Set NV to FV - IV
+Return NV
+
+
+RETURN ALGORITHM (PSEUDOCODE)
+Use the user ID and and Portfolio number to retrieve the Portfolio
+Retrieve a list of all Stock Names/Number of Units/Initial Cost Per Unit documents from the Portfolio
+Use the Stock Names to retrieve Current Cost (i.e. Price) from API of each Stock Name
+
+Set Return Collection to Empty
+For each Stock Name
+	Multply Number of Units by Current Cost to get Return
+	Add Stock Name/Return to Return Collection
+Return Return Collection
+
+
+HOLDING ALGORITHM (PSEUDOCODE)
+Use the user ID and and Portfolio number to retrieve the Portfolio
+Retrieve a list of all Stock Names/Number of Units/Initial Cost Per Unit documents from the Portfolio
+Use the Stock Names to retrieve Current Cost (i.e. Price) from API of each Stock Name
+
+Run TOTAL RETURN ALGORITHM to get Total Value
+
+Set Holding Collection to Empty
+For each Stock Name
+	Multply Number of Units by Current Cost to get Return
+	Divide Return by Total Value to get Holding
+	Add Stock Name/Holding to Holding Collection
+Return Holding Collection
+
+
+ROI ALGORITHM (PSEUDOCODE)
+Run TOTAL RETURN ALGORITHM to get TR
+Run COI ALGORITHM to get COI
+
+// Calculate the ROI as Percentage
+Divide TR by COI
+Multiply by 100 to get ROI
+Return ROI
+
+
+
