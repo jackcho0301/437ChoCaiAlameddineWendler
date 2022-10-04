@@ -1,5 +1,8 @@
 const {portfolioData, currentData} = require('./testdata')
 
+// Each of these methods are middleware and act as wrappers for the
+// "kernel" functions below, where the actual meat of the operations
+// take place.
 const retrievePortInfo = (req, res, next) => {
     const {userID, portID} = req.query
 
@@ -91,6 +94,13 @@ const roi = (req, res, next) => {
     }
 }
 
+// This method will retrieve the portfolio information for an individual user/
+// portfolio combination, represented by integer IDs. It will return a collection
+// of items with the properties: "userID", "portID", "stockName", "numOfUnits",
+// and "initCost". Each of these items represents a stock purchase in their 
+// portfolio. "stockName" is the ticker string of the stock. "numOfUnits" is the 
+// number of stocks that they own of that stock. "initCost" represents the price
+// they initially paid for that stock.
 function retrievePortInfoKernel(userID, portID){
     let portInfo = [...portfolioData]
 
@@ -104,6 +114,11 @@ function retrievePortInfoKernel(userID, portID){
     return portInfo
 }
 
+// This method will retrieve the current info based on an individual user/
+// portfolio combination, represented by integer IDs. It does not actually return
+// anything from the portfolio directly. Rather, it takes the stockName values
+// from the user's portfolio, accesses the same name from the stock API (ideally),
+// and returns the current price.
 function retrieveCurrInfoKernel(userID, portID){
     let currInfo = [...currentData]
 
@@ -120,6 +135,9 @@ function retrieveCurrInfoKernel(userID, portID){
     return currInfo
 }
 
+// This method will return the overall initial initial cost of investment
+// of their purchases. Ideally, if we are giving everyone the same 
+// starting amount of money, this will always be the same value.
 function coiKernel(userID, portID){
     const portInfo = retrievePortInfoKernel(userID, portID)
 
@@ -133,6 +151,10 @@ function coiKernel(userID, portID){
     return costOfInvestment
 }
 
+// This method will return the total return value for an individual 
+// user's portfolio; i.e. how much money they have gained or lost
+// on this portfolio. Keep in mind this value can be negative if 
+// too many stocks lost value.
 function totalReturnKernel(userID, portID){
     const coi = coiKernel(userID, portID)
     const portInfo = retrievePortInfoKernel(userID, portID)
@@ -159,6 +181,9 @@ function totalReturnKernel(userID, portID){
     return totReturn
 }
 
+// This method will return the individual value of each stock the
+// user currently owns in a particular portfolio. It is designed to
+// be used with generating that pie chart on that one window.
 function stockReturnKernel(userID, portID){
     const portInfo = retrievePortInfoKernel(userID, portID)
     const currInfo = retrieveCurrInfoKernel(userID, portID)
@@ -180,6 +205,9 @@ function stockReturnKernel(userID, portID){
     return returnCollection
 }
 
+// This method will return the individual holding of each stock the
+// user currently owns in a particular portfolio. It is designed to 
+// be used with generating that pie chart on that one window.
 function stockHoldingKernel(userID, portID){
     const portInfo = retrievePortInfoKernel(userID, portID)
     const currInfo = retrieveCurrInfoKernel(userID, portID)
@@ -215,6 +243,8 @@ function stockHoldingKernel(userID, portID){
     return holdingCollection
 }
 
+// This method returns the overall ROI for a given user's portfolio as
+// a percentage.
 function roiKernel(userID, portID){
     const totalReturnValue = Number(totalReturnKernel(userID, portID))
     const coiValue = Number(coiKernel(userID, portID))
