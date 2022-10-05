@@ -1,4 +1,4 @@
-const {portfolioData, currentData} = require('./testdata')
+const {portfolioData, currentData, usersData} = require('./testdata')
 
 // Each of these methods are middleware and act as wrappers for the
 // "kernel" functions below, where the actual meat of the operations
@@ -87,6 +87,54 @@ const roi = (req, res, next) => {
     if (userID & portID){
         req.roi = roiKernel(userID,portID)
         next()
+    }
+    else
+    {
+        res.status(200).send('User and Portfolio do not exist')
+    }
+}
+
+const totalValue = (req, res, next) => {
+    const {userID, portID} = req.query
+
+    if (userID){
+        if (portID){
+            req.totalValue = totalValueKernel(userID,portID)
+            next()
+        }
+        else
+        {
+            res.status(200).send('User and Portfolio do not exist')
+        }
+    }
+    else
+    {
+        res.status(200).send('User and Portfolio do not exist')
+    }
+}
+
+const ranking = (req, res, next) => {
+    req.ranking = rankingKernel()
+    next()
+}
+
+const allUserPortInfo = (req, res, next) => {
+    const {userID, portID} = req.query
+
+    if (userID){
+        if (portID){
+            req.coi = coiKernel(userID,portID)
+            req.totalReturn = totalReturnKernel(userID,portID)
+            req.stockReturn = stockReturnKernel(userID,portID)
+            req.stockHolding = stockHoldingKernel(userID,portID)
+            req.roi = roiKernel(userID,portID)
+            req.totalValue = totalValueKernel(userID,portID)
+            next()
+        }
+        else
+        {
+            res.status(200).send('User and Portfolio do not exist')
+        }
     }
     else
     {
@@ -255,4 +303,38 @@ function roiKernel(userID, portID){
     return roiValue
 }
 
-module.exports = {retrievePortInfo, retrieveCurrInfo, coi, totalReturn, stockReturn, stockHolding, roi}
+// This method returns the total monetary value of a portfolio, and is
+// the primary measure by which we will score users as it should be 
+// guaranteed to be non-negative.
+function totalValueKernel(userID, portID){
+    const stockReturn = stockReturnKernel(userID, portID)
+
+    let sumValue = 0
+    for (returnItem of stockReturn){
+        sumValue += returnItem.return
+    }
+
+    return sumValue
+}
+
+// This is the main method for calculating the leaderboard without any
+// "bells and whistles", although it can be enhanced later for that purpose
+// after the MVP. It simply grabs all the users, scores them, and then 
+// returns their names and scores pre-sorted in descending order. It should
+// be all the front end needs to build the leaderboard.
+function rankingKernel(){
+    let rankCollection = []
+
+    for (user of usersData)
+    {
+        totalValueScore = totalValueKernel(user.userID, user.prefPort)
+        rankItem = ({userName:user.userName,score:totalValueScore})
+        rankCollection.push(rankItem)
+    }
+
+    rankCollection.sort((a,b) => b.score - a.score)
+
+    return rankCollection
+}
+
+module.exports = {retrievePortInfo, retrieveCurrInfo, coi, totalReturn, stockReturn, stockHolding, roi, totalValue, ranking, allUserPortInfo}
