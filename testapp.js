@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const {retrievePortInfo, retrieveCurrInfo, coi, totalReturn, stockReturn, stockHolding, roi} = require('./project-methods')
+const {retrievePortInfo, retrieveCurrInfo, coi, totalReturn, stockReturn, stockHolding, roi, totalValue, ranking, allUserPortInfo} = require('./project-methods')
 
 app.get('/', (req, res)=>{
     res.send('Home Page for Method Testing')
@@ -86,6 +86,44 @@ app.get('/roi', roi, (req, res) =>{
     else
     {
         // Should never be hit because ROI returns a not 
+        // found response.
+        res.send('Home Page')
+    }
+})
+
+app.get('/totalValue', totalValue, (req, res) =>{
+    if (req.totalValue){
+        res.status(200).json({success:true, data:req.totalValue})
+    }
+    else
+    {
+        // Should never be hit because totalValue return a not
+        // found response.
+        res.send('Home Page')
+    }
+})
+
+app.get('/ranking', ranking, (req, res) =>{
+    if (req.ranking){
+        res.status(200).json({success:true, data:req.ranking})
+    }
+    else
+    {
+        // Should never be hit because ranking returns a not
+        // found response.
+        res.send('Home Page')
+    }
+})
+
+app.get('/allUserPortInfo', allUserPortInfo, (req, res) =>{
+    // Assume if totalValue is there, everything is there.
+    if (req.totalValue){
+        res.status(200).json({success:true, coi:req.coi, totalReturnVal:req.totalReturn, stockReturns:req.stockReturn, stockHoldings:req.stockHolding,
+            roiPercent:req.roi, totalVal:req.totalValue})
+    }
+    else
+    {
+        // Should never be hit because ranking returns a not
         // found response.
         res.send('Home Page')
     }
