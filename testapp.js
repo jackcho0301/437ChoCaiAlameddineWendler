@@ -1,121 +1,89 @@
 const express = require('express');
 const app = express();
 
-const {retrievePortInfo, retrieveCurrInfo, coi, totalReturn, stockReturn, stockHolding, roi, totalValue, ranking, allUserPortInfo} = require('./project-methods')
+const {ranking, allUserPortInfo, postPortfolioEntry, sellPortfolioEntry} = require('./project-methods')
+
+// Parse JSON
+app.use(express.json())
 
 app.get('/', (req, res)=>{
     res.send('Home Page for Method Testing')
 })
 
-app.get('/retrievePortInfo', retrievePortInfo, (req, res) =>{
-    if (req.retPortInfo){
-        res.status(200).json({success:true, data:req.retPortInfo})
-    }
-    else
-    {
-        // Should never be hit because retPortInfo returns a not
-        // found response.
-        res.send('Home Page')
-    }
-})
-
-app.get('/retrieveCurrInfo', retrieveCurrInfo, (req, res) =>{
-    if (req.retCurrInfo){
-        res.status(200).json({success:true, data:req.retCurrInfo})
-    }
-    else
-    {
-        // Should never be hit because retCurrInfo returns a not
-        // found response.
-        res.send('Home Page')
-    }
-})
-
-app.get('/coi', coi, (req, res) =>{
-    if (req.coi){
-        res.status(200).json({success:true, data:req.coi})
-    }
-    else
-    {
-        // Should never be hit because coi returns a not found
-        // response.
-        res.send('Home Page')
-    }
-})
-
-app.get('/totalReturn', totalReturn, (req, res) =>{
-    if (req.totalReturn){
-        res.status(200).json({success:true, data:req.totalReturn})
-    }
-    else
-    {
-        // Should never be hit because totalReturn a not found
-        // response.
-        res.send('Home Page')
-    }
-})
-
-app.get('/stockReturn', stockReturn, (req, res) =>{
-    if (req.stockReturn){
-        res.status(200).json({success:true, data:req.stockReturn})
-    }
-    else
-    {
-        // Should never be hit because stockReturn returns a not 
-        // found response.
-        res.send('Home Page')
-    }
-})
-
-app.get('/stockHolding', stockHolding, (req, res) =>{
-    if (req.stockHolding){
-        res.status(200).json({success:true, data:req.stockHolding})
-    }
-    else
-    {
-        // Should never be hit because stockHolding returns a not 
-        // found response.
-        res.send('Home Page')
-    }
-})
-
-app.get('/roi', roi, (req, res) =>{
-    if (req.roi){
-        res.status(200).json({success:true, data:req.roi})
-    }
-    else
-    {
-        // Should never be hit because ROI returns a not 
-        // found response.
-        res.send('Home Page')
-    }
-})
-
-app.get('/totalValue', totalValue, (req, res) =>{
+// This is the API for creating/buying stocks, and should primarily be 
+// used when creating or buying a portfolio. Note that although this is
+// a post request, it returns a value...in particular the total value that
+// the user currently has of their portfolio they are either creating or
+// buying for. There is a reason for this...this should be used in 
+// conjunction with whatever the "Base" amount of money the user gets to
+// have when creating a portfolio. Basically subtract this value from 
+// "base" and you'll have how much money the user still has to spend.
+// When making this POST request, the following JSON input is expected to 
+// be passed in the req.body:
+// {
+//      "userID": (whatever user ID),
+//      "portID": (whatever portfolio ID),
+//      "stockName": (whatever stock ticker name as a string),
+//      "numOfUnits": (how many units they're buying),
+//      "initCost": (initial cost of stock per share)
+// }
+// We can adapt this later to accept whole dollar values and calculate
+// numOfUnits from that.
+app.post('/transportfolio', postPortfolioEntry, (req, res) =>{
     if (req.totalValue){
         res.status(200).json({success:true, data:req.totalValue})
     }
     else
     {
-        // Should never be hit because totalValue return a not
-        // found response.
-        res.send('Home Page')
+        res.status(400).json({success:false, msg:'Error while posting new stock purchase'})
     }
 })
 
-app.get('/ranking', ranking, (req, res) =>{
+// This is the API for selling stocks. Note that although this is a 
+// delete request, it returns a value...in particular the total value of 
+// what they just sold. This should immediately be used to present the
+// user with what money they can reinvest. When making this DELETE 
+// request, the following JSON input is expected to  be passed in the 
+// req.body:
+// {
+//      "userID": (whatever user ID),
+//      "portID": (whatever portfolio ID),
+//      "stockName": (whatever stock ticker name as a string)
+// }
+// We can adapt this later to accept whole dollar values and calculate
+// numOfUnits from that.
+app.delete('/transportfolio', sellPortfolioEntry, (req, res) =>{
+    if (req.saleValue){
+        res.status(200).json({success:true, data:req.saleValue})
+    }
+    else
+    {
+        res.status(400).json({success:false, msg:'Error while selling stock'})
+    }
+})
+
+// This is the API for the leaderboard and should be called whenever the
+// user inspects the rankings page. Right now, it doesn't expect any sort
+// of body--it will always default to return everyone's ranking. Later, 
+// we can enhance the body to return filtered results.
+app.get('/leaderboard', ranking, (req, res) =>{
     if (req.ranking){
         res.status(200).json({success:true, data:req.ranking})
     }
     else
     {
-        // Should never be hit because ranking returns a not
-        // found response.
-        res.send('Home Page')
+        res.status(400).json({success:false, msg:'Error while getting leaderboard'})
     }
 })
 
-app.get('/allUserPortInfo', allUserPortInfo, (req, res) =>{
+// This is the API for all portfolio information and should be called when
+// the user tries to access their portfolio page. When making this POST 
+// request, the following JSON input is expected to be passed in the req.body:
+// {
+//      "userID": (whatever user ID),
+//      "portID": (whatever portfolio ID)
+// }
+app.post('/portfolio', allUserPortInfo, (req, res) =>{
     // Assume if totalValue is there, everything is there.
     if (req.totalValue){
         res.status(200).json({success:true, coi:req.coi, totalReturnVal:req.totalReturn, stockReturns:req.stockReturn, stockHoldings:req.stockHolding,
@@ -123,9 +91,8 @@ app.get('/allUserPortInfo', allUserPortInfo, (req, res) =>{
     }
     else
     {
-        // Should never be hit because ranking returns a not
-        // found response.
-        res.send('Home Page')
+        // Either the User ID or Portfolio ID does not exist.
+        res.status(404).json({success:false, msg:'User/Portfolio Not Found'})
     }
 })
 

@@ -1,125 +1,15 @@
-const {portfolioData, currentData, usersData} = require('./testdata')
+let {portfolioData, currentData, usersData} = require('./testdata')
 
 // Each of these methods are middleware and act as wrappers for the
 // "kernel" functions below, where the actual meat of the operations
 // take place.
-const retrievePortInfo = (req, res, next) => {
-    const {userID, portID} = req.query
-
-    if (userID & portID){
-        req.retPortInfo = retrievePortInfoKernel(userID, portID)
-        next()
-    }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
-    }
-};
-
-const retrieveCurrInfo = (req, res, next) => {
-    const {userID, portID} = req.query
-
-    if (userID & portID){
-        req.retCurrInfo = retrieveCurrInfoKernel(userID, portID)
-        next()
-    }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
-    }
-};
-
-const coi = (req, res, next) => {
-    const {userID, portID} = req.query
-
-    if (userID & portID){
-        req.coi = coiKernel(userID,portID)
-        next()
-    }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
-    }
-}
-
-const totalReturn = (req, res, next) => {
-    const {userID, portID} = req.query
-
-    if (userID & portID){
-        req.totalReturn = totalReturnKernel(userID,portID)
-        next()
-    }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
-    }
-}
-
-const stockReturn = (req, res, next) => {
-    const {userID, portID} = req.query
-
-    if (userID & portID){
-        req.stockReturn = stockReturnKernel(userID,portID)
-        next()
-    }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
-    }
-}
-
-const stockHolding = (req, res, next) => {
-    const {userID, portID} = req.query
-
-    if (userID & portID){
-        req.stockHolding = stockHoldingKernel(userID,portID)
-        next()
-    }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
-    }
-}
-
-const roi = (req, res, next) => {
-    const {userID, portID} = req.query
-
-    if (userID & portID){
-        req.roi = roiKernel(userID,portID)
-        next()
-    }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
-    }
-}
-
-const totalValue = (req, res, next) => {
-    const {userID, portID} = req.query
-
-    if (userID){
-        if (portID){
-            req.totalValue = totalValueKernel(userID,portID)
-            next()
-        }
-        else
-        {
-            res.status(200).send('User and Portfolio do not exist')
-        }
-    }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
-    }
-}
-
 const ranking = (req, res, next) => {
     req.ranking = rankingKernel()
     next()
 }
 
 const allUserPortInfo = (req, res, next) => {
-    const {userID, portID} = req.query
+    const {userID,portID} = req.body
 
     if (userID){
         if (portID){
@@ -131,14 +21,51 @@ const allUserPortInfo = (req, res, next) => {
             req.totalValue = totalValueKernel(userID,portID)
             next()
         }
-        else
-        {
-            res.status(200).send('User and Portfolio do not exist')
+    }
+}
+
+const postPortfolioEntry = (req, res, next) => {
+    const {userID, portID, stockName, numOfUnits, initCost} = req.body
+    if (userID){
+        if (portID){
+            if (stockName){
+                if (numOfUnits){
+                    if (initCost){
+                        portItem = ({userID:userID, portID:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
+                        // Note that this method is pushing to the local instance of
+                        // the collection of portfolioData. It needs to be adapted to
+                        // push to MongoDB instead.
+                        portfolioData.push(portItem)
+
+                        req.totalValue = totalValueKernel(userID,portID)
+                        next()
+                    }
+                }
+            }
         }
     }
-    else
-    {
-        res.status(200).send('User and Portfolio do not exist')
+}
+
+const sellPortfolioEntry = (req, res, next) => {
+    const {userID, portID, stockName} = req.body
+    if (userID){
+        if (portID){
+            if (stockName){
+                // This is off of testData's local instance for now. It needs to be 
+                // adapted to search MongoDB instead. This should only ever return
+                // one item.
+                stockItem = portfolioData.filter((portItem) => (portItem.userID==userID && portItem.portID==portID && portItem.stockName===stockName))
+                // Get the current price. This will need to come from the hosted
+                // stock API. Again, this should only ever return one item.
+                currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
+                // Compute the sale value.
+                req.saleValue = (stockItem[0].numOfUnits * currItem[0].currentCost)
+                // Finally, remove the sold item. This is temporary here, but will
+                // be modifying MongoDB in the actual version.
+                portfolioData = portfolioData.filter((portItem) => (portItem.userID!=userID || portItem.portID!=portID || portItem.stockName!==stockName))
+                next()
+            }
+        }
     }
 }
 
@@ -337,4 +264,4 @@ function rankingKernel(){
     return rankCollection
 }
 
-module.exports = {retrievePortInfo, retrieveCurrInfo, coi, totalReturn, stockReturn, stockHolding, roi, totalValue, ranking, allUserPortInfo}
+module.exports = {ranking, allUserPortInfo, postPortfolioEntry, sellPortfolioEntry}
