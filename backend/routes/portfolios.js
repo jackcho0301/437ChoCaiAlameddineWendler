@@ -2,9 +2,9 @@ const express = require('express')
 
 const router = express.Router()
 
-const {getAllPortfolios, getPortfolio,createPortfolio,updatePortfolio,deletePortfolio,} = require('../controllers/portfolios')
+const {getRankings, getPortfolio,updatePortfolio,sellPortfolioItem,} = require('../controllers/portfolios')
 
-router.route('/').post(createPortfolio).get(getAllPortfolios)
-router.route('/:id').get(getPortfolio).delete(deletePortfolio).patch(updatePortfolio)
+router.route('/').get(getRankings)
+router.route('/:id').get(getPortfolio).delete(sellPortfolioItem).patch(updatePortfolio)
 
 module.exports = router
