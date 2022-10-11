@@ -14,6 +14,11 @@ const UserSchema = new mongoose.Schema( {
         type: String,
         required: [true, 'Please provide password'],
         minlength: 6,
+    },
+    prefPort: {
+        type: Number,
+        enum: [1,2,3,4],
+        default: 1
     }
 }, {timestamps: true})
 
