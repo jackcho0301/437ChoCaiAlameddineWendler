@@ -19,11 +19,11 @@ const getRankings = async (req, res) => {
 // the user tries to access their portfolio page. When making this POST 
 // request, the following JSON input is expected to be passed in the req.body:
 // {
-//      "userID": (whatever user ID),
 //      "portID": (whatever portfolio ID)
 // }
 const getPortfolio = async (req, res) => {
-    const {userID,portID} = req.body
+    const userID = req.params.id
+    const portID = req.body
 
     if (userID){
         if (portID){
@@ -59,7 +59,6 @@ const getPortfolio = async (req, res) => {
 // When making this POST request, the following JSON input is expected to 
 // be passed in the req.body:
 // {
-//      "userID": (whatever user ID),
 //      "portID": (whatever portfolio ID),
 //      "stockName": (whatever stock ticker name as a string),
 //      "numOfUnits": (how many units they're buying),
@@ -68,7 +67,8 @@ const getPortfolio = async (req, res) => {
 // We can adapt this later to accept whole dollar values and calculate
 // numOfUnits from that.
 const updatePortfolio = async (req, res) => {
-    const {userID, portID, stockName, numOfUnits, initCost} = req.body
+    const userID = req.params.id
+    const {portID, stockName, numOfUnits, initCost} = req.body
     if (userID){
         if (portID){
             if (stockName){
@@ -103,14 +103,14 @@ const updatePortfolio = async (req, res) => {
 // request, the following JSON input is expected to  be passed in the 
 // req.body:
 // {
-//      "userID": (whatever user ID),
 //      "portID": (whatever portfolio ID),
 //      "stockName": (whatever stock ticker name as a string)
 // }
 // We can adapt this later to accept whole dollar values and calculate
 // numOfUnits from that.
 const sellPortfolioItem = async (req, res) => {
-    const {userID, portID, stockName} = req.body
+    const userID = req.params.id
+    const {portID, stockName} = req.body
     if (userID){
         if (portID){
             if (stockName){
