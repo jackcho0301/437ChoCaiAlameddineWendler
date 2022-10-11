@@ -18,17 +18,14 @@ const getRankings = async (req, res) => {
 }
 
 // This is the API for all portfolio information and should be called when
-// the user tries to access their portfolio page. When making this POST 
-// request, the following JSON input is expected to be passed in the req.body:
-// {
-//      "portID": (whatever portfolio ID)
-// }
+// the user tries to access their portfolio page. The only parameter necessary
+// for this call should be the portfolio ID within the URL.
 const getPortfolio = async (req, res) => {
     // const userID = req.params.id
     const portID = req.params.id
     //switch portID to be req.params.id
 
-    const userID = 1
+    const userID = req.user.userId
 
     if (userID){
         if (portID){
@@ -64,7 +61,6 @@ const getPortfolio = async (req, res) => {
 // When making this POST request, the following JSON input is expected to 
 // be passed in the req.body:
 // {
-//      "portID": (whatever portfolio ID),
 //      "stockName": (whatever stock ticker name as a string),
 //      "numOfUnits": (how many units they're buying),
 //      "initCost": (initial cost of stock per share)
@@ -75,7 +71,7 @@ const updatePortfolio = async (req, res) => {
     // const userID = req.params.id
     // const {portID, stockName, numOfUnits, initCost} = req.body
 
-    const userID = 1
+    const userID = req.user.userId
     const portID = req.params.id
 
     const {stockName, numOfUnits, initCost} = req.body
@@ -114,7 +110,6 @@ const updatePortfolio = async (req, res) => {
 // request, the following JSON input is expected to  be passed in the 
 // req.body:
 // {
-//      "portID": (whatever portfolio ID),
 //      "stockName": (whatever stock ticker name as a string)
 // }
 // We can adapt this later to accept whole dollar values and calculate
@@ -123,7 +118,7 @@ const sellPortfolioItem = async (req, res) => {
     // const userID = req.params.id
     // const {portID, stockName} = req.body
 
-    const userID = 1
+    const userID = req.user.userId
     const portID = req.params.id
     const {stockName} = req.body
 
