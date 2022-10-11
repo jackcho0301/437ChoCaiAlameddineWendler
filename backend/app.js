@@ -20,6 +20,7 @@ const authenticateUser = require('./middleware/authentication');
 //routers
 const authRouter = require('./routes/auth')
 const portfoliosRouter = require('./routes/portfolios')
+const usersRouter = require('./routes/users')
 
 /*
 const store = new MongoDBSession ({
@@ -67,6 +68,7 @@ const extractUserIdMiddleware = require('./middleware/extract-userId');
 
 // routes
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/portfolios', extractUserIdMiddleware, portfoliosRouter) //authentication middleware placed 
 
 
