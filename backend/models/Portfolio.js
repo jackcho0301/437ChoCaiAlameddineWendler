@@ -25,9 +25,8 @@ const PortfolioSchema = new mongoose.Schema( {
    stockName : {
        type: String,
         required: [true, 'Please provide stock ticker name'],
-        minlength: 2,
+        minlength: 1,
         maxlength: 10,
-        unique: true,
     },
 
     numOfUnits: {

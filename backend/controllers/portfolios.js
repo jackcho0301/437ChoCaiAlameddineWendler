@@ -1,5 +1,14 @@
 let {portfolioData, currentData, usersData} = require('./testdata')
+const Portfolio = require('../models/Portfolio')
+const {StatusCodes} = require('http-status-codes')
+const {BadRequestError, UnauthenticatedError} = require('../errors');
 
+const createPortfolio = async (req, res) => {
+    req.body.userId = req.user.userId;
+    console.log(req.body)
+    const portfolio  = await Portfolio.create(req.body);
+    res.status(StatusCodes.CREATED).json({portfolio});
+}
 
 // This is the API for the leaderboard and should be called whenever the
 // user inspects the rankings page. Right now, it doesn't expect any sort
@@ -356,5 +365,5 @@ module.exports = {
     getPortfolio,
     updatePortfolio,
     sellPortfolioItem,
-
+    createPortfolio
 }
