@@ -1,5 +1,6 @@
-let {portfolioData, currentData, usersData} = require('./testdata')
+let {currentData, usersData} = require('./testdata')
 const Portfolio = require('../models/Portfolio')
+const fetch = require('node-fetch')
 const {StatusCodes} = require('http-status-codes')
 const {BadRequestError, UnauthenticatedError} = require('../errors');
 
@@ -15,8 +16,33 @@ const createPortfolio = async (req, res) => {
 // of body--it will always default to return everyone's ranking. Later, 
 // we can enhance the body to return filtered results.
 const getRankings = async (req, res) => {
+    const portfolioInfo = await Portfolio.find();
 
-    req.ranking = rankingKernel()
+    let currInfo = []
+
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
+    currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
+
+    //REPLACE THE LINE ABOVE WITH THIS CODE WHEN READY
+    // // Assemble the list of stock names.
+    // let portStockNames = []
+    // portInfo.foreach(portItem => portStockNames.push(portItem.stockName))
+
+    // // Create a string for the API call.
+    // const portStockString = portStockNames.join()
+
+    // // API Call
+    // const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=<YOURAPIKEY>`)
+    // const prices = await twelveDataRes.json()
+
+    // // This assumes that prices are returned in order...need to test.
+    // const portStockNamesLength = portStockNames.length
+    // for (let i = 0; i < portStockNamesLength; i++){
+    //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
+    //     currInfo.push(currItem)
+    // }
+
+    req.ranking = rankingKernel(portfolioInfo, currInfo)
     if (req.ranking){
         res.status(200).json({success:true, data:req.ranking})
     }
@@ -30,6 +56,32 @@ const getRankings = async (req, res) => {
 // the user tries to access their portfolio page. The only parameter necessary
 // for this call should be the portfolio ID within the URL.
 const getPortfolio = async (req, res) => {
+    const portfolioInfo = await Portfolio.find();
+
+    let currInfo = []
+
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
+    currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
+
+    //REPLACE THE LINE ABOVE WITH THIS CODE WHEN READY
+    // // Assemble the list of stock names.
+    // let portStockNames = []
+    // portInfo.foreach(portItem => portStockNames.push(portItem.stockName))
+
+    // // Create a string for the API call.
+    // const portStockString = portStockNames.join()
+
+    // // API Call
+    // const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=<YOURAPIKEY>`)
+    // const prices = await twelveDataRes.json()
+
+    // // This assumes that prices are returned in order...need to test.
+    // const portStockNamesLength = portStockNames.length
+    // for (let i = 0; i < portStockNamesLength; i++){
+    //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
+    //     currInfo.push(currItem)
+    // }
+
     // const userID = req.params.id
     const portID = req.params.id
     //switch portID to be req.params.id
@@ -38,12 +90,12 @@ const getPortfolio = async (req, res) => {
 
     if (userID){
         if (portID){
-            req.coi = coiKernel(userID,portID)
-            req.totalReturn = totalReturnKernel(userID,portID)
-            req.stockReturn = stockReturnKernel(userID,portID)
-            req.stockHolding = stockHoldingKernel(userID,portID)
-            req.roi = roiKernel(userID,portID)
-            req.totalValue = totalValueKernel(userID,portID)
+            req.coi = coiKernel(userID,portID,portfolioInfo)
+            req.totalReturn = totalReturnKernel(userID,portID,portfolioInfo,currInfo)
+            req.stockReturn = stockReturnKernel(userID,portID,portfolioInfo,currInfo)
+            req.stockHolding = stockHoldingKernel(userID,portID,portfolioInfo,currInfo)
+            req.roi = roiKernel(userID,portID,portfolioInfo,currInfo)
+            req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
         }
     }
 
@@ -79,6 +131,31 @@ const getPortfolio = async (req, res) => {
 const updatePortfolio = async (req, res) => {
     // const userID = req.params.id
     // const {portID, stockName, numOfUnits, initCost} = req.body
+    const portfolioInfo = await Portfolio.find()
+
+    let currInfo = []
+
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
+    currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
+
+    //REPLACE THE LINE ABOVE WITH THIS CODE WHEN READY
+    // // Assemble the list of stock names.
+    // let portStockNames = []
+    // portInfo.foreach(portItem => portStockNames.push(portItem.stockName))
+
+    // // Create a string for the API call.
+    // const portStockString = portStockNames.join()
+
+    // // API Call
+    // const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=<YOURAPIKEY>`)
+    // const prices = await twelveDataRes.json()
+
+    // // This assumes that prices are returned in order...need to test.
+    // const portStockNamesLength = portStockNames.length
+    // for (let i = 0; i < portStockNamesLength; i++){
+    //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
+    //     currInfo.push(currItem)
+    // }
 
     const userID = req.user.userId
     const portID = req.params.id
@@ -94,9 +171,9 @@ const updatePortfolio = async (req, res) => {
                         // Note that this method is pushing to the local instance of
                         // the collection of portfolioData. It needs to be adapted to
                         // push to MongoDB instead.
-                        portfolioData.push(portItem)
+                        await Portfolio.save(portItem);
 
-                        req.totalValue = totalValueKernel(userID,portID)
+                        req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
                     }
                 }
             }
@@ -131,6 +208,31 @@ const sellPortfolioItem = async (req, res) => {
     const portID = req.params.id
     const {stockName} = req.body
 
+    const portfolioInfo = await Portfolio.find()
+
+    let currInfo = []
+
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
+    currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
+
+    //REPLACE THE LINE ABOVE WITH THIS CODE WHEN READY
+    // // Assemble the list of stock names.
+    // let portStockNames = []
+    // portInfo.foreach(portItem => portStockNames.push(portItem.stockName))
+
+    // // Create a string for the API call.
+    // const portStockString = portStockNames.join()
+
+    // // API Call
+    // const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=<YOURAPIKEY>`)
+    // const prices = await twelveDataRes.json()
+
+    // // This assumes that prices are returned in order...need to test.
+    // const portStockNamesLength = portStockNames.length
+    // for (let i = 0; i < portStockNamesLength; i++){
+    //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
+    //     currInfo.push(currItem)
+    // }
 
     if (userID){
         if (portID){
@@ -138,15 +240,18 @@ const sellPortfolioItem = async (req, res) => {
                 // This is off of testData's local instance for now. It needs to be 
                 // adapted to search MongoDB instead. This should only ever return
                 // one item.
-                stockItem = portfolioData.filter((portItem) => (portItem.userID==userID && portItem.portID==portID && portItem.stockName===stockName))
+                stockItem = portfolioInfo.filter((portItem) => (portItem.userID==userID && portItem.portID==portID && portItem.stockName===stockName))
                 // Get the current price. This will need to come from the hosted
                 // stock API. Again, this should only ever return one item.
-                currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
+                const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${stockItem[0].stockName}&apikey=<YOURAPIKEY>`)
+                const priceItem = await twelveDataRes.json()
+                //currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
                 // Compute the sale value.
-                req.saleValue = (stockItem[0].numOfUnits * currItem[0].currentCost)
+                req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
                 // Finally, remove the sold item. This is temporary here, but will
                 // be modifying MongoDB in the actual version.
-                portfolioData = portfolioData.filter((portItem) => (portItem.userID!=userID || portItem.portID!=portID || portItem.stockName!==stockName))
+                //portfolioData = portfolioData.filter((portItem) => (portItem.userID!=userID || portItem.portID!=portID || portItem.stockName!==stockName))
+                await Portfolio.deleteOne({userId: stockItem[0].userID, portId: stockItem[0].portID, stockName: stockItem[0].stockName})
             }
         }
     }
@@ -167,8 +272,9 @@ const sellPortfolioItem = async (req, res) => {
 // portfolio. "stockName" is the ticker string of the stock. "numOfUnits" is the 
 // number of stocks that they own of that stock. "initCost" represents the price
 // they initially paid for that stock.
-function retrievePortInfoKernel(userID, portID){
-    let portInfo = [...portfolioData]
+function retrievePortInfoKernel(userID, portID, portfolioInfo){
+    req.body.userId = req.user.userId;
+    let portInfo  = portfolioInfo;
 
     portInfo = portInfo.filter((infoItem) => {
         if ((Number(infoItem.userID) === Number(userID)) & (Number(infoItem.portID) === Number(portID))){
@@ -180,15 +286,34 @@ function retrievePortInfoKernel(userID, portID){
     return portInfo
 }
 
+// NOTE: This method is retained only for reference now.
 // This method will retrieve the current info based on an individual user/
 // portfolio combination, represented by integer IDs. It does not actually return
 // anything from the portfolio directly. Rather, it takes the stockName values
 // from the user's portfolio, accesses the same name from the stock API (ideally),
 // and returns the current price.
-function retrieveCurrInfoKernel(userID, portID){
+function retrieveCurrInfoKernel(userID, portID, portfolioInfo){
     let currInfo = [...currentData]
 
-    const portInfo = retrievePortInfoKernel(userID, portID)
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
+
+    // // Assemble the list of stock names.
+    // let portStockNames = []
+    // portInfo.foreach(portItem => portStockNames.push(portItem.stockName))
+
+    // // Create a string for the API call.
+    // const portStockString = portStockNames.join()
+
+    // API Call
+    //const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=<YOURAPIKEY>`)
+    //const prices = await twelveDataRes.json()
+
+    // This assumes that prices are returned in order...need to test.
+    // const portStockNamesLength = portStockNames.length
+    // for (let i = 0; i < portStockNamesLength; i++){
+    //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
+    //     currInfo.push(currItem)
+    // }
 
     currInfo = currInfo.filter((infoItem) => {
         for (pI of portInfo){
@@ -204,8 +329,8 @@ function retrieveCurrInfoKernel(userID, portID){
 // This method will return the overall initial initial cost of investment
 // of their purchases. Ideally, if we are giving everyone the same 
 // starting amount of money, this will always be the same value.
-function coiKernel(userID, portID){
-    const portInfo = retrievePortInfoKernel(userID, portID)
+function coiKernel(userID, portID, portfolioInfo){
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
 
     let costOfInvestment = 0
 
@@ -221,10 +346,9 @@ function coiKernel(userID, portID){
 // user's portfolio; i.e. how much money they have gained or lost
 // on this portfolio. Keep in mind this value can be negative if 
 // too many stocks lost value.
-function totalReturnKernel(userID, portID){
-    const coi = coiKernel(userID, portID)
-    const portInfo = retrievePortInfoKernel(userID, portID)
-    const currInfo = retrieveCurrInfoKernel(userID, portID)
+function totalReturnKernel(userID, portID, portfolioInfo, currInfo){
+    const coi = coiKernel(userID, portID, portfolioInfo)
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
 
     // Set the initial value.
     let initialValue = coi
@@ -250,9 +374,9 @@ function totalReturnKernel(userID, portID){
 // This method will return the individual value of each stock the
 // user currently owns in a particular portfolio. It is designed to
 // be used with generating that pie chart on that one window.
-function stockReturnKernel(userID, portID){
-    const portInfo = retrievePortInfoKernel(userID, portID)
-    const currInfo = retrieveCurrInfoKernel(userID, portID)
+function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
+    //const currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
 
     let returnCollection = []
     for (pI of portInfo){
@@ -274,9 +398,8 @@ function stockReturnKernel(userID, portID){
 // This method will return the individual holding of each stock the
 // user currently owns in a particular portfolio. It is designed to 
 // be used with generating that pie chart on that one window.
-function stockHoldingKernel(userID, portID){
-    const portInfo = retrievePortInfoKernel(userID, portID)
-    const currInfo = retrieveCurrInfoKernel(userID, portID)
+function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
 
     // Get the current value.
     let currentValue = 0
@@ -311,9 +434,9 @@ function stockHoldingKernel(userID, portID){
 
 // This method returns the overall ROI for a given user's portfolio as
 // a percentage.
-function roiKernel(userID, portID){
-    const totalReturnValue = Number(totalReturnKernel(userID, portID))
-    const coiValue = Number(coiKernel(userID, portID))
+function roiKernel(userID, portID, portfolioInfo, currInfo){
+    const totalReturnValue = Number(totalReturnKernel(userID, portID, portfolioInfo, currInfo))
+    const coiValue = Number(coiKernel(userID, portID, portfolioInfo))
 
     // Calculate as a percentage
     roiValue = ((totalReturnValue/coiValue) * 100)
@@ -324,8 +447,8 @@ function roiKernel(userID, portID){
 // This method returns the total monetary value of a portfolio, and is
 // the primary measure by which we will score users as it should be 
 // guaranteed to be non-negative.
-function totalValueKernel(userID, portID){
-    const stockReturn = stockReturnKernel(userID, portID)
+function totalValueKernel(userID, portID, portfolioInfo, currInfo){
+    const stockReturn = stockReturnKernel(userID, portID, portfolioInfo, currInfo)
 
     let sumValue = 0
     for (returnItem of stockReturn){
@@ -340,12 +463,12 @@ function totalValueKernel(userID, portID){
 // after the MVP. It simply grabs all the users, scores them, and then 
 // returns their names and scores pre-sorted in descending order. It should
 // be all the front end needs to build the leaderboard.
-function rankingKernel(){
+function rankingKernel(portfolioInfo, currInfo){
     let rankCollection = []
 
     for (user of usersData)
     {
-        totalValueScore = totalValueKernel(user.userID, user.prefPort)
+        totalValueScore = totalValueKernel(user.userID, user.prefPort, portfolioInfo, currInfo)
         rankItem = ({userName:user.userName,score:totalValueScore})
         rankCollection.push(rankItem)
     }
