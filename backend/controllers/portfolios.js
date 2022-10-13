@@ -1,5 +1,6 @@
 let {currentData, usersData} = require('./testdata')
 const Portfolio = require('../models/Portfolio')
+const User = require('../models/User')
 const fetch = require('node-fetch')
 const {StatusCodes} = require('http-status-codes')
 const {BadRequestError, UnauthenticatedError} = require('../errors');
@@ -17,11 +18,20 @@ const createPortfolio = async (req, res) => {
 // we can enhance the body to return filtered results.
 const getRankings = async (req, res) => {
     const portfolioInfo = await Portfolio.find();
+    const userInfo = await User.find();
 
-    let currInfo = []
+    let rankCollection = []
 
-    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
-    currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
+    for (var i = 0; i < userInfo.length; i++)
+    {
+        let currInfo = []
+
+        let portInfo = retrievePortInfoKernel(userInfo[i]._id, 1, portfolioInfo)
+        currInfo = retrieveCurrInfoKernel(userInfo[i]._id, 1, portfolioInfo)
+
+        totalValueScore = totalValueKernel(userInfo[i]._id, 1, portfolioInfo, currInfo)
+        rankItem = ({userName:userInfo[i].username,score:totalValueScore})
+        rankCollection.push(rankItem)
 
     //REPLACE THE LINE ABOVE WITH THIS CODE WHEN READY
     // // Assemble the list of stock names.
@@ -41,10 +51,11 @@ const getRankings = async (req, res) => {
     //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
     //     currInfo.push(currItem)
     // }
-
-    req.ranking = rankingKernel(portfolioInfo, currInfo)
-    if (req.ranking){
-        res.status(200).json({success:true, data:req.ranking})
+    }
+    
+    if (rankCollection){
+        rankCollection.sort((a,b) => b.score - a.score)
+        res.status(200).json({success:true, data:rankCollection})
     }
     else
     {
@@ -58,6 +69,12 @@ const getRankings = async (req, res) => {
 const getPortfolio = async (req, res) => {
     const portfolioInfo = await Portfolio.find();
 
+    // const userID = req.params.id
+    const portID = req.params.id
+    //switch portID to be req.params.id
+
+    const userID = req.user.userId
+
     let currInfo = []
 
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
@@ -81,12 +98,6 @@ const getPortfolio = async (req, res) => {
     //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
     //     currInfo.push(currItem)
     // }
-
-    // const userID = req.params.id
-    const portID = req.params.id
-    //switch portID to be req.params.id
-
-    const userID = req.user.userId
 
     if (userID){
         if (portID){
@@ -131,7 +142,10 @@ const getPortfolio = async (req, res) => {
 const updatePortfolio = async (req, res) => {
     // const userID = req.params.id
     // const {portID, stockName, numOfUnits, initCost} = req.body
-    const portfolioInfo = await Portfolio.find()
+    let portfolioInfo = await Portfolio.find()
+
+    const userID = req.user.userId
+    const portID = req.params.id
 
     let currInfo = []
 
@@ -157,9 +171,6 @@ const updatePortfolio = async (req, res) => {
     //     currInfo.push(currItem)
     // }
 
-    const userID = req.user.userId
-    const portID = req.params.id
-
     const {stockName, numOfUnits, initCost} = req.body
 
     if (userID){
@@ -167,12 +178,15 @@ const updatePortfolio = async (req, res) => {
             if (stockName){
                 if (numOfUnits){
                     if (initCost){
-                        portItem = ({userID:userID, portID:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
+                        portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
                         // Note that this method is pushing to the local instance of
                         // the collection of portfolioData. It needs to be adapted to
                         // push to MongoDB instead.
-                        await Portfolio.save(portItem);
-
+                        await Portfolio.create(portItem);
+                        
+                        // portfolioInfo and currInfo is now stale...reload here.
+                        portfolioInfo = await Portfolio.find()
+                        currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
                         req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
                     }
                 }
@@ -240,18 +254,19 @@ const sellPortfolioItem = async (req, res) => {
                 // This is off of testData's local instance for now. It needs to be 
                 // adapted to search MongoDB instead. This should only ever return
                 // one item.
-                stockItem = portfolioInfo.filter((portItem) => (portItem.userID==userID && portItem.portID==portID && portItem.stockName===stockName))
+                stockItem = portfolioInfo.filter((portItem) => (String(portItem.userId)===String(userID) && Number(portItem.portId)==Number(portID) && String(portItem.stockName)===String(stockName)))
                 // Get the current price. This will need to come from the hosted
                 // stock API. Again, this should only ever return one item.
-                const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${stockItem[0].stockName}&apikey=<YOURAPIKEY>`)
-                const priceItem = await twelveDataRes.json()
-                //currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
+                //const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${stockItem[0].stockName}&apikey=<YOURAPIKEY>`)
+                //const priceItem = await twelveDataRes.json()
+                currItem = currInfo.filter((infoItem) => (infoItem.stockName===stockName))
                 // Compute the sale value.
-                req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
+                //req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
+                req.saleValue = (stockItem[0].numOfUnits * Number(currItem[0].currentCost))
                 // Finally, remove the sold item. This is temporary here, but will
                 // be modifying MongoDB in the actual version.
                 //portfolioData = portfolioData.filter((portItem) => (portItem.userID!=userID || portItem.portID!=portID || portItem.stockName!==stockName))
-                await Portfolio.deleteOne({userId: stockItem[0].userID, portId: stockItem[0].portID, stockName: stockItem[0].stockName})
+                await Portfolio.deleteOne({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: stockItem[0].stockName})
             }
         }
     }
@@ -273,11 +288,10 @@ const sellPortfolioItem = async (req, res) => {
 // number of stocks that they own of that stock. "initCost" represents the price
 // they initially paid for that stock.
 function retrievePortInfoKernel(userID, portID, portfolioInfo){
-    req.body.userId = req.user.userId;
     let portInfo  = portfolioInfo;
 
     portInfo = portInfo.filter((infoItem) => {
-        if ((Number(infoItem.userID) === Number(userID)) & (Number(infoItem.portID) === Number(portID))){
+        if ((String(infoItem.userId) === String(userID)) & (Number(infoItem.portId) == Number(portID))){
             const {stockName, numOfUnits, initCost} = infoItem
             return {stockName, numOfUnits, initCost}
         }
@@ -458,16 +472,19 @@ function totalValueKernel(userID, portID, portfolioInfo, currInfo){
     return sumValue
 }
 
+// NOTE: This is only being retained for reference.
 // This is the main method for calculating the leaderboard without any
 // "bells and whistles", although it can be enhanced later for that purpose
 // after the MVP. It simply grabs all the users, scores them, and then 
 // returns their names and scores pre-sorted in descending order. It should
 // be all the front end needs to build the leaderboard.
-function rankingKernel(portfolioInfo, currInfo){
+function rankingKernel(portfolioInfo, currInfo, userInfo){
     let rankCollection = []
+    console.log(userInfo)
 
-    for (user of usersData)
+    for (user of userInfo)
     {
+        console.log(user)
         totalValueScore = totalValueKernel(user.userID, user.prefPort, portfolioInfo, currInfo)
         rankItem = ({userName:user.userName,score:totalValueScore})
         rankCollection.push(rankItem)
