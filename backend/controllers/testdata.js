@@ -60,27 +60,111 @@ const portfolioData = [
 const currentData = [
     {
         stockName: 'TSLA',
-        currentCost: 240.40
+        currentCost: 200.00
     },
     {
         stockName: 'AAPL',
-        currentCost: 142.45
+        currentCost: 150.00
     },
     {
         stockName: 'MSFT',
-        currentCost: 240.74
+        currentCost: 250.00
     },
     {
         stockName: 'NVDA',
-        currentCost: 125.12
+        currentCost: 150.00
     },
     {
         stockName: 'F',
-        currentCost: 12.51
+        currentCost: 10.00
     },
     {
         stockName: 'TWTR',
-        currentCost: 51.30
+        currentCost: 50.00
+    },
+    {
+        stockName: 'AMZN',
+        currentCost: 20.00
+    },
+    {
+        stockName: 'GOOGL',
+        currentCost: 30.00
+    },
+    {
+        stockName: 'GOOG',
+        currentCost: 40.00
+    },
+    {
+        stockName: 'BRK.B',
+        currentCost: 50.00
+    },
+    {
+        stockName: 'UNH',
+        currentCost: 60.00
+    },
+    {
+        stockName: 'JNJ',
+        currentCost: 70.00
+    },
+    {
+        stockName: 'XOM',
+        currentCost: 80.00
+    },
+    {
+        stockName: 'JPM',
+        currentCost: 90.00
+    },
+    {
+        stockName: 'META',
+        currentCost: 100.00
+    },
+    {
+        stockName: 'V',
+        currentCost: 110.00
+    },
+    {
+        stockName: 'PG',
+        currentCost: 120.00
+    },
+    {
+        stockName: 'HD',
+        currentCost: 130.00
+    },
+    {
+        stockName: 'CVX',
+        currentCost: 140.00
+    },
+    {
+        stockName: 'LLY',
+        currentCost: 160.00
+    },
+    {
+        stockName: 'MA',
+        currentCost: 170.00
+    },
+    {
+        stockName: 'ABBV',
+        currentCost: 180.00
+    },
+    {
+        stockName: 'PFE',
+        currentCost: 190.00
+    },
+    {
+        stockName: 'MRK',
+        currentCost: 210.00
+    },
+    {
+        stockName: 'PEP',
+        currentCost: 220.00
+    },
+    {
+        stockName: 'BAC',
+        currentCost: 230.00
+    },
+    {
+        stockName: 'KO',
+        currentCost: 240.00
     }
 ]
 
