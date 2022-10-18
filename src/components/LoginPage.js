@@ -8,7 +8,7 @@ export default function LoginPage(props) {
 
     return (
         <div id='login-page'>
-            <h1>Market Simulator</h1>
+            <h1 className='login-title'>Lord of Stonks</h1>
             <div id='login-page-form-div'>
                 <Grid
                     container
@@ -89,6 +89,8 @@ export default function LoginPage(props) {
                 >
                     {!isRegisterSelected ? 'Sign In' : 'Register'}
                 </Button>
+                {isRegisterSelected ||
+                <a href='' id='forgot-password'>Forgot Password?</a>}
             </div>
         </div>
     )

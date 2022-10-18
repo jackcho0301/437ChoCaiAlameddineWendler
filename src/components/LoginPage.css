@@ -47,3 +47,18 @@
 #login-chart-icon-container {
 
 }
+
+#forgot-password {
+    color: #0000EE !important;
+    text-decoration: none;
+    margin-top: 1vh;
+    margin-right: auto;
+    margin-left: 0.2vw;
+}
+
+.login-title {
+    font-size: 3.5vw;
+    text-transform: uppercase;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: black;
+}

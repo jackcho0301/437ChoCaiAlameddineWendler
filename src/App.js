@@ -3,6 +3,11 @@ import React, { useState, useEffect } from 'react'
 import Header from './components/Header'
 import PAGES from './config/pages.json'
 import LoginPage from './components/LoginPage'
+import LeaderboardPage from './components/LeaderboardPage'
+import HomePage from './components/HomePage'
+import MyRankPage from './components/MyRankPage'
+import PortfolioPage from './components/PortfolioPage'
+import HelpPage from './components/HelpPage'
 import Swal from 'sweetalert2'
 import './Swal.css'
 
@@ -45,14 +50,17 @@ function App() {
           <Header
             pageState={pageState}
             setPage={setPageActive} />
+          <div className='divide-10'/>
           {pageState.home.active &&
-            <h1>Home</h1>}
+            <HomePage/>}
           {pageState.portfolio.active &&
-            <h1>My Portfolio</h1>}
+            <PortfolioPage/>}
           {pageState.ranking.active &&
-            <h1>My Ranking</h1>}
+            <MyRankPage/>}
           {pageState.leaderboard.active &&
-            <h1>Leaderboard</h1>}
+            <LeaderboardPage/>}
+          {pageState.help.active &&
+            <HelpPage/>}
         </div>
       )
     }

@@ -1,0 +1,122 @@
+/* h1 {
+    color: white;
+    font-size: 45px
+} */
+
+table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table td {
+    border: 1px solid black;
+    padding: 5px;
+}
+
+.rank-header {
+  color: black;
+  font-size: 27px;
+  font-weight: bold;
+}
+.data:first-child {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+
+/* Custom */
+
+table td {
+  padding: 10px;
+}
+
+#leaderboard-wrapper {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.sub-leaderboard-wrapper {
+  display: flex !important;
+  justify-content: center;
+  padding-top: 1vh;
+  
+}
+
+.leaderboard-next-button {
+  margin-left: auto;
+  /* margin-right: 0; */
+  align-items: center;
+  width: 10vw;
+}
+
+.leaderboard-prev-button {
+  margin-right: auto;
+  width: 10vw;  
+}
+
+.sub-leaderboard-wrapper p {
+  margin: auto;
+  color: #0000EE;
+  text-decoration: underline;
+}
+
+#lBoard {
+  width: 100vw;
+}
+
+form {
+  float: l
+}
+
+.rank-header {
+  font-weight: 750;
+}
+
+:not(.rank-header) {
+  font-weight: bold;
+} 
+
+.rank {
+  font-weight: 500;
+}
+
+.name {
+  font-weight: 750;
+}
+
+.score {
+  font-weight: 750;
+}
+
+#forgot-password 
+
+/* table style */
+table {
+  /* border: 2px solid #000000; */
+  background-color: white;
+}
+table td, table th {
+  border: 1px solid #4A4A4A;
+  padding: 20px;
+}
+table tbody td {
+  font-size: 24px;
+  color: black;
+}
+table tr:nth-child(even) {
+  background: rgb(85,150,255);
+}
+table thead {
+  background: #000000;
+  border-bottom: 3px solid #000000;
+}
+table thead th {
+  font-size: 50px;
+  font-weight: bold;
+  color: #E6E6E6;
+  text-align: center;
+  border-left: 2px solid #4A4A4A;
+}
+table thead th:first-child {
+  border-left: none;
+}
