@@ -14,5 +14,9 @@
     "leaderboard": {
         "text": "Top Earners",
         "active": false
+    },
+    "help": {
+        "text": "FAQs",
+        "active": false
     }
 }
