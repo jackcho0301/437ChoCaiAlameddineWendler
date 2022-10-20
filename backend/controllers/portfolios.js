@@ -270,6 +270,7 @@ const sellPortfolioItem = async (req, res) => {
     const portfolioInfo = await Portfolio.find()
 
     let currInfo = []
+    let saleValue = 0
 
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
     currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
@@ -300,24 +301,27 @@ const sellPortfolioItem = async (req, res) => {
                 // adapted to search MongoDB instead. This should only ever return
                 // one item.
                 stockItem = portfolioInfo.filter((portItem) => (String(portItem.userId)===String(userID) && Number(portItem.portId)==Number(portID) && String(portItem.stockName)===String(stockName)))
-                // Get the current price. This will need to come from the hosted
-                // stock API. Again, this should only ever return one item.
-                //const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${stockItem[0].stockName}&apikey=<YOURAPIKEY>`)
-                //const priceItem = await twelveDataRes.json()
-                currItem = currInfo.filter((infoItem) => (infoItem.stockName===stockName))
-                // Compute the sale value.
-                //req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
-                req.saleValue = (stockItem[0].numOfUnits * Number(currItem[0].currentCost))
-                // Finally, remove the sold item. This is temporary here, but will
-                // be modifying MongoDB in the actual version.
-                //portfolioData = portfolioData.filter((portItem) => (portItem.userID!=userID || portItem.portID!=portID || portItem.stockName!==stockName))
-                await Portfolio.deleteOne({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: stockItem[0].stockName})
+                // If we return nothing, the item doesn't exist so don't try and sell.
+                if (stockItem.length > 0){
+                    // Get the current price. This will need to come from the hosted
+                    // stock API. Again, this should only ever return one item.
+                    //const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${stockItem[0].stockName}&apikey=<YOURAPIKEY>`)
+                    //const priceItem = await twelveDataRes.json()
+                    currItem = currInfo.filter((infoItem) => (infoItem.stockName===stockName))
+                    // Compute the sale value.
+                    //req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
+                    saleValue = (stockItem[0].numOfUnits * Number(currItem[0].currentCost))
+                    // Finally, remove the sold item. This is temporary here, but will
+                    // be modifying MongoDB in the actual version.
+                    //portfolioData = portfolioData.filter((portItem) => (portItem.userID!=userID || portItem.portID!=portID || portItem.stockName!==stockName))
+                    await Portfolio.deleteOne({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: stockItem[0].stockName})
+                }
             }
         }
     }
     
-    if (req.saleValue){
-        res.status(200).json({success:true, data:req.saleValue})
+    if (saleValue){
+        res.status(200).json({success:true, data:saleValue})
     }
     else
     {
