@@ -165,6 +165,10 @@ const currentData = [
     {
         stockName: 'KO',
         currentCost: 240.00
+    },
+    {
+        stockName: 'dollars',
+        currentCost: 1.00
     }
 ]
 
