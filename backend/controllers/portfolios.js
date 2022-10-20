@@ -5,11 +5,29 @@ const fetch = require('node-fetch')
 const {StatusCodes} = require('http-status-codes')
 const {BadRequestError, UnauthenticatedError} = require('../errors');
 
+// Upon calling this API, a new entry will be inserted in portfolios
+// for a special stock called "dollars" along with the default
+// startingMoney amount.
 const createPortfolio = async (req, res) => {
-    req.body.userId = req.user.userId;
-    console.log(req.body)
-    const portfolio  = await Portfolio.create(req.body);
-    res.status(StatusCodes.CREATED).json({portfolio});
+    const startingMoney = 10000
+    const userID = req.user.userId;
+    // Default for now
+    const portID = 1 
+    
+    // First verify that the user has not already created max portfolios
+    const portfolioInfo = await Portfolio.find()
+    const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
+    if (portInfo.length > 0) {
+        // Note that this only checks for one portfolio. It needs to check for 4.
+        res.status(400).json({success:false, msg:'You are already at max number of portfolios.'})
+    }
+    else
+    {
+        // Make a new portfolio entry for "dollars".
+        portItem = ({userId:userID, portId:portID, stockName:"dollars", numOfUnits:startingMoney, initCost:1})
+        const portfolio = await Portfolio.create(portItem);
+        res.status(StatusCodes.CREATED).json({portfolio});
+    }
 }
 
 // This is the API for the leaderboard and should be called whenever the
@@ -140,6 +158,8 @@ const getPortfolio = async (req, res) => {
 // We can adapt this later to accept whole dollar values and calculate
 // numOfUnits from that.
 const updatePortfolio = async (req, res) => {
+    let stockDoesntExist = false
+    let alreadyPurchased = false
     // const userID = req.params.id
     // const {portID, stockName, numOfUnits, initCost} = req.body
     let portfolioInfo = await Portfolio.find()
@@ -178,16 +198,35 @@ const updatePortfolio = async (req, res) => {
             if (stockName){
                 if (numOfUnits){
                     if (initCost){
-                        portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
-                        // Note that this method is pushing to the local instance of
-                        // the collection of portfolioData. It needs to be adapted to
-                        // push to MongoDB instead.
-                        await Portfolio.create(portItem);
+                        // First see if this stock exists. Note this will have to be checked
+                        // against the TwelveData API or cache later.
+                        currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
+                        if (currItem.length == 0){
+                            stockDoesntExist = true
+                        }
+                        else {
+                            // Next check if the user already owns this stock. Implicit in this
+                            // is an "all or nothing" approach, in which a user may only sell or
+                            // purchase batches of one stock at at time.
+                            alreadyPurchased = await Portfolio.exists({userId:userID, portId:portID, stockName:stockName})
+                            if (alreadyPurchased){
+                                // Do nothing...exit the if statement
+                            }
+                            else{
+                                // Finally, before allowing the purchase to go through, verify
+                                // the user has the funds for it...
+                                portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
+                                // Note that this method is pushing to the local instance of
+                                // the collection of portfolioData. It needs to be adapted to
+                                // push to MongoDB instead.
+                                await Portfolio.create(portItem);
                         
-                        // portfolioInfo and currInfo is now stale...reload here.
-                        portfolioInfo = await Portfolio.find()
-                        currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
-                        req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
+                                // portfolioInfo and currInfo is now stale...reload here.
+                                portfolioInfo = await Portfolio.find()
+                                currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
+                                req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
+                            }
+                        }
                     }
                 }
             }
@@ -196,6 +235,12 @@ const updatePortfolio = async (req, res) => {
 
     if (req.totalValue){
         res.status(200).json({success:true, data:req.totalValue})
+    }
+    else if (stockDoesntExist){
+        res.status(400).json({success:false, msg:'The requested stock does not exist.'})
+    }
+    else if (alreadyPurchased){
+        res.status(400).json({success:false, msg:'You already own this stock. You must sell first.'})
     }
     else
     {
