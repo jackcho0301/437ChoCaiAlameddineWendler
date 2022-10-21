@@ -10,14 +10,20 @@ import PortfolioPage from './components/PortfolioPage'
 import HelpPage from './components/HelpPage'
 import Swal from 'sweetalert2'
 import './Swal.css'
+import { UserContext } from "./context/User"
+import { login } from "./context/Events"
+
 
 const DEBUG = {
   pageState: false
 }
 
+
+
 function App() {
   const [pageState, setPageState] = useState(PAGES)
-  const [loggedIn, setLoggedIn] = useState(false) //TODO: convert this to usercontext!
+  const [user, modifyUser] = React.useContext(UserContext)
+
 
   useEffect(() => {
     DEBUG.pageState && console.log(pageState)
@@ -32,19 +38,22 @@ function App() {
     setPageState(newPageState)
   }
 
-  const setUserLoggedIn = () => {
-    setLoggedIn(true)
-    Swal.fire({
-      title: 'Logged in!',
-      icon: 'success',
-      iconColor: 'rgb(0, 207, 0)',
-      showConfirmButton: false,
-      timer: 1000
-    })
+  const setUserLoggedIn = (username, password) => {
+    modifyUser({type: "login", value: true})
+    modifyUser({type: "username", value: username})
+    login(username, password)
+  }
+
+  const isCookie = cookie => {
+    return document.cookie.match(`/^(.*;)?\s*${cookie}\s*=\s*[^;]+(.*)?$/`)
   }
 
   const pageContent = () => {
-    if (loggedIn) {
+    if (document.cookie.match(`/^(.*;)?\s*437_auth_session\s*=\s*[^;]+(.*)?$/`)) {
+      ; //login user automatically if already logged in. need to know how to decode cookie to do this so not sure how we can implement this functionality
+    }
+
+    if (user.loggedIn) {
       return (
         <div id='page-content'>
           <Header
@@ -65,7 +74,7 @@ function App() {
       )
     }
     else {
-      return <LoginPage setLoggedIn={setUserLoggedIn} />
+      return <LoginPage setUserLoggedIn={setUserLoggedIn}/>
     }
   }
 

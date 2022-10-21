@@ -8,3 +8,9 @@
     
 }
 
+.refresh-scores {
+    position: fixed !important;
+    top: 3vh;
+    right: 10vw;
+    z-index: 10000000;
+}

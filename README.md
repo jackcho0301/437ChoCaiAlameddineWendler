@@ -1,8 +1,11 @@
 ## Getting Started
 
-To run this app, please use the following commands:
+To run this app, please run
 ```
-cd finance-game
-npm install
-npm start
+bash start.sh
+```
+
+To stop it, please run
+```
+bash stop.sh
 ```
