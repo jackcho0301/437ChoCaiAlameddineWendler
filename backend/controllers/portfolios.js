@@ -260,66 +260,71 @@ const updatePortfolio = async (req, res) => {
 // We can adapt this later to accept whole dollar values and calculate
 // numOfUnits from that.
 const sellPortfolioItem = async (req, res) => {
-    // const userID = req.params.id
-    // const {portID, stockName} = req.body
-
     const userID = req.user.userId
     const portID = req.params.id
     const {stockName} = req.body
-
+    
     const portfolioInfo = await Portfolio.find()
-
+    
     let currInfo = []
     let saleValue = 0
-
+    
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
-    currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
 
-    //REPLACE THE LINE ABOVE WITH THIS CODE WHEN READY
-    // // Assemble the list of stock names.
-    // let portStockNames = []
-    // portInfo.foreach(portItem => portStockNames.push(portItem.stockName))
-
-    // // Create a string for the API call.
-    // const portStockString = portStockNames.join()
-
-    // // API Call
-    // const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=<YOURAPIKEY>`)
-    // const prices = await twelveDataRes.json()
-
-    // // This assumes that prices are returned in order...need to test.
-    // const portStockNamesLength = portStockNames.length
-    // for (let i = 0; i < portStockNamesLength; i++){
-    //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
-    //     currInfo.push(currItem)
-    // }
+    // Assemble the list of stock names.
+    let portStockNames = []
+    for (portItem of portInfo){
+        portStockNames.push(portItem.stockName)
+    }
+    
+    // Remove the dollars.
+    portStockNames = portStockNames.filter(function(name) {
+        return name !== 'dollars';
+    });
+    
+    // Create a string for the API call.
+    const portStockString = portStockNames.join()
+    
+    // API Call
+    let pricesArray = []
+    const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=fa8559d1144748a086f5f8db3b6a54ff`)
+    const prices = await twelveDataRes.json()
+    // Special cases based on how many items were returned. The JSON is different for one versus many.
+    if (portStockNames.length == 1) {
+        pricesArray.push(prices.price);
+    }
+    else {
+        for (name of portStockNames){
+            pricesArray.push(prices[name].price)
+        }
+    }
+    
+    // This assumes that prices are returned in order...need to test.
+    const portStockNamesLength = portStockNames.length
+    for (let i = 0; i < portStockNamesLength; i++){
+        currItem = {stockName: portStockNames[i], currentPrice: pricesArray[i]}
+        currInfo.push(currItem)
+    }
 
     if (userID){
         if (portID){
             if (stockName){
-                // This is off of testData's local instance for now. It needs to be 
-                // adapted to search MongoDB instead. This should only ever return
-                // one item.
+                // This should only ever return one item.
                 stockItem = portfolioInfo.filter((portItem) => (String(portItem.userId)===String(userID) && Number(portItem.portId)==Number(portID) && String(portItem.stockName)===String(stockName)))
                 // If we return nothing, the item doesn't exist so don't try and sell.
                 if (stockItem.length > 0){
                     // Get the current price. This will need to come from the hosted
                     // stock API. Again, this should only ever return one item.
-                    //const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${stockItem[0].stockName}&apikey=<YOURAPIKEY>`)
-                    //const priceItem = await twelveDataRes.json()
                     currItem = currInfo.filter((infoItem) => (infoItem.stockName===stockName))
                     // Compute the sale value.
-                    //req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
-                    saleValue = (stockItem[0].numOfUnits * Number(currItem[0].currentCost))
-                    // Finally, remove the sold item. This is temporary here, but will
-                    // be modifying MongoDB in the actual version.
-                    //portfolioData = portfolioData.filter((portItem) => (portItem.userID!=userID || portItem.portID!=portID || portItem.stockName!==stockName))
+                    saleValue = (stockItem[0].numOfUnits * Number(currItem[0].currentPrice))
+                    // Finally, remove the sold item.
                     await Portfolio.deleteOne({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: stockItem[0].stockName})
                 }
             }
         }
     }
-    
+
     if (saleValue){
         res.status(200).json({success:true, data:saleValue})
     }
