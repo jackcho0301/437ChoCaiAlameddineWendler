@@ -444,7 +444,7 @@ function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
     let returnCollection = []
     for (pI of portInfo){
         // Should only ever return one item
-        currentItem = currInfo.filter((infoItem) => {
+        currentItem = currentData.filter((infoItem) => {
             if (pI.stockName === infoItem.stockName){
                 return infoItem
             }
