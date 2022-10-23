@@ -16,6 +16,16 @@ const config = {
       withCredentials: true
     }
 
+const deleteConfig = {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    withCredentials: true,
+    data: {
+      'stockName': 'F'
+    }
+}
+
 export const login = async (username, password) => {
     await axios.post("http://localhost:3000/api/v1/auth/login",
         {username: username, password: password}, config
@@ -53,7 +63,7 @@ export const register = async (username, password) => {
 
 export const buyStock = async (stockname, numofunits, initcost) => {
     await axios.patch('http://localhost:3000/api/v1/portfolios/1',
-        {"stockName": stockname, "numOfUnits": numofunits, "initCost": initcost}, config)
+        {"stockName": "F", "numOfUnits": 10, "initCost": 10}, config)
     .then(function (response) {
         DEBUG.buyStock && console.log('Buy Stock response:', response.data);
     })
@@ -64,7 +74,7 @@ export const buyStock = async (stockname, numofunits, initcost) => {
 
 export const sellStock = async (stockname) => {
     await axios.delete('http://localhost:3000/api/v1/portfolios/1',
-        {data: {"stockName": stockname}}, config)
+        deleteConfig)
     .then(function (response) {
         DEBUG.sellStock && console.log('Sell Stock response:', response.data);
     })
