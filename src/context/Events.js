@@ -3,7 +3,9 @@ import axios from 'axios'
 const DEBUG = {
     login: true,
     getScores: true,
-    register: true
+    register: true,
+    buyStock: true,
+    sellStock: true
 }
 
 const config = {
@@ -45,5 +47,27 @@ export const register = async (username, password) => {
     })
     .catch(function (error) {
       console.log(error);
+    });
+}
+
+export const buyStock = async (stockname, numofunits, initcost) => {
+    await axios.patch('http://localhost:3000/api/v1/portfolios/1',
+        {"stockName": stockname, "numOfUnits": numofunits, "initCost": initcost}, config)
+    .then(function (response) {
+        DEBUG.buyStock && console.log('Buy Stock response:', response.data);
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+}
+
+export const sellStock = async (stockname) => {
+    await axios.delete('http://localhost:3000/api/v1/portfolios/1',
+        {data: {"stockName": stockname}}, config)
+    .then(function (response) {
+        DEBUG.sellStock && console.log('Sell Stock response:', response.data);
+    })
+    .catch(function (error) {
+        console.log(error);
     });
 }
