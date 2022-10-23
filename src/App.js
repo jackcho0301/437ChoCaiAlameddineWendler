@@ -70,6 +70,7 @@ function App() {
             <LeaderboardPage/>}
           {pageState.help.active &&
             <HelpPage/>}
+
         </div>
       )
     }

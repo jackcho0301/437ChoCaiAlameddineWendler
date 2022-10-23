@@ -1,7 +1,6 @@
 require('dotenv').config();
 require('express-async-errors');
 
-
 const express = require('express')
 const session = require('express-session')
 
@@ -55,8 +54,7 @@ app.use(session({ //config object
   cookie: {
       maxAge: Number(process.env.SESSION_LIFETIME),
       sameSite: true,
-      secure: false,
-      httpOnly: true,
+      secure: false
   },
   name: process.env.SESSION_NAME,
   resave: false,
