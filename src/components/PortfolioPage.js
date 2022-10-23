@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import './PortfolioPage.css'
-import {buyStock, sellStock} from "../context/Events"
+import {buyStock, sellStock, createPortfolio} from "../context/Events"
 import {TextField, Button, FormControl, Divider, Grid, Box, rgbToHex} from "@mui/material"
 
 export default function PortfolioPage(props) {
@@ -40,10 +40,11 @@ export default function PortfolioPage(props) {
                 <img src='./images/Portfolio Page.png' />
             </div>
             <TextField className='stock-name-text' placeholder="StockName" size='small' variant='outlined' onChange={event => setStockName(event)}/>
-            <input type="number" className='num-of-units-text' onChange={event => setNumOfUnits(event)}/>
-            <input type="number" className='init-cost-text' onChange={event => setInitCost(event)}/>
+            <TextField className='num-of-units-text' placeholder="0" size='small' variant='outlined' onChange={event => setNumOfUnits(event)}/>
+            <TextField className='init-cost-text' placeholder="0" size='small' variant='outlined' onChange={event => setInitCost(event)}/>
             <Button variant="contained" onClick={buyStock} className='buy-stock'>BUY</Button>
             <Button variant="contained" onClick={sellStock} className='sell-stock'>SELL</Button>
+            <Button variant="contained" onClick={createPortfolio} className='create-portfolio'>CREATE PORTFOLIO</Button>
         </div>
     )
 }
