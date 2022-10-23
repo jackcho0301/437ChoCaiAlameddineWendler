@@ -1,10 +1,92 @@
 import React, { useState } from 'react'
-import { TextField, Button, FormControl, Divider, Grid, Box } from '@mui/material'
+import { TextField, Button, FormControl, Divider, Grid, Box, rgbToHex } from '@mui/material'
 import './LoginPage.css'
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import Swal from 'sweetalert2'
+import { register } from '../context/Events'
+import PasswordChecklist from "react-password-checklist"
+
+
+const DEBUG = {
+    username: false,
+    loggedIn: false
+}
+
 
 export default function LoginPage(props) {
     const [isRegisterSelected, setRegisterSelected] = useState(false)
+    const [credentials, setCredentials] = React.useState({
+        username: '',
+        password: ''
+    })
+    const [passwordVerify, setPasswordVerify] = React.useState('')
+
+    const isRegistrationValid = () => {
+        const conditions = [
+            credentials.password == passwordVerify,
+            credentials.password.length >= 6,
+            credentials.username.length >= 3
+        ]
+        return conditions.every(x => x)
+    }
+
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        withCredentials: true
+    }
+
+    const setLoggedIn = () => {
+        DEBUG.loggedIn && console.log('credentials: ', credentials)
+        props.setUserLoggedIn(credentials.username, credentials.password)
+        Swal.fire({
+            title: 'Logged in!',
+            icon: 'success',
+            iconColor: 'rgb(0, 207, 0)',
+            showConfirmButton: false,
+            timer: 1000
+        })
+    }
+
+    const registerUser = () => {
+        if (isRegistrationValid()) {
+            register(credentials.username, credentials.password)
+            Swal.fire({
+                title: 'Registration Successful!',
+                icon: 'success',
+                iconColor: 'rgb(0, 207, 0)',
+                showConfirmButton: false,
+                showCloseButton: true,
+                timer: 1000
+            })
+        }
+        else {
+            Swal.fire({
+                // title: '<h1 style="color: red">Passwords do not match</h1>',
+                title: 'Registration Invalid',
+                text: 'Please try again',
+                icon: 'error',
+                timer: 2000
+            })
+        }
+    }
+
+    const setUsername = event => {
+        DEBUG.username && console.log('username:', event.target.value)
+        setCredentials({
+            username: event.target.value,
+            password: credentials.password
+        })
+    }
+
+    const setPassword = event => {
+        setCredentials({
+            username: credentials.username,
+            password: event.target.value
+        })
+    }
+
 
     return (
         <div id='login-page'>
@@ -51,46 +133,76 @@ export default function LoginPage(props) {
                     </Box>
                 </Grid>
                 <Box sx={{ m: 1 }} />
-                    <FormControl id='login-form-control'>
-                        <div id='login-textfields'>
-                            <TextField
-                                className='login-text'
-                                placeholder="Username"
-                                required
-                                size='small'
-                                variant='outlined'
-                            />
-                            <TextField
-                                className='login-text'
-                                placeholder="Password"
-                                type="password"
-                                required
-                                size='small'
-                                variant='outlined' />
-                            {isRegisterSelected &&
+                <FormControl id='login-form-control'>
+                    <div id='login-textfields'>
+                        <TextField
+                            className='login-text'
+                            placeholder="Username"
+                            required
+                            size='small'
+                            variant='outlined'
+                            onChange={event => setUsername(event)}
+                        />
+                        <TextField
+                            className='login-text'
+                            placeholder="Password"
+                            type="password"
+                            required
+                            size='small'
+                            variant='outlined'
+                            onChange={event => setPassword(event)}
+                        />
+                        {isRegisterSelected &&
+                            <React.Fragment>
                                 <TextField
                                     className='login-text'
                                     placeholder="Verify Password"
                                     type="password"
                                     required
                                     size='small'
-                                    variant='outlined' />}
+                                    variant='outlined'
+                                    onChange={event => setPasswordVerify(event.target.value)}
+                                />
 
-                        </div>
-                        {/* <div id='login-chart-icon-container'>
+                                <PasswordChecklist
+                                    rules={["minLength"]}
+                                    minLength={3}
+                                    value={credentials.username}
+                                    onChange={(isValid) => { }}
+                                    messages={{
+                                        minLength: "Username must have at least 3 characters",
+                                    }}
+                                />
+                                <PasswordChecklist
+                                    rules={["minLength", "match"]}
+                                    minLength={6}
+                                    value={credentials.password}
+                                    valueAgain={passwordVerify}
+                                    onChange={(isValid) => { }}
+                                    messages={{
+                                        minLength: "Password must have at least 6 characters",
+                                        match: "Passwords must match"
+                                    }}
+                                />
+                            </React.Fragment>
+
+                        }
+
+                    </div>
+                    {/* <div id='login-chart-icon-container'>
                             <ShowChartIcon style={{ fill: 'green', fontSize: '4vw' }} />
                         </div> */}
 
-                    </FormControl>
+                </FormControl>
                 <Box sx={{ m: 1 }} />
                 <Button
                     variant='contained'
-                    onClick={props.setLoggedIn}
+                    onClick={!isRegisterSelected ? setLoggedIn : registerUser}
                 >
                     {!isRegisterSelected ? 'Sign In' : 'Register'}
                 </Button>
                 {isRegisterSelected ||
-                <a href='' id='forgot-password'>Forgot Password?</a>}
+                    <a href='' id='forgot-password'>Forgot Password?</a>}
             </div>
         </div>
     )

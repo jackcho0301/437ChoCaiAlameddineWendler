@@ -9,7 +9,15 @@ const session = require('express-session')
 
 const app = express()
 const cors = require('cors');
-app.use(cors());
+// app.use(cors());
+
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
 
 //connectDB
 const connectDB = require('./db/connect')
@@ -46,7 +54,8 @@ app.use(session({ //config object
   cookie: {
       maxAge: Number(process.env.SESSION_LIFETIME),
       sameSite: true,
-      secure: false
+      secure: false,
+      httpOnly: true,
   },
   name: process.env.SESSION_NAME,
   resave: false,
