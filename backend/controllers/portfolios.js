@@ -12,14 +12,25 @@ const createPortfolio = async (req, res) => {
     const startingMoney = 10000
     const userID = req.user.userId;
     // Default for now
-    const portID = 1 
-    
+    const portID = 1
+
     // First verify that the user has not already created max portfolios
     const portfolioInfo = await Portfolio.find()
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
     if (portInfo.length > 0) {
+        // TEST CODE - Check for the presence of a "dollars" portfolio.
+        // This is being used only to correct past MongoDB entries
         // Note that this only checks for one portfolio. It needs to check for 4.
-        res.status(400).json({success:false, msg:'You are already at max number of portfolios.'})
+        const dollarsItem = portInfo.filter((item) => item.stockName === "dollars")
+        if (dollarsItem.length > 0){
+            res.status(400).json({success:false, msg:'You are already at max number of portfolios.'})
+        }
+        else{
+            // Make a new portfolio entry for "dollars".
+            portItem = ({userId:userID, portId:portID, stockName:"dollars", numOfUnits:startingMoney, initCost:1})
+            const portfolio = await Portfolio.create(portItem);
+            res.status(StatusCodes.CREATED).json({portfolio});
+        }
     }
     else
     {
