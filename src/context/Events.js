@@ -5,7 +5,8 @@ const DEBUG = {
     getScores: true,
     register: true,
     buyStock: true,
-    sellStock: true
+    sellStock: true,
+    createPortfolio: true
 }
 
 const config = {
@@ -66,6 +67,16 @@ export const sellStock = async (stockname) => {
         {data: {"stockName": stockname}}, config)
     .then(function (response) {
         DEBUG.sellStock && console.log('Sell Stock response:', response.data);
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+}
+
+export const createPortfolio = async () => {
+    await axios.get('http://localhost:3000/api/v1/portfolios/1', config)
+    .then(function (response) {
+        DEBUG.createPortfolio && console.log('Create Portfolio response:', response);
     })
     .catch(function (error) {
         console.log(error);
