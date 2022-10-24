@@ -84,7 +84,7 @@ export const sellStock = async (stockname) => {
 }
 
 export const createPortfolio = async () => {
-    await axios.get('http://localhost:3000/api/v1/portfolios/1', config)
+    await axios.get('http://localhost:3000/api/v1/portfolios', config)
     .then(function (response) {
         DEBUG.createPortfolio && console.log('Create Portfolio response:', response);
     })
