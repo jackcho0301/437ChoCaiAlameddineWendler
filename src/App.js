@@ -11,11 +11,12 @@ import HelpPage from './components/HelpPage'
 import Swal from 'sweetalert2'
 import './Swal.css'
 import { UserContext } from "./context/User"
-import { login } from "./context/Events"
-
+import { EventsContext } from './context/Events';
+// import { login } from "./context/Events"
 
 const DEBUG = {
-  pageState: false
+  pageState: false,
+  eventsState: true
 }
 
 
@@ -23,6 +24,8 @@ const DEBUG = {
 function App() {
   const [pageState, setPageState] = useState(PAGES)
   const [user, modifyUser] = React.useContext(UserContext)
+  const [events, callEvent] = React.useContext(EventsContext)
+
 
 
   useEffect(() => {
@@ -41,7 +44,8 @@ function App() {
   const setUserLoggedIn = (username, password) => {
     modifyUser({type: "login", value: true})
     modifyUser({type: "username", value: username})
-    login(username, password)
+    // user.api('login', [username, password])
+    callEvent.login(username, password)
   }
 
   const isCookie = cookie => {
@@ -78,6 +82,11 @@ function App() {
       return <LoginPage setUserLoggedIn={setUserLoggedIn}/>
     }
   }
+
+  useEffect(() => {
+    // DEBUG.eventsState && console.log("Events state:", JSON.stringify(events, 0, 2))
+    DEBUG.eventsState && console.log("Events state:", events)
+  }, [events])
 
   return (
     <div className="App">

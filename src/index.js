@@ -4,17 +4,21 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { UserProvider } from './context/User'
+import { EventsProvider } from './context/Events'
 
 const logOutput = true
 
 if (process.env.NODE_ENV !== "development" || !logOutput)
-    console.log = () => {};
+  console.log = () => { };
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <UserProvider>
-    <App />
+    <EventsProvider>
+      <App />
+    </EventsProvider>
   </UserProvider>
+
 );
 
 // If you want to start measuring performance in your app, pass a function

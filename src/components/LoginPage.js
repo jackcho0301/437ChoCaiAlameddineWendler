@@ -3,7 +3,7 @@ import { TextField, Button, FormControl, Divider, Grid, Box, rgbToHex } from '@m
 import './LoginPage.css'
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import Swal from 'sweetalert2'
-import { register } from '../context/Events'
+import { EventsContext } from '../context/Events'
 import PasswordChecklist from "react-password-checklist"
 
 
@@ -20,6 +20,7 @@ export default function LoginPage(props) {
         password: ''
     })
     const [passwordVerify, setPasswordVerify] = React.useState('')
+    const [events, callEvent] = React.useContext(EventsContext)
 
     const isRegistrationValid = () => {
         const conditions = [
@@ -51,7 +52,7 @@ export default function LoginPage(props) {
 
     const registerUser = () => {
         if (isRegistrationValid()) {
-            register(credentials.username, credentials.password)
+            callEvent.register(credentials.username, credentials.password)
             Swal.fire({
                 title: 'Registration Successful!',
                 icon: 'success',

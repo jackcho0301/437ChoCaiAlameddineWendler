@@ -1,6 +1,7 @@
 import React from "react"
 import { reducer, initialState } from "./UserReducer"
 
+
 export const UserContext = React.createContext({
     state: initialState,
     dispatch: () => null

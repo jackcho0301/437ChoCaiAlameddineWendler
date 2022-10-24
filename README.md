@@ -5,7 +5,7 @@ To run this app, please run
 bash start.sh
 ```
 
-To stop it, please run
+If CTRL+C doesn't kill both backend and frontend, please run
 ```
 bash stop.sh
 ```

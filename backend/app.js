@@ -35,7 +35,6 @@ const store = new MongoDBSession ({
     uri: process.env.MONGO_URI,
     collection: "sessions",
 })
-
 app.use(session({
     name: process.env.SESSION_NAME,
     secret: process.env.SECRET_KEY,
@@ -54,7 +53,8 @@ app.use(session({ //config object
   cookie: {
       maxAge: Number(process.env.SESSION_LIFETIME),
       sameSite: true,
-      secure: false
+      secure: false,
+      httpOnly: true,
   },
   name: process.env.SESSION_NAME,
   resave: false,

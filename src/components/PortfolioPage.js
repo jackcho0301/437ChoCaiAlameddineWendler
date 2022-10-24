@@ -1,19 +1,33 @@
-import React from 'react'
-import './PortfolioPage.css'
-import { getPortfolio, updatePortfolio, sellPortfolioItem, createPortfolio } from '../context/Events'
-import { Button } from '@mui/material'
+// import React, { useEffect } from 'react'
+// import './PortfolioPage.css'
+// import { EventsContext } from '../context/Events'
+// import { Button } from '@mui/material'
 
-export default function PortfolioPage(props) {
+// export default function PortfolioPage(props) {
+//     const [user, modifyUser] = React.useContext(UserContext)
+//     const events = React.useContext(EventsContext)
+
+//     // useEffect(() => {
+//     //     modifyUser({type: "portfolio", value: getPortfolio())
+//     // }, [])
+
+//     useEffect(() => {
+//         console.log('Current portfolio:', currentPortfolio)
+//     }, [currentPortfolio])
 
 
-    return (
-        <div id='portfolio-page' style={{height: '100vh', display: 'flex', alignItems: 'true', justifyContent: 'true'}}>
-            {/* <div class='trim'><img src='./images/Portfolio Page.png' /></div> */}
-            <Button variant='contained' onClick={createPortfolio}>Create</Button>
-            <Button variant='contained' onClick={getPortfolio}>Current</Button>
-            <Button variant='contained'onClick={updatePortfolio}>Buy</Button>
-            <Button variant='contained' onClick={sellPortfolioItem}>Sell</Button>
+//     return (
+//         <div className='portfolio-page'>
+//             {/* <div class='trim'><img src='./images/Portfolio Page.png' /></div> */}
+//             <h1>Current Portfolio</h1>
+//             <p>{JSON.stringify(currentPortfolio, null, 2)}</p>
 
-        </div>
-    )
-}
+//             <Button variant='contained' onClick={addDollars}>Add Dollars</Button>
+//             <Button variant='contained' onClick={getPortfolio}>Current</Button>
+//             <Button variant='contained'onClick={buyStock}>Buy</Button>
+//             <Button variant='contained' onClick={sellStock}>Sell</Button>
+
+
+//         </div>
+//     )
+// }

@@ -1,4 +1,6 @@
 import { AgricultureSharp } from "@mui/icons-material"
+import axios from 'axios'
+
 
 const DEBUG = {
     action: true
@@ -21,6 +23,13 @@ export const reducer = (state, action) => {
             }
             break
 
+        case "portfolio":
+            return {
+                ...state,
+                portfolio: action.value
+            }
+            break
+
         default:
             throw new TypeError('Unable to decipher user action')
     }
@@ -28,5 +37,7 @@ export const reducer = (state, action) => {
 
 export const initialState = {
     username: '',
-    loggedIn: false
+    loggedIn: false,
+    portfolio: {},
+    // api: events,
 }
