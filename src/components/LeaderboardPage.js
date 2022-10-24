@@ -3,9 +3,10 @@ import './LeaderboardPage.css'
 import Leaderboard from './react-leaderboard';
 import LEADERS from '../config/leaders.json'
 import { DataGrid } from '@mui/x-data-grid';
-import { Button } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { UserContext } from '../context/User';
 import { EventsContext } from '../context/Events'
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 const DEBUG = {
     allScores: true,
@@ -19,28 +20,37 @@ export default function LeaderboardPage(props) {
         name: "Loading",
         score: 0
     }])
-    const [updateLeaders, toggleUpdateLeaders] = React.useState(false)
     const [leaderboard, setLeaderboard] = React.useState(null)
-    const [scoresLoaded, setScoresLoaded] = React.useState(false)
+    const [scoresLoaded, setScoresLoaded] = React.useState(true)
+    const [allowScoresToLoad, setAllowScoresToLoad] = React.useState(true)
 
-    // let leaders = LEADERS.cgally
+    //only refreshing once right now
+    const AUTO_REFRESH_MS = 30000;
 
-    //query on page load
-    // useEffect(() => {
-    //     setLeaders(user.api('getScores'))
-    // }, [])
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setAllowScoresToLoad(true)
+        console.log('REFRESH!')
+      }, AUTO_REFRESH_MS);
+    
+      return () => clearInterval(interval);
+    }, [])
 
     //query when refresh button clicked
     useEffect(() => {
-        callEvent.getScores()
-        setLeaderboard(newLeaderboard())
-    }, [updateLeaders])
+        if(scoresLoaded && allowScoresToLoad) {
+            callEvent.getScores()
+            setLeaderboard(newLeaderboard())
+        }
+        setAllowScoresToLoad(false)
+    }, [scoresLoaded])
 
     //update scores whenever scores are changed
     useEffect(() => {
         const newScores = [...backend.allScores]
         setLeaders(newScores)
         DEBUG.allScores && console.log('all scores:', newScores)
+        handleRefreshScores()
     }, [backend.allScores])
 
     useEffect(() => {
@@ -48,21 +58,33 @@ export default function LeaderboardPage(props) {
         setLeaderboard(newLeaderboard())
     }, [leaders])
 
+    // leaderboard component won't re-render on prop change so we need to re-render it hackily
     const newLeaderboard = () => {
         return (
-        <>
-        <Leaderboard
-                className='leaderboard'
-                users={leaders}
-                paginate={10}
-                // key={updateLeaders}
-            />
-        {/* <h1>{JSON.stringify(leaders)}</h1> */}
-        </>
+            <>
+                <Leaderboard
+                    className='leaderboard'
+                    users={leaders}
+                    paginate={10}
+                />
+            </>
         )
     }
 
-    DEBUG.leaders && console.log('leaderboard:', leaderboard)
+    // DEBUG.leaders && console.log('leaderboard:', leaderboard)
+
+    const handleRefreshScores = () => {
+        // toggleUpdateLeaders(!updateLeadersQuery);
+        setScoresLoaded(false)
+    }
+
+    //toggle on and off render to get leaderboard to update
+    useEffect(() => {
+        if (!scoresLoaded) {
+            setScoresLoaded(true)
+        }
+    }, [scoresLoaded])
+
 
 
     // leaders.sort(player => {
@@ -79,14 +101,14 @@ export default function LeaderboardPage(props) {
 
     return (
         <div id='leaderboard-page'>
-            <Button
+            <IconButton
                 variant="contained"
-                onClick={() => {toggleUpdateLeaders(!updateLeaders); setScoresLoaded(true)}}
+                onClick={() => {handleRefreshScores(); setAllowScoresToLoad(true)}}
                 className='refresh-scores'
             >
-                QUERY
-            </Button>
-            {scoresLoaded ? leaderboard: 'LOADING...'}
+                <RefreshIcon/>
+            </IconButton>
+            {scoresLoaded ? leaderboard : 'LOADING...'}
             {/* <DataGrid
                 rows={rows}
                 columns={cols}

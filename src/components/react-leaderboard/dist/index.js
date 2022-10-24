@@ -192,21 +192,21 @@ var Leaderboard = function (_Component) {
                 // )
               )
             ),
-            _react2.default.createElement(
-              'tr',
-              null,
-              _react2.default.createElement(
-                'td',
-                { colSpan: '10000' }, 
-                _react2.default.createElement(
-                  'form',
-                  { onChange: this.filterRank },
-                  '',
-                  _react2.default.createElement('input', { type: 'search', name: 'search', placeholder: 'User Lookup' }),
-                  // _react2.default.createElement('input', { type: 'checkbox', name: 'search', value:  }),
-                )
-              )
-            ),
+            // _react2.default.createElement(
+            //   'tr',
+            //   null,
+            //   _react2.default.createElement(
+            //     'td',
+            //     { colSpan: '10000' }, 
+            //     _react2.default.createElement(
+            //       'form',
+            //       { onChange: this.filterRank },
+            //       '',
+            //       // _react2.default.createElement('input', { type: 'search', name: 'search', placeholder: 'User Lookup' }),
+            //       // _react2.default.createElement('input', { type: 'checkbox', name: 'search', value:  }),
+            //     )
+            //   )
+            // ),
             _react2.default.createElement(
               'tr',
               null,
@@ -243,7 +243,9 @@ var Leaderboard = function (_Component) {
                 user.page == _this2.state.page ? _react2.default.createElement(
                   'td',
                   { className: 'data score' },
-                  user.score.toLocaleString('en', {useGrouping:true})
+                  // user.score <-- default
+                  // user.score.toLocaleString('en', {useGrouping:true})
+                  user.score != undefined ? user.score.toLocaleString('en', {useGrouping:true}): user.score
 
                 ) : null
               );

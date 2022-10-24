@@ -10,7 +10,13 @@
 
 .refresh-scores {
     position: fixed !important;
-    top: 3vh;
+    top: 1.8vh;
     right: 10vw;
     z-index: 10000000;
+}
+
+.refresh-scores * {
+    color: white;
+    width: 2em !important;
+    height: 2em !important;
 }
