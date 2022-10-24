@@ -79,13 +79,13 @@ export default function LeaderboardPage(props) {
 
     return (
         <div id='leaderboard-page'>
-            <Button
+            {/* <Button
                 variant="contained"
                 onClick={() => {toggleUpdateLeaders(!updateLeaders); setScoresLoaded(true)}}
                 className='refresh-scores'
             >
                 QUERY
-            </Button>
+            </Button> */}
             {scoresLoaded ? leaderboard: 'LOADING...'}
             {/* <DataGrid
                 rows={rows}
