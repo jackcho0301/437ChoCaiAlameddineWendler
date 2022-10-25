@@ -1,7 +1,6 @@
 .portfolio-page {
     height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
     flex-direction: column;
 }
@@ -9,3 +8,42 @@
 /* .portfolio-page Button {
     height: ;
 } */
+
+.refresh-portfolio {
+    color: blue !important;
+}
+
+.portfolio-text-and-refresh {
+    display: flex;
+    justify-content: center;
+
+}
+
+.space-filler-iconbutton {
+    visibility: hidden;
+}
+
+.inner-portfolio-return {
+    display: flex;
+}
+
+.inner-portfolio-return * {
+    margin: auto
+}
+
+.stock-data-table * {
+    text-align: center;
+}
+
+.portfolio-page th * {
+    margin: auto;
+    font-weight: 800;
+}
+
+.portfolio-actions * {
+    margin: 1vw !important
+}
+
+.portfolio-return {
+    margin-bottom: 20px;
+}

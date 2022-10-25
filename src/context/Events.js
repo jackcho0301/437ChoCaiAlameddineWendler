@@ -23,16 +23,6 @@ const config = {
     withCredentials: true
 }
 
-const deleteConfig = {
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    withCredentials: true,
-    data: {
-        'stockName': 'AAPL'
-    }
-}
-
 export const EventsProvider = ({ children }) => {
     const [state, dispatch] = React.useReducer(reducer, values)
 
