@@ -171,6 +171,7 @@ const getPortfolio = async (req, res) => {
 const updatePortfolio = async (req, res) => {
     let stockDoesntExist = false
     let alreadyPurchased = false
+    let insufficientFunds = false
     // const userID = req.params.id
     // const {portID, stockName, numOfUnits, initCost} = req.body
     let portfolioInfo = await Portfolio.find()
@@ -226,16 +227,28 @@ const updatePortfolio = async (req, res) => {
                             else{
                                 // Finally, before allowing the purchase to go through, verify
                                 // the user has the funds for it...
-                                portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
-                                // Note that this method is pushing to the local instance of
-                                // the collection of portfolioData. It needs to be adapted to
-                                // push to MongoDB instead.
-                                await Portfolio.create(portItem);
-                        
-                                // portfolioInfo and currInfo is now stale...reload here.
-                                portfolioInfo = await Portfolio.find()
-                                currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
-                                req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
+                                currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
+                                // This should always return something.
+                                let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * initCost)
+                                // If the answer is negative...
+                                if (afterPurchaseFunds < 0){
+                                    // Cancel the sale.
+                                    insufficientFunds = true
+                                }
+                                else {
+                                    portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
+                                    // Note that this method is pushing to the local instance of
+                                    // the collection of portfolioData. It needs to be adapted to
+                                    // push to MongoDB instead.
+                                    await Portfolio.create(portItem);
+
+                                    // Update the money
+                                    await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:"dollars"}, {numOfUnits:afterPurchaseFunds})
+                                    // portfolioInfo and currInfo is now stale...reload here.
+                                    portfolioInfo = await Portfolio.find()
+                                    currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
+                                    req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
+                                }
                             }
                         }
                     }
@@ -245,13 +258,16 @@ const updatePortfolio = async (req, res) => {
     }
 
     if (req.totalValue){
-        res.status(200).json({success:true, data:req.totalValue})
+        res.status(200).json({data: {success:true, retdata:req.totalValue}})
     }
     else if (stockDoesntExist){
         res.status(400).json({success:false, msg:'The requested stock does not exist.'})
     }
     else if (alreadyPurchased){
         res.status(400).json({success:false, msg:'You already own this stock. You must sell first.'})
+    }
+    else if (insufficientFunds){
+        res.status(400).json({success:false, msg:'You don\'t have enough funds for this purchase.'})
     }
     else
     {
@@ -304,11 +320,11 @@ const sellPortfolioItem = async (req, res) => {
     //     currItem = {stockName: portStockNames[i], currentPrice: prices[i]}
     //     currInfo.push(currItem)
     // }
-
+    
     if (userID){
         if (portID){
             if (stockName){
-                // This is off of testData's local instance for now. It needs to be 
+                // This is off of testData's local instance for now. It needs to be
                 // adapted to search MongoDB instead. This should only ever return
                 // one item.
                 stockItem = portfolioInfo.filter((portItem) => (String(portItem.userId)===String(userID) && Number(portItem.portId)==Number(portID) && String(portItem.stockName)===String(stockName)))
@@ -322,9 +338,11 @@ const sellPortfolioItem = async (req, res) => {
                     // Compute the sale value.
                     //req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
                     saleValue = (stockItem[0].numOfUnits * Number(currItem[0].currentCost))
-                    // Finally, remove the sold item. This is temporary here, but will
-                    // be modifying MongoDB in the actual version.
-                    //portfolioData = portfolioData.filter((portItem) => (portItem.userID!=userID || portItem.portID!=portID || portItem.stockName!==stockName))
+                    // Add this money to the user's dollars value.
+                    currentFunds = await Portfolio.find({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"});
+                    let newAvailableFunds = currentFunds[0].numOfUnits + saleValue
+                    await Portfolio.findOneAndUpdate({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"}, {numOfUnits: newAvailableFunds})
+                    // Finally, remove the sold item.
                     await Portfolio.deleteOne({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: stockItem[0].stockName})
                 }
             }
