@@ -136,15 +136,16 @@ export default function PortfolioPage(props) {
                             item.stockName,
                             stockHoldings[item.stockName],
                             item.return,
+                            `${Math.round(item.return/stockHoldings[item.stockName])}%`,
                         ]
                     })}
-                    columns={["Stock", "Return", "Holding"]}
+                    columns={["Stock", "Current Holding", "Total Return", "ROI"]}
                 />
             }
 
             <div className='portfolio-actions'>
                 <Button variant='contained' onClick={() => { callEvent.sellStock('AAPL'); callEvent.getPortfolio() }}>Sell AAPL</Button>
-                <Button variant='contained' onClick={() => { callEvent.addDollars(); callEvent.getPortfolio() }}>Set Money to $10,000</Button>
+                <Button variant='contained' onClick={() => { callEvent.createPortfolio(); callEvent.getPortfolio() }}>New Portfolio</Button>
                 <Button variant='contained' onClick={() => { callEvent.buyStock('AAPL', 1, 1); callEvent.getPortfolio() }}>Buy AAPL</Button>
             </div>
 

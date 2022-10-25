@@ -88,7 +88,7 @@ export const EventsProvider = ({ children }) => {
         sellStock: async stockname => {
             // let deleteConfig = structuredClone(config)
             let deleteConfig = JSON.parse(JSON.stringify(config))
-            deleteConfig["data"] = {'stockName': stockname}
+            deleteConfig["data"] = { 'stockName': stockname }
             await axios.delete('http://localhost:3000/api/v1/portfolios/1',
                 deleteConfig)
                 .then(function (response) {
@@ -101,28 +101,44 @@ export const EventsProvider = ({ children }) => {
                 });
         },
         addDollars: async () => {
-              await axios.get('http://localhost:3000/api/v1/portfolios/1', config)
-              .then(function (response) {
-                  DEBUG.createPortfolio && console.log('Create Portfolio response:', response.data);
-                  dispatch({ type: "dollarsAdded", value: response.data })
+            await axios.get('http://localhost:3000/api/v1/portfolios/1', config)
+                .then(function (response) {
+                    DEBUG.createPortfolio && console.log('Create Portfolio response:', response.data);
+                    dispatch({ type: "dollarsAdded", value: response.data })
 
-              })
-              .catch(function (error) {
-                  console.log(error);
-              });
-            },
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
 
         getPortfolio: async () => {
-              await axios.get('http://localhost:3000/api/v1/portfolios/1', config
-              )
-              .then(function (response) {
-                console.log(response.data)
-                dispatch({ type: "portfolio", value: response.data })
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
-            },
+            await axios.get('http://localhost:3000/api/v1/portfolios/1', config
+            )
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "portfolio", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        createPortfolio: async () => {
+            await axios.post('http://localhost:3000/api/v1/portfolios/', {
+                "portId": 1,
+                "stockName": "AAPL",
+                "numOfUnits": 75,
+                "initCost": 60.00
+            }, config
+            )
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
     }
 
     return (
