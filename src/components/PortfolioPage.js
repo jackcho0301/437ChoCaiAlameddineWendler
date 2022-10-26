@@ -15,7 +15,8 @@ export default function PortfolioPage(props) {
     const [displayPortfolio, setDisplayPortfolio] = React.useState([{}])
     const [portfolioStats, setPortfolioStats] = React.useState({
         cost: 0,
-        return: 0
+        return: 0,
+        roi: 0
     })
     const [toggleRefresh, setToggleRefresh] = React.useState(false)
 
@@ -49,7 +50,8 @@ export default function PortfolioPage(props) {
         // }
         setPortfolioStats({
             cost: portfolio.coi,
-            return: portfolio.totalReturnVal
+            return: portfolio.totalReturnVal,
+            roi: Math.round(portfolio.roiPercent*100)/100
         })
         setToggleRefresh(false)
     }, [backend.boughtStock, backend.soldStock, backend.dollarsAdded, backend.currentPortfolio, toggleRefresh])
@@ -121,8 +123,12 @@ export default function PortfolioPage(props) {
                         <p>{portfolioStats.cost}</p>
                     </div>
                     <div>
-                        <h3>Total Return</h3>
+                        <h3>Total Profit</h3>
                         <p>{portfolioStats.return}</p>
+                    </div>
+                    <div>
+                        <h3>ROI</h3>
+                        <p>{portfolioStats.roi}%</p>
                     </div>
                 </div>
             </div>
@@ -134,12 +140,12 @@ export default function PortfolioPage(props) {
                     data={currentReturnsPortfolio.map(item => {
                         return [
                             item.stockName,
-                            stockHoldings[item.stockName],
                             item.return,
+                            `${(stockHoldings[item.stockName]/100)}%`,
                             `${Math.round(item.return/stockHoldings[item.stockName])}%`,
                         ]
                     })}
-                    columns={["Stock", "Current Holding", "Total Return", "ROI"]}
+                    columns={["Stock", "Holding ($)", "Holding (%)", "ROI"]}
                 />
             }
 
