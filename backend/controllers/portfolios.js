@@ -217,38 +217,29 @@ const updatePortfolio = async (req, res) => {
                             stockDoesntExist = true
                         }
                         else {
-                            // Next check if the user already owns this stock. Implicit in this
-                            // is an "all or nothing" approach, in which a user may only sell or
-                            // purchase batches of one stock at at time.
-                            alreadyPurchased = await Portfolio.exists({userId:userID, portId:portID, stockName:stockName})
-                            if (alreadyPurchased){
-                                // Do nothing...exit the if statement
+                            // Finally, before allowing the purchase to go through, verify
+                            // the user has the funds for it...
+                            currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
+                            // This should always return something.
+                            let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * initCost)
+                            // If the answer is negative...
+                            if (afterPurchaseFunds < 0){
+                                // Cancel the sale.
+                                insufficientFunds = true
                             }
-                            else{
-                                // Finally, before allowing the purchase to go through, verify
-                                // the user has the funds for it...
-                                currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
-                                // This should always return something.
-                                let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * initCost)
-                                // If the answer is negative...
-                                if (afterPurchaseFunds < 0){
-                                    // Cancel the sale.
-                                    insufficientFunds = true
-                                }
-                                else {
-                                    portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
-                                    // Note that this method is pushing to the local instance of
-                                    // the collection of portfolioData. It needs to be adapted to
-                                    // push to MongoDB instead.
-                                    await Portfolio.create(portItem);
+                            else {
+                                portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
+                                // Note that this method is pushing to the local instance of
+                                // the collection of portfolioData. It needs to be adapted to
+                                // push to MongoDB instead.
+                                await Portfolio.create(portItem);
 
-                                    // Update the money
-                                    await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:"dollars"}, {numOfUnits:afterPurchaseFunds})
-                                    // portfolioInfo and currInfo is now stale...reload here.
-                                    portfolioInfo = await Portfolio.find()
-                                    currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
-                                    req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
-                                }
+                                // Update the money
+                                await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:"dollars"}, {numOfUnits:afterPurchaseFunds})
+                                // portfolioInfo and currInfo is now stale...reload here.
+                                portfolioInfo = await Portfolio.find()
+                                currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
+                                req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
                             }
                         }
                     }
@@ -262,9 +253,6 @@ const updatePortfolio = async (req, res) => {
     }
     else if (stockDoesntExist){
         res.status(400).json({success:false, msg:'The requested stock does not exist.'})
-    }
-    else if (alreadyPurchased){
-        res.status(400).json({success:false, msg:'You already own this stock. You must sell first.'})
     }
     else if (insufficientFunds){
         res.status(400).json({success:false, msg:'You don\'t have enough funds for this purchase.'})
@@ -335,20 +323,22 @@ const sellPortfolioItem = async (req, res) => {
                     //const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${stockItem[0].stockName}&apikey=<YOURAPIKEY>`)
                     //const priceItem = await twelveDataRes.json()
                     currItem = currInfo.filter((infoItem) => (infoItem.stockName===stockName))
-                    // Compute the sale value.
-                    //req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
-                    saleValue = (stockItem[0].numOfUnits * Number(currItem[0].currentCost))
-                    // Add this money to the user's dollars value.
-                    currentFunds = await Portfolio.find({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"});
-                    let newAvailableFunds = currentFunds[0].numOfUnits + saleValue
-                    await Portfolio.findOneAndUpdate({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"}, {numOfUnits: newAvailableFunds})
-                    // Finally, remove the sold item.
-                    await Portfolio.deleteOne({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: stockItem[0].stockName})
+                    // Compute the sale value of all entries.
+                    for (let i = 0; i < stockItem.length; i++) {
+                        //req.saleValue = (stockItem[0].numOfUnits * Number(priceItem.price))
+                        saleValue = (stockItem[i].numOfUnits * Number(currItem[0].currentCost))
+                        // Add this money to the user's dollars value.
+                        currentFunds = await Portfolio.find({userId: stockItem[i].userId, portId: stockItem[i].portId, stockName: "dollars"});
+                        let newAvailableFunds = currentFunds[0].numOfUnits + saleValue
+                        await Portfolio.findOneAndUpdate({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"}, {numOfUnits: newAvailableFunds})
+                        // Finally, remove the sold item.
+                        await Portfolio.deleteOne({_id: stockItem[i]._id}) //userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: stockItem[0].stockName})
+                    }
                 }
             }
         }
     }
-    
+
     if (saleValue){
         res.status(200).json({success:true, data:saleValue})
     }
