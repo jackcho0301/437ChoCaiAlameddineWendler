@@ -170,10 +170,8 @@ const getPortfolio = async (req, res) => {
 // numOfUnits from that.
 const updatePortfolio = async (req, res) => {
     let stockDoesntExist = false
-    let alreadyPurchased = false
     let insufficientFunds = false
-    // const userID = req.params.id
-    // const {portID, stockName, numOfUnits, initCost} = req.body
+    let invalidPurchaseAmount = false
     let portfolioInfo = await Portfolio.find()
 
     const userID = req.user.userId
@@ -209,29 +207,64 @@ const updatePortfolio = async (req, res) => {
         if (portID){
             if (stockName){
                 if (numOfUnits){
-                    if (initCost){
-                        // First see if this stock exists. Note this will have to be checked
-                        // against the TwelveData API or cache later.
-                        currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
-                        if (currItem.length == 0){
-                            stockDoesntExist = true
+                    // Assume the user wants to purchase shares directly at the current price.
+                    // First see if this stock exists. Note this will have to be checked against
+                    // the TwelveData API or cache later.
+                    currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
+                    if (currItem.length == 0){
+                        stockDoesntExist = true
+                    }
+                    else {
+                        // Finally, before allowing the purchase to go through, verify the user
+                        // has the funds for it...
+                        currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
+                        // This should always return something.
+                        let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * currItem[0].currentCost)
+                        // If the answer is negative...
+                        if (afterPurchaseFunds < 0){
+                            // Cancel the sale...user cannot "buy naked" at this time.
+                            insufficientFunds = true
                         }
                         else {
-                            // Finally, before allowing the purchase to go through, verify
-                            // the user has the funds for it...
-                            currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
-                            // This should always return something.
-                            let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * initCost)
-                            // If the answer is negative...
-                            if (afterPurchaseFunds < 0){
-                                // Cancel the sale.
-                                insufficientFunds = true
+                            portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:currItem[0].currentCost})
+                            await Portfolio.create(portItem);
+
+                            // Update the money
+                            await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:"dollars"}, {numOfUnits:afterPurchaseFunds})
+                            // portfolioInfo and currInfo are now stale...reload here.
+                            portfolioInfo = await Portfolio.find()
+                            currInfo = retrieveCurrInfoKernel(userID,portID,portfolioInfo)
+                            req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
+                        }
+                    }
+                }
+                                else {
+                    // Assume that an initCost for a flat stock rate was submitted.
+                    // First see if this stock exists. Note this will have to be checked
+                    // against the TwelveData API or cache later.
+                    currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
+                    if (currItem.length == 0){
+                        stockDoesntExist = true
+                    }
+                    else {
+                        // Finally, before allowing the purchase to go through, verify
+                        // the user has the funds for it...
+                        currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
+                        // This should always return something.
+                        let afterPurchaseFunds = currentFunds[0].numOfUnits - initCost
+                        // If the answer is negative...
+                        if (afterPurchaseFunds < 0){
+                            // Cancel the sale.
+                            insufficientFunds = true
+                        }
+                        else {
+                            // Calculate the number of units. Note we should convert to float just in case.
+                            calcNumOfUnits = ((initCost*1.0) / currItem[0].currentCost)
+                            if (calcNumOfUnits == 0){
+                                invalidPurchaseAmount = true
                             }
                             else {
-                                portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:initCost})
-                                // Note that this method is pushing to the local instance of
-                                // the collection of portfolioData. It needs to be adapted to
-                                // push to MongoDB instead.
+                                portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:calcNumOfUnits, initCost:currItem[0].currentCost})
                                 await Portfolio.create(portItem);
 
                                 // Update the money
@@ -256,6 +289,9 @@ const updatePortfolio = async (req, res) => {
     }
     else if (insufficientFunds){
         res.status(400).json({success:false, msg:'You don\'t have enough funds for this purchase.'})
+    }
+    else if (invalidPurchaseAmount){
+        res.status(400).json({success:false, msg:'You did not specify a stock number or flat purchase.'})
     }
     else
     {
