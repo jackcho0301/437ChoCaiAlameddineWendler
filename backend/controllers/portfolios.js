@@ -287,7 +287,7 @@ const sellPortfolioItem = async (req, res) => {
     
     // API Call
     let pricesArray = []
-    const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=fa8559d1144748a086f5f8db3b6a54ff`)
+    const twelveDataRes = await fetch(`https://api.twelvedata.com/price?symbol=${portStockString}&apikey=<YOURAPIKEY>`)
     const prices = await twelveDataRes.json()
     // Special cases based on how many items were returned. The JSON is different for one versus many.
     if (portStockNames.length == 1) {
