@@ -12,7 +12,7 @@ const ProfilePicSchema = new mongoose.Schema( {
         data: Buffer, //binary data
         contentType: String
     }
-})
+}, {timestamps: true})
 
 
 module.exports = mongoose.model('ProfilePic', ProfilePicSchema)

@@ -2,8 +2,8 @@ const express = require('express')
 
 const router = express.Router()
 
-const {uploadProfilePic} = require('../controllers/profilePic')
+const {uploadProfilePic, deleteProfilePic, updateProfilePic, getProfilePic} = require('../controllers/profilePic')
 
-router.route('/').patch(uploadProfilePic)
+router.route('/').post(uploadProfilePic).delete(deleteProfilePic).put(updateProfilePic).get(getProfilePic)
 
 module.exports = router
