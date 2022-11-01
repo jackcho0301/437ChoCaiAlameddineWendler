@@ -37,7 +37,7 @@ const portfoliosRouter = require('./routes/portfolios')
 const usersRouter = require('./routes/users')
 const statsRouter = require('./routes/stats')
 const profilePicRouter = require('./routes/profilePic')
-
+const profileRouter = require('./routes/profile')
 
 app.use(session({ //config object
   cookie: {
@@ -81,7 +81,7 @@ app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/portfolios', extractUserIdMiddleware, portfoliosRouter) //authentication middleware placed 
 app.use('/api/v1/stats', extractUserIdMiddleware, statsRouter) // authentication middleware placed
 app.use('/api/v1/profilePic', extractUserIdMiddleware, profilePicRouter) // authentication middleware placed
-
+app.use('/api/v1/profile', extractUserIdMiddleware, profileRouter)// authentication middleware placed
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
