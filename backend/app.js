@@ -29,7 +29,7 @@ const authenticateUser = require('./middleware/authentication');
 //for uploading images
 // const multer = require('multer')
 // const ProfilePicModel = require('./models/ProfilePic')
-
+app.use(express.static('./uploads'))
 
 //routers
 const authRouter = require('./routes/auth')
@@ -53,6 +53,7 @@ app.use(session({ //config object
 }))
 
 
+
 // error handler
 const notFoundMiddleware = require('./middleware/not-found');
 const errorHandlerMiddleware = require('./middleware/error-handler');
@@ -62,6 +63,16 @@ app.use(express.json()); //data in req.body is available for POST methods
 //middleware for authentication
 const extractUserIdMiddleware = require('./middleware/extract-userId');
 
+
+const ProfilePic = require('./models/ProfilePic')
+app.get('/',async (req,res) => {
+  const pics = await ProfilePic.find({})
+  const pic = pics[0]
+
+  res.send(pic)
+ 
+  // res.send( String.fromCharCode(...new Uint8Array((pic.image.data))))
+})
 
 
 // routes
