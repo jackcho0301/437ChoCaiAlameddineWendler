@@ -10,6 +10,7 @@ const path = require('path');
 const { readdir } = require('fs/promises');
 
 
+
 const updateProfilePic = async (req, res) => {
 
     const Storage = multer.diskStorage({
@@ -43,29 +44,6 @@ const updateProfilePic = async (req, res) => {
 
 const deleteProfilePic = (req, res) => {
 
-    // const Storage = multer.diskStorage({
-    //     destination: 'uploads/',
-    //     filename: (req, file, callback) => {
-    //         callback(null, req.user.userId + ".png")
-    //     }
-    // })
-    
-    // const upload = multer({
-    //     storage: Storage
-    // }).single('profilePicture')
-
-
-
-    // const userId = req.user.userId
-
-
-
-    // const image =  await ProfilePic.findOneAndDelete({userId: userId});
-
-    // if (!image) {   
-    //     throw new BadRequestError('profile picture not found');
-    // }
-
     const userId = req.user.userId
 
     const dir = path.join(__dirname, '..', 'uploads', userId + '.png');
@@ -79,7 +57,6 @@ const deleteProfilePic = (req, res) => {
         }
     })
    
-
 }
 
 
@@ -101,10 +78,10 @@ const getProfilePic = async (req, res) => {
     }
 
     if (matchedFiles.length == 0) {
-        res.send(path.join(__dirname, '..', 'uploads', 'default', 'default.png'))
+        res.json({path: path.join(__dirname, '..', 'uploads', 'default', 'default.png')})
     }
     else {
-        res.send(path.join(__dirname, '..', 'uploads', matchedFiles[0]))
+        res.json({path: path.join(__dirname, '..', 'uploads', matchedFiles[0])})
     }
 
 }
