@@ -6,8 +6,8 @@ const {BadRequestError, UnauthenticatedError} = require('../errors');
 const multer = require('multer')
 
 const fs = require('fs')
-
-
+const path = require('path');
+const { readdir } = require('fs/promises');
 
 
 const updateProfilePic = async (req, res) => {
@@ -15,7 +15,6 @@ const updateProfilePic = async (req, res) => {
     const Storage = multer.diskStorage({
         destination: 'uploads',
         filename: (req, file, callback) => {
-            // callback(null, file.originalname)
             callback(null, req.user.userId + ".png")
         }
     })
@@ -35,18 +34,6 @@ const updateProfilePic = async (req, res) => {
         else {
             
             res.status(StatusCodes.CREATED).json({msg: "profile picture UPDATE successful"})
-
-            // const newImage = new ProfilePic({
-            //     userId: userId, 
-            //     image: {
-            //         data : req.file.filename,
-            //         contentType: 'image/png'
-            //     }
-            // }) 
-
-            // newImage.save()
-            //     .then(() =>  res.status(StatusCodes.CREATED).json({msg: "profile picture UPDATE successful"}))
-            //     .catch(err => console.log(err))
         }
     })
 
@@ -79,24 +66,50 @@ const deleteProfilePic = (req, res) => {
     //     throw new BadRequestError('profile picture not found');
     // }
 
-    res.status(200).json({msg: "profile picture deleted"});
+    const userId = req.user.userId
+
+    const dir = path.join(__dirname, '..', 'uploads', userId + '.png');
+
+    fs.unlink(dir, (err) => {
+        if (err) {
+            return res.status(404).json({msg: "profile picture is already default"})
+        }
+        else {
+            return res.status(200).json({msg: "profile picture successfully deleted"})
+        }
+    })
+   
+
 }
-
-
 
 
 const getProfilePic = async (req, res) => {
-
     const userId = req.user.userId
 
-    const image = await ProfilePic.findOne({userId : userId});
+    const dir = path.join(__dirname, '..', 'uploads');
+    console.log(dir)
+    const name = userId
 
-    if (!image) { 
-        throw new BadRequestError('Unable to get image');
+    const matchedFiles = [];
+    const files = await readdir(dir);
+    for (const file of files) {
+        // Method 1:
+        const filename = path.parse(file).name;
+        if (filename === name) {
+            matchedFiles.push(file);
+        }
     }
 
-    res.status(200).json({image: image}); 
+    if (matchedFiles.length == 0) {
+        res.send(path.join(__dirname, '..', 'uploads', 'default', 'default.png'))
+    }
+    else {
+        res.send(path.join(__dirname, '..', 'uploads', matchedFiles[0]))
+    }
+
 }
+
+
 
 module.exports = { 
 //    uploadProfilePic,
