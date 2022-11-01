@@ -24,7 +24,7 @@ const getProfile = async (req, res) => {
     }
 
     const userId = user._id
-    console.log(userId)
+    // console.log(userId)
 
 
 
@@ -38,10 +38,10 @@ const getProfile = async (req, res) => {
     for (const file of files) {
         // Method 1:
         const filename = path.parse(file).name;
-        console.log(filename)
-        console.log(name)
-        console.log(filename === name)
-        console.log() 
+        // console.log(filename)
+        // console.log(name)
+        // console.log(filename === name)
+        // console.log() 
         if (filename === name) {
             matchedFiles.push(file);
         }
@@ -73,7 +73,7 @@ const getProfile = async (req, res) => {
 
     const {rankCollection} = await getRankings(req,res)
 
-    console.log(rankCollection)
+    // console.log(rankCollection)
 
     const rankObject = rankCollection.find(element => element.userName === username);
     const score = rankObject.score
