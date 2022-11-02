@@ -1,6 +1,9 @@
 import React from "react"
 import { reducer, values } from "./EventsReducer"
 import axios from 'axios'
+import { url } from "../config/constants"
+
+
 
 export const EventsContext = React.createContext({
     state: values,
@@ -28,7 +31,7 @@ export const EventsProvider = ({ children }) => {
 
     const communicationEvents = {
         login: async (username, password) => {
-            await axios.post("http://localhost:3000/api/v1/auth/login",
+            await axios.post(`${url}/api/v1/auth/login`,
                 { username: username, password: password }, config
             )
                 .then(function (response) {
@@ -40,7 +43,7 @@ export const EventsProvider = ({ children }) => {
                 });
         },
         register: async (username, password) => {
-            await axios.post('http://localhost:3000/api/v1/auth/register',
+            await axios.post(`${url}/api/v1/auth/register`,
                 { "username": username, "password": password }
             )
                 .then(function (response) {
@@ -53,7 +56,7 @@ export const EventsProvider = ({ children }) => {
         },
 
         getScores: async () => {
-            await axios.get('http://localhost:3000/api/v1/portfolios', config)
+            await axios.get(`${url}/api/v1/portfolios`, config)
                 .then(function (response) {
                     //   console.log(JSON.stringify(response, 0, 2));
                     const data = response.data
@@ -74,11 +77,11 @@ export const EventsProvider = ({ children }) => {
         },
 
         buyStock: async (stockname, numofunits, initcost) => {
-            if(initcost === undefined) {
+            if (initcost === undefined) {
                 initcost = 0
             }
-            await axios.patch('http://localhost:3000/api/v1/portfolios/1',
-                { "stockName": stockname, "numOfUnits": numofunits, "initCost": initcost }, config)
+            await axios.patch(`${url}/api/v1/portfolios/1`,
+                { "stockName": stockname, "numOfUnits": Number(numofunits), "initCost": Number(initcost) }, config)
                 .then(function (response) {
                     DEBUG.buyStock && console.log('Buy Stock response:', response.data);
                     dispatch({ type: "boughtStock", value: response.data })
@@ -92,7 +95,7 @@ export const EventsProvider = ({ children }) => {
             // let deleteConfig = structuredClone(config)
             let deleteConfig = JSON.parse(JSON.stringify(config))
             deleteConfig["data"] = { 'stockName': stockname }
-            await axios.delete('http://localhost:3000/api/v1/portfolios/1', deleteConfig)
+            await axios.delete(`${url}/api/v1/portfolios/1`, deleteConfig)
                 .then(function (response) {
                     DEBUG.sellStock && console.log('Sell Stock response:', response.data);
                     dispatch({ type: "soldStock", value: response.data })
@@ -103,7 +106,7 @@ export const EventsProvider = ({ children }) => {
                 });
         },
         addDollars: async () => {
-            await axios.get('http://localhost:3000/api/v1/portfolios/1', config)
+            await axios.get(`${url}/api/v1/portfolios/1`, config)
                 .then(function (response) {
                     DEBUG.createPortfolio && console.log('Create Portfolio response:', response.data);
                     dispatch({ type: "dollarsAdded", value: response.data })
@@ -115,7 +118,7 @@ export const EventsProvider = ({ children }) => {
         },
 
         getPortfolio: async () => {
-            await axios.get('http://localhost:3000/api/v1/portfolios/1', config
+            await axios.get(`${url}/api/v1/portfolios/1`, config
             )
                 .then(function (response) {
                     console.log(response.data)
@@ -136,7 +139,7 @@ export const EventsProvider = ({ children }) => {
         },
 
         createPortfolio: async () => {
-            await axios.post('http://localhost:3000/api/v1/portfolios/', {
+            await axios.post(`${url}/api/v1/portfolios/`, {
                 "portId": 1,
                 "stockName": "AAPL",
                 "numOfUnits": 75,
@@ -152,20 +155,20 @@ export const EventsProvider = ({ children }) => {
         },
 
         logout: async () => {
-            await axios.post('http://localhost:3000/api/v1/auth/logout', {}, config)
-            .then(function (response) {
-              console.log(response);
-              window.location.reload()
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-          }
+            await axios.post(`${url}/api/v1/auth/logout`, {}, config)
+                .then(function (response) {
+                    console.log(response);
+                    window.location.reload()
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
     }
 
     return (
-        <EventsContext.Provider value={[state, communicationEvents]}>
-            {children}
-        </EventsContext.Provider>
+            <EventsContext.Provider value={[state, communicationEvents]}>
+                {children}
+            </EventsContext.Provider>
     )
 }

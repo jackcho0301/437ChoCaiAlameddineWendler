@@ -85,7 +85,7 @@ function App() {
 
   useEffect(() => {
     // DEBUG.eventsState && console.log("Events state:", JSON.stringify(events, 0, 2))
-    DEBUG.eventsState && console.log("Events state:", events)
+    DEBUG.eventsState && console.log("Backend events state:", events)
   }, [events])
 
   return (
