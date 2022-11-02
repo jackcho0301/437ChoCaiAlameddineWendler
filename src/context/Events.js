@@ -78,7 +78,7 @@ export const EventsProvider = ({ children }) => {
                 initcost = 0
             }
             await axios.patch('http://localhost:3000/api/v1/portfolios/1',
-                { "stockName": stockname, "numOfUnits": numofunits, "initCost": initcost }, config)
+                { "stockName": stockname, "numOfUnits": Number(numofunits), "initCost": Number(initcost) }, config)
                 .then(function (response) {
                     DEBUG.buyStock && console.log('Buy Stock response:', response.data);
                     dispatch({ type: "boughtStock", value: response.data })
