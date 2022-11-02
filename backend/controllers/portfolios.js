@@ -270,39 +270,48 @@ const updatePortfolio = async (req, res) => {
         if (portID){
             if (stockName){
                 if (numOfUnits){
-		    // Assume the user wants to purchase shares directly at the current price.
-	            // First see if this stock exists. Note this will have to be checked against
-		    // the TwelveData API or cache later.
-		    currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
-		    if (currItem.length == 0){
-			stockDoesntExist = true
-		    }
-		    else {
-			// Finally, before allowing the purchase to go through, verify the user
-			// has the funds for it...
-			currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
-			// This should always return something.
-			let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * currItem[0].currentCost)
-			// If the answer is negative...
-			if (afterPurchaseFunds < 0){
-		            // Cancel the sale...user cannot "buy naked" at this time.
-			    insufficientFunds = true
-			}
-			else {
-			    portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:currItem[0].currentCost})
-			    await Portfolio.create(portItem);
-
-			    // Update the money
-		            await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:"dollars"}, {numOfUnits:afterPurchaseFunds})
-			    // portfolioInfo and currInfo are now stale...reload here.
-			    portfolioInfo = await Portfolio.find()
-			    currInfo = retrieveCurrInfoKernel(userID,portID,portfolioInfo)
-			    req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
-			}
-		    }
-		}
-		else {
-		    // Assume that an initCost for a flat stock rate was submitted.
+                    // Assume the user wants to purchase shares directly at the current price.
+                    // First see if this stock exists. Note this will have to be checked against
+                    // the TwelveData API or cache later.
+                    currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
+                    if (currItem.length == 0){
+                        stockDoesntExist = true
+                    }
+                    else {
+                        // Finally, before allowing the purchase to go through, verify the user
+                        // has the funds for it...
+                        currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
+                        // This should always return something.
+                        let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * currItem[0].currentCost)
+                        // If the answer is negative...
+                        if (afterPurchaseFunds < 0){
+                            // Cancel the sale...user cannot "buy naked" at this time.
+                            insufficientFunds = true
+                        }
+                        else {
+                            // Do we create a new item or add to an existing one? Searcg for an existing item first.
+                            searchItem = await Portfolio.find({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].currentCost})
+                            if (searchItem.length > 0) {
+                                // Just add to the existing item.
+                                newNumOfUnits = numOfUnits + searchItem[0].numOfUnits
+                                await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].currentCost}, {numOfUnits:newNumOfUnits})
+                            }
+                            else {
+                                // Make a brand new entry.
+                                portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:currItem[0].currentCost})
+                                await Portfolio.create(portItem);
+                            }
+                            // Update the money
+                            await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:"dollars"}, {numOfUnits:afterPurchaseFunds})
+                            // portfolioInfo and currInfo are now stale...reload here.
+                            portfolioInfo = await Portfolio.find()
+                            currInfo = retrieveCurrInfoKernel(userID,portID,portfolioInfo)
+                            req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
+                        }
+                    }
+                }
+                else {
+                    // Assume that an initCost for a flat stock rate was submitted.
                     // First see if this stock exists. Note this will have to be checked
                     // against the TwelveData API or cache later.
                     currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
@@ -321,14 +330,24 @@ const updatePortfolio = async (req, res) => {
                             insufficientFunds = true
                         }
                         else {
-			    // Calculate the number of units. Note we should convert to float just in case.
-			    calcNumOfUnits = ((initCost*1.0) / currItem[0].currentCost)
-			    if (calcNumOfUnits == 0){
-		                invalidPurchaseAmount = true
-			    }
-			    else {
-                                portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:calcNumOfUnits, initCost:currItem[0].currentCost})
-                                await Portfolio.create(portItem);
+                            // Calculate the number of units. Note we should convert to float just in case.
+                            calcNumOfUnits = ((initCost*1.0) / currItem[0].currentCost)
+                            if (calcNumOfUnits == 0){
+                                invalidPurchaseAmount = true
+                            }
+                            else {
+                                // Do we create a new item or add to an existing one? Search for an existing item first.
+                                searchItem = await Portfolio.find({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].currentCost})
+                                if (searchItem.length > 0) {
+                                    // Just add to the existing item.
+                                    newNumOfUnits = calcNumOfUnits + searchItem[0].numOfUnits
+                                    await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].currentCost}, {numOfUnits:newNumOfUnits})
+                                }
+                                else {
+                                    // Make a brand new entry.
+                                    portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:calcNumOfUnits, initCost:currItem[0].currentCost})
+                                    await Portfolio.create(portItem);
+                                }
 
                                 // Update the money
                                 await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:"dollars"}, {numOfUnits:afterPurchaseFunds})
@@ -336,7 +355,7 @@ const updatePortfolio = async (req, res) => {
                                 portfolioInfo = await Portfolio.find()
                                 currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
                                 req.totalValue = totalValueKernel(userID,portID,portfolioInfo,currInfo)
-			    }
+                            }
                         }
                     }
                 }
