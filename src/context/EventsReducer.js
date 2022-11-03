@@ -8,7 +8,8 @@ const DEBUG = {
     register: true,
     buyStock: true,
     sellStock: true,
-    createPortfolio: true
+    createPortfolio: true,
+    getUserGroupMemberships: true
 }
 
 export const values = {
@@ -18,7 +19,8 @@ export const values = {
     boughtStock: 0,
     soldStock: 0,
     dollarsAdded: 0,
-    currentPortfolio: {}
+    currentPortfolio: {},
+    groupMemberships: {}
 }
 
 export const reducer = (state, action) => {
@@ -67,5 +69,11 @@ export const reducer = (state, action) => {
                 currentPortfolio: action.value
             }
         }
+        case "group": {
+	        return {
+		        ...state,
+		        groupMemberships: action.value
+	        }
+	    }
     }
 }
