@@ -13,7 +13,8 @@ const DEBUG = {
     register: true,
     buyStock: true,
     sellStock: true,
-    createPortfolio: true
+    createPortfolio: true,
+    getUserGroupMemberships: true
 }
 
 const config = {
@@ -74,8 +75,11 @@ export const EventsProvider = ({ children }) => {
         },
 
         buyStock: async (stockname, numofunits, initcost) => {
+            if(initcost === undefined) {
+                initcost = 0
+            }
             await axios.patch('http://localhost:3000/api/v1/portfolios/1',
-                { "stockName": stockname, "numOfUnits": numofunits, "initCost": initcost }, config)
+                { "stockName": stockname, "numOfUnits": Number(numofunits), "initCost": Number(initcost) }, config)
                 .then(function (response) {
                     DEBUG.buyStock && console.log('Buy Stock response:', response.data);
                     dispatch({ type: "boughtStock", value: response.data })
@@ -89,8 +93,7 @@ export const EventsProvider = ({ children }) => {
             // let deleteConfig = structuredClone(config)
             let deleteConfig = JSON.parse(JSON.stringify(config))
             deleteConfig["data"] = { 'stockName': stockname }
-            await axios.delete('http://localhost:3000/api/v1/portfolios/1',
-                deleteConfig)
+            await axios.delete('http://localhost:3000/api/v1/portfolios/1', deleteConfig)
                 .then(function (response) {
                     DEBUG.sellStock && console.log('Sell Stock response:', response.data);
                     dispatch({ type: "soldStock", value: response.data })
@@ -117,6 +120,15 @@ export const EventsProvider = ({ children }) => {
             )
                 .then(function (response) {
                     console.log(response.data)
+                    // let portfolio = {}
+                    // for (obj in response.data) {
+                    //     const stockName = obj.stockHoldings.stockName
+                    //     if (stockName in portfolio) {
+                    //         portfolio[stockName].holding += obj.stockHoldings.holding
+                    //     } else {
+                    //         portfolio
+                    //     }
+                    // }
                     dispatch({ type: "portfolio", value: response.data })
                 })
                 .catch(function (error) {
@@ -138,7 +150,29 @@ export const EventsProvider = ({ children }) => {
                 .catch(function (error) {
                     console.log(error);
                 });
-        }
+        },
+
+        logout: async () => {
+            await axios.post('http://localhost:3000/api/v1/auth/logout', {}, config)
+            .then(function (response) {
+              console.log(response);
+              window.location.reload()
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+          },
+
+	getUserGroupMemberships: async () => {
+	    await axios.get('http://localhost:3000/api/v1/groups', config)
+	        .then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "group", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
     }
 
     return (
