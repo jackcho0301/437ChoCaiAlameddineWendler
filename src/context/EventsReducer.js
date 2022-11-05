@@ -9,7 +9,9 @@ const DEBUG = {
     buyStock: true,
     sellStock: true,
     createPortfolio: true,
-    getUserGroupMemberships: true
+    getUserGroupMemberships: true,
+    createGroup: true,
+    addGroupMembership: true
 }
 
 export const values = {
@@ -20,7 +22,10 @@ export const values = {
     soldStock: 0,
     dollarsAdded: 0,
     currentPortfolio: {},
-    groupMemberships: {}
+    groupMemberships: {},
+    groupOwnships: {},
+    createGroupResponse: {},
+    addMemberResponse: {}
 }
 
 export const reducer = (state, action) => {
@@ -70,10 +75,28 @@ export const reducer = (state, action) => {
             }
         }
         case "group": {
-	        return {
-		        ...state,
-		        groupMemberships: action.value
-	        }
+	    return {
+		...state,
+		groupMemberships: action.value
 	    }
+	}
+	case "groupOwn": {
+	    return {
+		...state,
+		groupOwnships: action.value
+	    }
+	}
+        case "createGroupRes": {
+	    return {
+		...state,
+		createGroupResponse: action.value
+	    }
+	}
+	case "addMemberRes": {
+	    return {
+	        ...state,
+		addMemberResponse: action.value
+	    }
+	}
     }
 }
