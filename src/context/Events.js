@@ -14,7 +14,10 @@ const DEBUG = {
     buyStock: true,
     sellStock: true,
     createPortfolio: true,
-    getUserGroupMemberships: true
+    getUserGroupMemberships: true,
+    getUserGroupOwnships: true,
+    createGroup: true,
+    addGroupMember: true
 }
 
 const config = {
@@ -173,6 +176,41 @@ export const EventsProvider = ({ children }) => {
 		    console.log(error);
 		});
 	},
+	
+	getUserGroupOwnships: async () => {
+            await axios.get('http://localhost:3000/api/v1/groupowns', config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "groupOwn", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+	
+	createGroup: async groupTitle => {
+	    await axios.post('http://localhost:3000/api/v1/groupowns',
+                {"groupTitle":groupTitle}, config)
+		.then (function (response) {
+		    console.log(response);
+		    dispatch({ type: "createGroupRes", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+	
+	addGroupMember: async (name, groupTitle) => {
+	    await axios.post('http://localhost:3000/api/v1/groups', 
+		{"name":name,"groupTitle":groupTitle}, config)
+		.then (function (response) {
+		    console.log(response);
+		    dispatch({ type: "addMemberRes", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	}
     }
 
     return (
