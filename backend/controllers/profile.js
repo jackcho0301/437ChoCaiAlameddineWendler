@@ -14,34 +14,24 @@ const Portfolio = require('../models/Portfolio')
 const NodeCache = require('node-cache');
 
 
+const getMyProfile = async (req, res) => {
 
-const getProfile = async (req, res) => {
-
-    const username = req.query.username
-    const user = await User.findOne({ username: username });
+    const userId = req.user.userId
+    const user = await User.findOne({ _id: userId });
     if (!user) {
-        throw new NotFoundError(`No user with username ${username}`);
+        throw new NotFoundError(`No user with id ${userId}`);
     }
 
-    const userId = user._id
-    // console.log(userId)
-
-
+    const username = user.username
 
 
     const dir = path.join(__dirname, '..', 'uploads');
-    console.log(dir)
     const name = userId.toString()
 
     const matchedFiles = [];
     const files = await readdir(dir);
     for (const file of files) {
-        // Method 1:
         const filename = path.parse(file).name;
-        // console.log(filename)
-        // console.log(name)
-        // console.log(filename === name)
-        // console.log() 
         if (filename === name) {
             matchedFiles.push(file);
         }
@@ -58,22 +48,7 @@ const getProfile = async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     const {rankCollection} = await getRankings(req,res)
-
-    // console.log(rankCollection)
 
     const rankObject = rankCollection.find(element => element.userName === username);
     const score = rankObject.score
@@ -85,15 +60,11 @@ const getProfile = async (req, res) => {
         
         count ++
         if (rankCollection[i].score < prevScore){
-            // console.log("rank before is " + rank)
+
             rank = count
-            // console.log("rank after is " + rank)
+
             prevScore = rankCollection[i].score
         }
-        // else {
-        //     rank = count
-        // }
-
         if (rankCollection[i].userName === username){
             break
         }
@@ -105,6 +76,74 @@ const getProfile = async (req, res) => {
 
 
 
+    res.status(200).json({username: username, score: score, rank: rank, profilePicPath})
+
+    
+}
+
+
+const getOthersProfile = async (req, res) => {
+
+    const username = req.query.username
+    const user = await User.findOne({ username: username });
+    if (!user) {
+        throw new NotFoundError(`No user with username ${username}`);
+    }
+
+    const userId = user._id
+    // console.log(userId)
+
+
+
+
+    const dir = path.join(__dirname, '..', 'uploads');
+    // console.log(dir)
+    const name = userId.toString()
+
+    const matchedFiles = [];
+    const files = await readdir(dir);
+    for (const file of files) {
+
+        const filename = path.parse(file).name;
+
+        if (filename === name) {
+            matchedFiles.push(file);
+        }
+    }
+
+    let profilePicPath = ""
+
+    if (matchedFiles.length == 0) {
+        profilePicPath =  path.join(__dirname, '..', 'uploads', 'default', 'default.png')
+    }
+    else {
+        profilePicPath = path.join(__dirname, '..', 'uploads', matchedFiles[0])
+    }
+
+
+    const {rankCollection} = await getRankings(req,res)
+
+
+    const rankObject = rankCollection.find(element => element.userName === username);
+    const score = rankObject.score
+    
+    let rank = 1
+    let prevScore = rankCollection[0].score
+    let count = 0
+    for (let i = 0; i < rankCollection.length; i++) {
+        
+        count ++
+        if (rankCollection[i].score < prevScore){
+            rank = count
+            prevScore = rankCollection[i].score
+        }
+
+        if (rankCollection[i].userName === username){
+            break
+        }
+    }
+
+    
     res.status(200).json({username: username, score: score, rank: rank, profilePicPath})
 
     
@@ -233,6 +272,6 @@ function totalValueKernel(userID, portID, portfolioInfo, currInfo){
 
 
 module.exports = { 
-    getProfile,
-
+    getMyProfile,
+    getOthersProfile,
 }
