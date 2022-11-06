@@ -17,7 +17,8 @@ const DEBUG = {
     getUserGroupMemberships: true,
     getUserGroupOwnships: true,
     createGroup: true,
-    addGroupMember: true
+    addGroupMember: true,
+    getMyProfile: true,
 }
 
 const config = {
@@ -210,7 +211,19 @@ export const EventsProvider = ({ children }) => {
 		.catch(function (error) {
 		    console.log(error);
 		});
-	}
+	},
+
+    getMyProfile: async () => {
+        await axios.get('http://localhost:3000/api/v1/profile', config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "profile", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+
     }
 
     return (

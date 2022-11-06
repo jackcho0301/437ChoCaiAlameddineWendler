@@ -17,6 +17,7 @@ export default function ProfilePage(props) {
 	title: ''
     })
     const [addMemberMessage, setAddMemberMessage] = React.useState([{}])
+	const [myProfile, setMyProfile] = React.useState([{}])
 
     useEffect(() => {
 	setCurrentGroupMemberships(backend.groupMemberships)
@@ -33,6 +34,36 @@ export default function ProfilePage(props) {
     useEffect(() => {
 	setAddMemberMessage(backend.addMemberResponse)
     }, [backend.addMemberResponse])
+
+
+	useEffect(() => {
+	setMyProfile(backend.getMyProfileResponse)
+	}, [backend.getMyProfileResponse])
+
+    useEffect(() => {
+        console.log('Current returns portfolio:', myProfile)
+    }, [myProfile])
+
+
+
+
+	const refreshMyProfile = (
+    	<div className='my-profile'>
+	    <h1>My Profile</h1>
+		{console.log(myProfile.score)}
+	    <IconButton
+	        onClick={callEvent.getMyProfile}
+	        className='refresh-get-my-profile'
+	    >
+	    <RefreshIcon fontSize='large' />
+	    </IconButton>
+	</div>
+    )
+
+
+
+
+
 
     const newMemberInput = () => {
         const changeNewMemberName = event => {
@@ -71,7 +102,7 @@ export default function ProfilePage(props) {
         <div className='groups-text-and-refresh'>
 	    <h1>Groups I Belong To</h1>
 	    <IconButton
-	        onClick={callEvent.getUserGroupMemberships}
+	        onClick={callEvent.getMyProfileResponse}
 	        className='refresh-group-membership'
 	    >
 	    <RefreshIcon fontSize='large' />
@@ -164,6 +195,14 @@ export default function ProfilePage(props) {
 		    </InputLabel>
 	        </>
 	    }
+
+		{refreshMyProfile}
+
+		<p>Username: {myProfile.username}</p>
+		<p>Score: {myProfile.score}</p>
+		<p>Rank: {myProfile.rank}</p>
+		<img src={myProfile.profilePicPath} />
+		{/* {currentProfile} */}
 	</div>
     )
 }
