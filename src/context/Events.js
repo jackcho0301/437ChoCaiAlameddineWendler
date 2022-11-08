@@ -17,7 +17,8 @@ const DEBUG = {
     getUserGroupMemberships: true,
     getUserGroupOwnships: true,
     createGroup: true,
-    addGroupMember: true
+    addGroupMember: true,
+    getTitle: true
 }
 
 const config = {
@@ -206,6 +207,28 @@ export const EventsProvider = ({ children }) => {
 		.then (function (response) {
 		    console.log(response);
 		    dispatch({ type: "addMemberRes", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+
+	getTitle: async () => {
+	    await axios.get('http://localhost:3000/api/v1/stats/title', config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "title", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+	
+	getStats: async () => {
+	    await axios.get('http://localhost:3000/api/v1/stats', config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "stats", value: response.data })
 		})
 		.catch(function (error) {
 		    console.log(error);
