@@ -17,7 +17,7 @@ export default function ProfilePage(props) {
 	title: ''
     })
     const [addMemberMessage, setAddMemberMessage] = React.useState([{}])
-	const [myProfile, setMyProfile] = React.useState([{}])
+	const [myProfile, setMyProfile] = React.useState(<></>)
 
     useEffect(() => {
 	setCurrentGroupMemberships(backend.groupMemberships)
@@ -37,28 +37,48 @@ export default function ProfilePage(props) {
 
 
 	useEffect(() => {
-	setMyProfile(backend.getMyProfileResponse)
-	}, [backend.getMyProfileResponse])
+		console.log("!!" + JSON.stringify(backend.profile))
+		setMyProfile(renderProfile(backend.profile)) 
+    }, [backend.profile])
 
-    useEffect(() => {
-        console.log('Current returns portfolio:', myProfile)
-    }, [myProfile])
+	useEffect(() => {
+		callEvent.getMyProfile()
+	}, [])
+
+	const renderProfile = profile => {
+		return (
+			<>
+				<p>Username: {profile.username}</p>
+				<p>Score: {profile.score}</p>
+				<p>Rank: {profile.rank}</p>
+				<img src="/profilePicture/6355a789f60cadf72eb90954.png" width="100px" length="100px" />
+			</>
+		)
+	}
 
 
 
 
-	const refreshMyProfile = (
-    	<div className='my-profile'>
-	    <h1>My Profile</h1>
-		{console.log(myProfile.score)}
-	    <IconButton
-	        onClick={callEvent.getMyProfile}
-	        className='refresh-get-my-profile'
-	    >
-	    <RefreshIcon fontSize='large' />
-	    </IconButton>
-	</div>
-    )
+
+    // useEffect(() => {
+    //     console.log('Current returns portfolio:', myProfile)
+    // }, [myProfile])
+
+
+
+
+	// const refreshMyProfile = (
+    // 	<div className='my-profile'>
+	//     <h1>My Profile</h1>
+	// 	{console.log(myProfile.score)}
+	//     <IconButton
+	//         onClick={callEvent.getMyProfile}
+	//         className='refresh-get-my-profile'
+	//     >
+	//     <RefreshIcon fontSize='large' />
+	//     </IconButton>
+	// </div>
+    // )
 
 
 
@@ -196,13 +216,12 @@ export default function ProfilePage(props) {
 	        </>
 	    }
 
-		{refreshMyProfile}
+		{/* {refreshMyProfile} */}
 
-		<p>Username: {myProfile.username}</p>
-		<p>Score: {myProfile.score}</p>
-		<p>Rank: {myProfile.rank}</p>
-		<img src={myProfile.profilePicPath} />
-		{/* {currentProfile} */}
+		{myProfile}
+
+
+
 	</div>
     )
 }
