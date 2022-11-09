@@ -149,7 +149,7 @@ export default function ProfilePage(props) {
 		</>
 	    }
 	    {newMemberInput()}
-	    {(addMemberMessage.msg != undefined && addMemberMessage.success)
+	    {(addMemberMessage.msg != undefined)
 		&& <>
 	            <InputLabel>
 			{addMemberMessage.msg}
@@ -157,7 +157,7 @@ export default function ProfilePage(props) {
 		</>
 	    }
 	    {newGroupInput()}
-            {(createGroupMessage.msg != undefined && createGroupMessage.success)
+            {(createGroupMessage.msg != undefined)
 		&& <>
 		    <InputLabel>
 		        {createGroupMessage.msg}
