@@ -23,7 +23,11 @@ export default function Header(props) {
                     <div id='menu-wrapper'>
                         {Object.keys(props.pageState).map((page, idx) => {
                             const text = props.pageState[page].text
-                            if(text) {
+                            if (text == "Profile")
+                            {
+                                // Do Nothing
+                            }
+                            else if(text) {
                                 return (
                                     <HeaderItem
                                         setPage={() => props.setPage(page)}
