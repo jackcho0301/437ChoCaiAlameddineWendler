@@ -42,7 +42,7 @@ export default function Header(props) {
                     </div>
 
                     <div id='icon-wrapper'>
-                        <IconButton>
+                        <IconButton onClick={() => props.setPage("profile")}>
                             <Avatar
                                 src='/images/stonks.png'
                                 alt='profile-avatar'

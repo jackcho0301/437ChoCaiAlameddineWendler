@@ -18,5 +18,9 @@
     "help": {
         "text": "FAQs",
         "active": false
+    },
+    "profile": {
+	    "text": false,
+	    "active": false
     }
 }
