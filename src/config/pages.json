@@ -20,7 +20,7 @@
         "active": false
     },
     "profile": {
-	    "text": false,
-	    "active": false
+        "text": "Profile",
+        "active": false
     }
 }
