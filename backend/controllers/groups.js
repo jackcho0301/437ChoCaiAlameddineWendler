@@ -8,7 +8,7 @@ const getUserGroupMemberships = async (req, res) => {
     const userGroupMemInfo = await Group.find({userId:req.user.userId})
 
     if (userGroupMemInfo.length == 0) {
-        return res.status(404).json({success:false,msg:"No group memberships were found. The user may not belong to any."})    
+        return res.status(200).json({success:false,msg:"No group memberships were found. The user may not belong to any."})    
     }
     else {
         let groupNames = []
@@ -28,7 +28,7 @@ const getGroupMembers = async (req, res) => {
     const groupMemInfo = await Group.find({groupName:groupTitle})
 
     if (groupMemInfo.length == 0) {
-        return res.status(404).json({success:false,msg:"No members were found for the specified group."})
+        return res.status(200).json({success:false,msg:"No members were found for the specified group."})
     }
     else {
 	let groupNames = []
@@ -59,7 +59,7 @@ const putGroupMembership = async (req, res) => {
     const newMemberInfo = await User.find({username: name})
     // This should only ever return one result.
     if (newMemberInfo.length == 0) {
-        return res.status(404).json({success:false, msg:"New member name not found."})
+        return res.status(200).json({success:false, msg:"New member name not found."})
     }
     else {
         const newMemberId = newMemberInfo[0]._id

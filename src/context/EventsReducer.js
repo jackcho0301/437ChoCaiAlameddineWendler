@@ -11,7 +11,9 @@ const DEBUG = {
     createPortfolio: true,
     getUserGroupMemberships: true,
     createGroup: true,
-    addGroupMembership: true
+    addGroupMembership: true,
+    getTitle: true,
+    getStats: true
 }
 
 export const values = {
@@ -25,7 +27,9 @@ export const values = {
     groupMemberships: {},
     groupOwnships: {},
     createGroupResponse: {},
-    addMemberResponse: {}
+    addMemberResponse: {},
+    currentTitle: {},
+    currentStats: {}
 }
 
 export const reducer = (state, action) => {
@@ -96,6 +100,18 @@ export const reducer = (state, action) => {
 	    return {
 	        ...state,
 		addMemberResponse: action.value
+	    }
+	}
+	case "title": {
+	    return {
+		...state,
+		currentTitle: action.value
+	    }
+	}
+        case "stats": {
+	    return {
+		...state,
+		currentStats: action.value
 	    }
 	}
     }

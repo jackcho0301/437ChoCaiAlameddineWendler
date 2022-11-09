@@ -1,4 +1,5 @@
 const Stat = require('../models/Stat')
+const User = require('../models/User')
 const fetch = require('node-fetch')
 
 // Note that the year doesn't matter for constant dates.
@@ -14,6 +15,20 @@ const getStats = async (req, res) => {
 
     if (statInfo) {
         res.status(200).json({success:true,data:statInfo})
+    }
+    else {
+	res.status(400).json({success:false,msg:'An error occurred retrieving the user\'s stats'})
+    }
+}
+
+// API for retrieving the user's name and title. The name is important
+// for returning ranking out of all users. 
+const getTitle = async (req, res) => {
+    const userInfo = await User.find({_id:req.user.userId})
+
+    const titleInfo = {user:userInfo[0].username,title:'foobar'}
+    if (userInfo) {
+	res.status(200).json({success:true,data:titleInfo})
     }
     else {
 	res.status(400).json({success:false,msg:'An error occurred retrieving the user\'s stats'})
@@ -74,5 +89,6 @@ const putStat = async (req, res) => {
 
 module.exports = {
     getStats,
+    getTitle,
     putStat
 }

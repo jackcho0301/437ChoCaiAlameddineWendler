@@ -9,7 +9,7 @@ const getGroupOwnships = async (req, res) => {
     const groupOwnInfo = await GroupOwnship.find({userId:req.user.userId})
 
     if (groupOwnInfo.length == 0) {
-        return res.status(404).json({success:false,msg:"You have not created any groups."})
+        return res.status(200).json({success:false,msg:"You have not created any groups."})
     }
     else {
 	let ownedGroups = []
@@ -61,7 +61,7 @@ const createGroup = async (req, res) => {
 	return res.status(200).json({success:true,msg:"New group created."})
     }
     else {
-	return res.status(403).json({success:false,msg:"The group name specified already exists."})
+	return res.status(200).json({success:false,msg:"The group name specified already exists."})
     }
 }
 
