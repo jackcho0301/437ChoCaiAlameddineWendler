@@ -140,7 +140,7 @@ export default function PortfolioPage(props) {
                     data={currentReturnsPortfolio.map(item => {
                         return [
                             item.stockName,
-                            item.return,
+                            item.returnVal,
                             `${(stockHoldings[item.stockName]/100)}%`,
                             `${Math.round(item.return/stockHoldings[item.stockName])}%`,
                         ]
