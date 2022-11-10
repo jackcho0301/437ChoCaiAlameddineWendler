@@ -583,15 +583,23 @@ function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
         })
 
         indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
-        returnItem = ({stockName:pI.stockName,return:indivReturn})
-        returnCollection.push(returnItem)
+
+        if (returnCollection.find(elem => elem.stockName === pI.stockName)) {
+            existingItemIndex = returnCollection.findIndex(element => element.stockName === pI.stockName)
+            newIndivReturn = indivReturn + returnCollection[existingItemIndex].returnVal
+            returnCollection[existingItemIndex].returnVal = newIndivReturn
+        }
+        else {
+            returnItem = ({stockName:pI.stockName,returnVal:indivReturn})
+            returnCollection.push(returnItem)
+        }
     }
 
     return returnCollection
 }
 
 // This method will return the individual holding of each stock the
-// user currently owns in a particular portfolio. It is designed to 
+// user currently owns in a particular portfolio. It is designed to
 // be used with generating that pie chart on that one window.
 function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
@@ -619,9 +627,20 @@ function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
         })
 
         indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
-        indivHolding = ((indivReturn / currentValue) * 100)
-        holdingItem = ({stockName:pI.stockName,holding:indivHolding})
-        holdingCollection.push(holdingItem)
+
+        if (holdingCollection.find(elem => elem.stockName === pI.stockName)){
+            // Reclaim the original holding value
+            existingItemIndex = holdingCollection.findIndex(element => element.stockName === pI.stockName)
+            originalReturn = ((holdingCollection[existingItemIndex].holding * currentValue) / 100)
+            newIndivReturn = originalReturn + indivReturn
+            newIndivHolding = ((newIndivReturn / currentValue) * 100)
+            holdingCollection[existingItemIndex].holding = newIndivHolding
+        }
+        else {
+            indivHolding = ((indivReturn / currentValue) * 100)
+            holdingItem = ({stockName:pI.stockName,holding:indivHolding})
+            holdingCollection.push(holdingItem)
+        }
     }
 
     return holdingCollection
@@ -647,7 +666,7 @@ function totalValueKernel(userID, portID, portfolioInfo, currInfo){
 
     let sumValue = 0
     for (returnItem of stockReturn){
-        sumValue += returnItem.return
+        sumValue += returnItem.returnVal
     }
 
     return sumValue
