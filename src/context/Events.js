@@ -93,10 +93,10 @@ export const EventsProvider = ({ children }) => {
                 });
         },
 
-        sellStock: async stockname => {
+        sellStock: async (stockname, numofunits) => {
             // let deleteConfig = structuredClone(config)
             let deleteConfig = JSON.parse(JSON.stringify(config))
-            deleteConfig["data"] = { 'stockName': stockname }
+            deleteConfig["data"] = { 'stockName': stockname, "numOfUnits": Number(numofunits) }
             await axios.delete('http://localhost:3000/api/v1/portfolios/1', deleteConfig)
                 .then(function (response) {
                     DEBUG.sellStock && console.log('Sell Stock response:', response.data);
@@ -107,6 +107,7 @@ export const EventsProvider = ({ children }) => {
                     console.log(error);
                 });
         },
+	    
         addDollars: async () => {
             await axios.get('http://localhost:3000/api/v1/portfolios/1', config)
                 .then(function (response) {
