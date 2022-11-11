@@ -20,8 +20,8 @@ export const values = {
     registeredUser: '',
     loggedInUser: '',
     allScores: [{name: 'Loading', score: 0}],
-    boughtStock: 0,
-    soldStock: 0,
+    boughtStock: {},
+    soldStock: {},
     dollarsAdded: 0,
     currentPortfolio: {},
     groupMemberships: {},
@@ -55,13 +55,13 @@ export const reducer = (state, action) => {
         case "boughtStock": {
             return {
                 ...state,
-                boughtStock: action.value.data
+                boughtStock: action.value
             }
         }
         case "soldStock": {
             return {
                 ...state,
-                soldStock: action.value.data
+                soldStock: action.value
             }
         }
         //TODO: set up bought and dollars to be cumulative
