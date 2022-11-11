@@ -30,6 +30,8 @@ export default function PortfolioPage(props) {
         ticker: '',
         number: 0
     })
+    const [buyStockMessage, setBuyStockMessage] = React.useState([{}])
+    const [sellStockMessage, setSellStockMessage] = React.useState([{}])
 
     // useEffect(() => {
     //     modifyUser({type: "portfolio", value: getPortfolio())
@@ -76,6 +78,14 @@ export default function PortfolioPage(props) {
         DEBUG.stockParams && console.table([buyStockParams, sellStockParams])
     }, [buyStockParams, sellStockParams])
 
+    useEffect(() => {
+        setBuyStockMessage(backend.boughtStock)
+    }, [backend.boughtStock])
+
+    useEffect(() => {
+        setSellStockMessage(backend.soldStock)
+    }, [backend.soldStock])
+    
     // console.log(displayPortfolio)
 
     const stockHoldings = {}
@@ -234,6 +244,11 @@ export default function PortfolioPage(props) {
                         Buy
                     </Button>
                     {buySellControls(true)}
+                    {(buyStockMessage.msg != undefined)
+                        && <>
+                            <label>{buyStockMessage.msg}</label>
+                        </>
+                    }
                 </div>
                 <div className='sell-stock'>
                     <Button 
@@ -244,6 +259,11 @@ export default function PortfolioPage(props) {
                         Sell
                     </Button>
                     {buySellControls(false)}
+                    {(sellStockMessage.msg != undefined)
+                        && <>
+                            <label>{sellStockMessage.msg}</label>
+                        </>
+                    }
                 </div>
             </div>
 
