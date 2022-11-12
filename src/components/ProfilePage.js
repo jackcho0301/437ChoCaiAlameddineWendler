@@ -52,10 +52,11 @@ export default function ProfilePage(props) {
 	const renderProfile = profile => {
 		return (
 			<>
-				<p>Username: {profile.username}</p>
-				<p>Score: {profile.score}</p>
-				<p>Rank: {profile.rank}</p>
+				<p><strong>Username:</strong> {profile.username}</p>
 				<img src={profile.profilePicPath} width="100px" length="100px" />
+				<p><strong>Score:</strong> {profile.score}</p>
+				<p><strong>Rank:</strong> {profile.rank}</p>
+				
 				{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
 
 			</>
