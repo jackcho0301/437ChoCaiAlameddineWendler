@@ -240,7 +240,7 @@ export const EventsProvider = ({ children }) => {
 	},
 
     getMyProfile: async () => {
-        await axios.get('http://localhost:3000/api/v1/profile', config)
+        await axios.get(`http://${URL}:3000/api/v1/profile`, config)
 		.then(function (response) {
 		    console.log(response.data)
 		    dispatch({ type: "profile", value: response.data })
