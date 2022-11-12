@@ -16,7 +16,6 @@ export default function LogoutPage(props) {
 
     return (
         <div id='logout-page'>
-            <p>hello</p>
         </div>
     )
 }
