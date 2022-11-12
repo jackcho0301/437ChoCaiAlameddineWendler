@@ -19,6 +19,10 @@
         "text": "FAQs",
         "active": false
     },
+    "logout": {
+        "text": "Log Out",
+        "active": false
+    },
     "profile": {
         "text": "Profile",
         "active": false

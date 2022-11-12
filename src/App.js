@@ -8,6 +8,7 @@ import HomePage from './components/HomePage'
 import MyRankPage from './components/MyRankPage'
 import PortfolioPage from './components/PortfolioPage'
 import HelpPage from './components/HelpPage'
+import LogoutPage from './components/LogoutPage'
 import ProfilePage from './components/ProfilePage'
 import Swal from 'sweetalert2'
 import './Swal.css'
@@ -75,8 +76,11 @@ function App() {
             <LeaderboardPage/>}
           {pageState.help.active &&
             <HelpPage/>}
+          {pageState.logout.active &&
+            <LogoutPage/>}
 	        {pageState.profile.active &&
 	          <ProfilePage/>}
+            
 
         </div>
       )

@@ -121,5 +121,11 @@ export const reducer = (state, action) => {
 		profile: action.value
 	    }
 	}
+    case "logout": {
+	    return {
+	        ...state,
+		logoutResponse: {}
+	    }
+	}
     }
 }
