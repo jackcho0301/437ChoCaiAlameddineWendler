@@ -41,3 +41,8 @@
 .divide-10 {
   height: 5vh;
 }
+
+#logout-btn {
+  margin-right : 10px;
+  cursor: pointer;
+}

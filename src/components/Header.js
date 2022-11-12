@@ -23,7 +23,7 @@ export default function Header(props) {
                     <div id='menu-wrapper'>
                         {Object.keys(props.pageState).map((page, idx) => {
                             const text = props.pageState[page].text
-                            if (text == "Profile")
+                            if (text == "Profile" || text == "Log Out")
                             {
                                 // Do Nothing
                             }
@@ -43,6 +43,12 @@ export default function Header(props) {
                                 />)
                             }
                         })}
+                    </div>
+
+                    <div id='logout-wrapper'>
+                        <p id="logout-btn" onClick={() => props.setPage("logout")}>
+                            <strong>Log Out</strong>
+                        </p>
                     </div>
 
                     <div id='icon-wrapper'>
