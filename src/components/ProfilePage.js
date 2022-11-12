@@ -51,7 +51,7 @@ export default function ProfilePage(props) {
 
 	const renderProfile = profile => {
 		return (
-			<>
+			<div id="profile-info-div">
 				<p><strong>Username:</strong> {profile.username}</p>
 				<img src={profile.profilePicPath} width="100px" length="100px" />
 				<p><strong>Score:</strong> {profile.score}</p>
@@ -59,7 +59,7 @@ export default function ProfilePage(props) {
 				
 				{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
 
-			</>
+			</div>
 
 		)
 	}
@@ -157,6 +157,9 @@ export default function ProfilePage(props) {
 
     return (
         <div class='profile-page' id='profile-page'>
+
+			{myProfile}
+
             {refreshGroupControls}
             {(currentGroupMemberships.success != undefined && currentGroupMemberships.success)
 	        && <>
@@ -198,7 +201,7 @@ export default function ProfilePage(props) {
 	        </>
 	    }
 
-		{myProfile}
+	
 	</div>
     )
 }
