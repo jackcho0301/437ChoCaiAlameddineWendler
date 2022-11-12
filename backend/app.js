@@ -32,6 +32,8 @@ const usersRouter = require('./routes/users')
 const statsRouter = require('./routes/stats')
 const groupsRouter = require('./routes/groups')
 const groupOwnshipsRouter = require('./routes/groupownships')
+const profilePicRouter = require('./routes/profilePic')
+const profileRouter = require('./routes/profile')
 
 /*
 const store = new MongoDBSession ({
@@ -84,6 +86,9 @@ app.use('/api/v1/portfolios', extractUserIdMiddleware, portfoliosRouter) //authe
 app.use('/api/v1/stats', extractUserIdMiddleware, statsRouter) // authentication middleware placed
 app.use('/api/v1/groups', extractUserIdMiddleware, groupsRouter) // authentication middleware placed
 app.use('/api/v1/groupowns', extractUserIdMiddleware, groupOwnshipsRouter) //authentication middleware placed
+app.use('/api/v1/profilePic', extractUserIdMiddleware, profilePicRouter) // authentication middleware placed
+app.use('/api/v1/profile', extractUserIdMiddleware, profileRouter)// authentication middleware placed
+
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
