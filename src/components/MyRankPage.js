@@ -55,15 +55,18 @@ export default function MyRankPage(props) {
 	if (backend.currentTitle.data != undefined) {
 	    setRankTotal(backend.allScores.length + 1)
 	    const isUser = (element) => element.name == backend.currentTitle.data.user
-	    setRankNumber(backend.allScores.findIndex(isUser) + 1)
-	    if (isUser.score < 10000) {
-	        setRankTitle('Trader Who Can\'t Even')
-	    }
-	    else if (isUser.score > 1000000) {
-		setRankTitle('Global Elite')
-	    }
-	    else {
-		setRankTitle('Unpaid Stock Analyst Intern')
+	    const currentUserIndex = backend.allScores.findIndex(isUser)
+	    setRankNumber(currentUserIndex + 1)
+	    if (backend.allScores.length > 1) {
+	        if (Number(backend.allScores[currentUserIndex].score) < 10000) {
+	            setRankTitle('Trader Who Can\'t Even')
+	        }
+	        else if (Number(backend.allScores[currentUserIndex].score) > 1000000) {
+		    setRankTitle('Global Elite')
+	        }
+	        else {
+		    setRankTitle('Unpaid Stock Analyst Intern')
+	        }
 	    }
 	}
 	if (backend.currentStats.success) {
@@ -72,7 +75,8 @@ export default function MyRankPage(props) {
     }, [backend.allScores, backend.currentTitle, backend.currentStats])
 
     return (
-        <div id='my-rank-page'>
+        <div class='my-rank-page' id='my-rank-page'>
+	    <header></header>
             <h1>Your Current Quarter Rank is:</h1>
 	    {(rankNumber != 0 && rankTotal != 0)
 	        && <>
@@ -83,8 +87,8 @@ export default function MyRankPage(props) {
             {(rankStats.length > 1)
 	        && <>
 		    {
-	                rankStats.map((stat, i) => <p>{stat.quarterEnd.toString()} &#36;{stat.finalValue}</p>)
-		    }
+		       rankStats.map((stat, i) => <p>{(new Date(stat.quarterEnd)).toLocaleDateString()} &#36;{stat.finalValue}</p>)
+		    }		    
 	        </>
             }
 	    <h1>Your Current Title is:</h1>

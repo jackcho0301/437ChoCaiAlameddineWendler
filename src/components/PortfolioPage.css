@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
+    margin-top: 10vh;
 }
 
 /* .portfolio-page Button {
@@ -46,4 +47,8 @@
 
 .portfolio-return {
     margin-bottom: 20px;
+}
+
+.buy-stock, .sell-stock {
+    display: flex;
 }

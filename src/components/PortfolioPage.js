@@ -24,7 +24,8 @@ export default function PortfolioPage(props) {
     const [toggleRefresh, setToggleRefresh] = React.useState(false)
     const [buyStockParams, setBuyStockParams] = React.useState({
         ticker: '',
-        number: 0
+        number: 0,
+	amount: 0
     })
     const [sellStockParams, setSellStockParams] = React.useState({
         ticker: '',
@@ -83,9 +84,9 @@ export default function PortfolioPage(props) {
     }, [backend.boughtStock])
 
     useEffect(() => {
-        setSellStockMessage(backend.soldStock)
+	setSellStockMessage(backend.soldStock)
     }, [backend.soldStock])
-    
+
     // console.log(displayPortfolio)
 
     const stockHoldings = {}
@@ -102,7 +103,8 @@ export default function PortfolioPage(props) {
             isBuy ?
                 setBuyStockParams({
                     number: buyStockParams.number,
-                    ticker: event.target.value.toUpperCase()
+                    ticker: event.target.value.toUpperCase(),
+		    amount: buyStockParams.amount
                 })
                 :
                 setSellStockParams({
@@ -114,7 +116,8 @@ export default function PortfolioPage(props) {
             isBuy ?
                 setBuyStockParams({
                     ticker: buyStockParams.ticker,
-                    number: event.target.value
+                    number: event.target.value,
+		    amount: buyStockParams.amount
                 })
                 :
                 setSellStockParams({
@@ -122,6 +125,19 @@ export default function PortfolioPage(props) {
                     number: event.target.value
                 })
         }
+	const changeAmount = event => {
+	    isBuy ?
+		setBuyStockParams({
+		    ticker: buyStockParams.ticker,
+		    number: buyStockParams.number,
+		    amount: event.target.value
+		})
+		:
+		setSellStockParams({
+		    ticker: sellStockParams.ticker,
+		    number: sellStockParams.number
+		})
+	}
 
         return (
             <Box
@@ -145,6 +161,13 @@ export default function PortfolioPage(props) {
                     variant="filled"
                     onChange={event => changeNumber(event)}
                 />
+		{isBuy &&
+		<TextField
+		    id="stock-amount"
+		    label="Dollar Value"
+		    variant="filled"
+		    onChange={event => changeAmount(event)}
+		/>}
             </Box>
         );
     }
@@ -238,17 +261,17 @@ export default function PortfolioPage(props) {
                 <div className='buy-stock'>
                     <Button
                         variant='contained'
-                        onClick={() => { callEvent.buyStock(buyStockParams.ticker, buyStockParams.number); callEvent.getPortfolio() }}
-                        disabled={!(buyStockParams.ticker && buyStockParams.number)}
+                        onClick={() => { callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyStockParams.amount); callEvent.getPortfolio() }}
+                        disabled={!(buyStockParams.ticker && (buyStockParams.number || buyStockParams.amount))}
                     >
                         Buy
                     </Button>
                     {buySellControls(true)}
-                    {(buyStockMessage.msg != undefined)
-                        && <>
-                            <label>{buyStockMessage.msg}</label>
-                        </>
-                    }
+	            {(buyStockMessage.msg != undefined)
+			&& <>
+			    <label>{buyStockMessage.msg}</label>
+			</>
+		    }
                 </div>
                 <div className='sell-stock'>
                     <Button 
@@ -259,11 +282,11 @@ export default function PortfolioPage(props) {
                         Sell
                     </Button>
                     {buySellControls(false)}
-                    {(sellStockMessage.msg != undefined)
-                        && <>
-                            <label>{sellStockMessage.msg}</label>
-                        </>
-                    }
+	            {(sellStockMessage.msg != undefined)
+	                && <>
+		            <label>{sellStockMessage.msg}</label>
+		        </>
+		    }
                 </div>
             </div>
 

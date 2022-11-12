@@ -60,6 +60,7 @@ export default function ProfilePage(props) {
 	            <Button 
 		        variant="contained"
 		        onClick={() => {callEvent.addGroupMember(addGroupMemberParams.name, addGroupMemberParams.title)}}
+		        disabled={addGroupMemberParams.name == '' || addGroupMemberParams.title == ''}
 		    >Add Member</Button>
 		</Box>
 	    </div>
@@ -123,7 +124,7 @@ export default function ProfilePage(props) {
     }
 
     return (
-        <div id='profile-page'>
+        <div class='profile-page' id='profile-page'>
             {refreshGroupControls}
             {(currentGroupMemberships.success != undefined && currentGroupMemberships.success)
 	        && <>
@@ -141,9 +142,9 @@ export default function ProfilePage(props) {
 		&& <>
 	            <div className='current-owns-return'>
 			<ul>
-			    {
-				currentGroupOwnships.data.map((own, i) => <li>{own}</li>)
-			    }
+			    { 
+			        currentGroupOwnships.data.map((own, i) => <li>{own}</li>)
+			    }  
 		        </ul>
 		    </div>
 		</>
