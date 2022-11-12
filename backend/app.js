@@ -25,6 +25,9 @@ const connectDB = require('./db/connect')
 //middleware for authentication (placed before porfolio route)
 const authenticateUser = require('./middleware/authentication');
 
+//for uploading images
+app.use(express.static('./uploads'))
+
 //routers
 const authRouter = require('./routes/auth')
 const portfoliosRouter = require('./routes/portfolios')

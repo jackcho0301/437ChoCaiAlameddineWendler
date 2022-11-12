@@ -77,12 +77,27 @@ const getProfilePic = async (req, res) => {
         }
     }
 
+ 
+
+    let profilePicPath = ""
+
     if (matchedFiles.length == 0) {
-        res.json({path: path.join(__dirname, '..', 'uploads', 'default', 'default.png')})
+        // profilePicPath =  path.join(__dirname, '..', 'uploads', 'default', 'default.png')
+        profilePicPath = req.protocol + '://' + req.get('host') + "/default.png"
     }
     else {
-        res.json({path: path.join(__dirname, '..', 'uploads', matchedFiles[0])})
+        // profilePicPath = path.join(__dirname, '..', 'uploads', matchedFiles[0])
+        profilePicPath = req.protocol + '://' + req.get('host') + "/" + req.user.userId + ".png"
     }
+
+
+    res.json({path: profilePicPath})
+    // if (matchedFiles.length == 0) {
+    //     res.json({path: path.join(__dirname, '..', 'uploads', 'default', 'default.png')})
+    // }
+    // else {
+    //     res.json({path: path.join(__dirname, '..', 'uploads', matchedFiles[0])})
+    // }
 
 }
 

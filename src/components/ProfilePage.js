@@ -18,6 +18,8 @@ export default function ProfilePage(props) {
     })
     const [addMemberMessage, setAddMemberMessage] = React.useState([{}])
 
+	const [myProfile, setMyProfile] = React.useState(<></>)
+
     useEffect(() => {
 	setCurrentGroupMemberships(backend.groupMemberships)
     }, [backend.groupMemberships])
@@ -33,6 +35,35 @@ export default function ProfilePage(props) {
     useEffect(() => {
 	setAddMemberMessage(backend.addMemberResponse)
     }, [backend.addMemberResponse])
+
+
+
+	useEffect(() => {
+		console.log("!!" + JSON.stringify(backend.profile))
+		setMyProfile(renderProfile(backend.profile)) 
+    }, [backend.profile])
+
+	useEffect(() => {
+		callEvent.getMyProfile()
+	}, [])
+
+
+
+	const renderProfile = profile => {
+		return (
+			<>
+				<p>Username: {profile.username}</p>
+				<p>Score: {profile.score}</p>
+				<p>Rank: {profile.rank}</p>
+				<img src={profile.profilePicPath} width="100px" length="100px" />
+				{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
+
+			</>
+
+		)
+	}
+
+
 
     const newMemberInput = () => {
         const changeNewMemberName = event => {
@@ -165,6 +196,8 @@ export default function ProfilePage(props) {
 		    </InputLabel>
 	        </>
 	    }
+
+		{myProfile}
 	</div>
     )
 }

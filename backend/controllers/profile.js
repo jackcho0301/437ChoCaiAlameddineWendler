@@ -40,11 +40,15 @@ const getMyProfile = async (req, res) => {
     let profilePicPath = ""
 
     if (matchedFiles.length == 0) {
-        profilePicPath =  path.join(__dirname, '..', 'uploads', 'default', 'default.png')
+        // profilePicPath =  path.join(__dirname, '..', 'uploads', 'default', 'default.png')
+        profilePicPath = req.protocol + '://' + req.get('host') + "/default.png"
     }
     else {
-        profilePicPath = path.join(__dirname, '..', 'uploads', matchedFiles[0])
+        // profilePicPath = path.join(__dirname, '..', 'uploads', matchedFiles[0])
+        profilePicPath = req.protocol + '://' + req.get('host') + "/" + req.user.userId + ".png"
     }
+
+    
 
 
 
@@ -114,10 +118,11 @@ const getOthersProfile = async (req, res) => {
     let profilePicPath = ""
 
     if (matchedFiles.length == 0) {
-        profilePicPath =  path.join(__dirname, '..', 'uploads', 'default', 'default.png')
+        profilePicPath = req.protocol + '://' + req.get('host') + "/default.png"
     }
     else {
-        profilePicPath = path.join(__dirname, '..', 'uploads', matchedFiles[0])
+        // profilePicPath = path.join(__dirname, '..', 'uploads', matchedFiles[0])
+        profilePicPath = req.protocol + '://' + req.get('host') + "/" + matchedFiles[0]
     }
 
 
