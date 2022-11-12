@@ -109,6 +109,7 @@ export const EventsProvider = ({ children }) => {
                     console.log(error);
                 });
         },
+
         addDollars: async () => {
             await axios.get(`http://${URL}:3000/api/v1/portfolios/1`, config)
                 .then(function (response) {
