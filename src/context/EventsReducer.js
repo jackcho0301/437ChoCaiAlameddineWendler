@@ -29,7 +29,8 @@ export const values = {
     createGroupResponse: {},
     addMemberResponse: {},
     currentTitle: {},
-    currentStats: {}
+    currentStats: {},
+    profile: {},
 }
 
 export const reducer = (state, action) => {
@@ -112,6 +113,18 @@ export const reducer = (state, action) => {
 	    return {
 		...state,
 		currentStats: action.value
+	    }
+	}
+    case "profile": {
+	    return {
+	        ...state,
+		profile: action.value
+	    }
+	}
+    case "logout": {
+	    return {
+	        ...state,
+		logoutResponse: {}
 	    }
 	}
     }
