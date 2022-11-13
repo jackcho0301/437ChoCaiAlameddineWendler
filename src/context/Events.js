@@ -16,8 +16,14 @@ const DEBUG = {
     register: true,
     buyStock: true,
     sellStock: true,
-    createPortfolio: true
+    createPortfolio: true,
+    getUserGroupMemberships: true,
+    getUserGroupOwnships: true,
+    createGroup: true,
+    addGroupMember: true,
+    getTitle: true
 }
+
 
 const config = {
     headers: {
@@ -91,10 +97,10 @@ export const EventsProvider = ({ children }) => {
                 });
         },
 
-        sellStock: async stockname => {
+        sellStock: async (stockname, numofunits) => {
             // let deleteConfig = structuredClone(config)
             let deleteConfig = JSON.parse(JSON.stringify(config))
-            deleteConfig["data"] = { 'stockName': stockname }
+            deleteConfig["data"] = { 'stockName': stockname, "numOfUnits": Number(numofunits) }
             await axios.delete(`${url}/api/v1/portfolios/1`, deleteConfig)
                 .then(function (response) {
                     DEBUG.sellStock && console.log('Sell Stock response:', response.data);
@@ -105,6 +111,7 @@ export const EventsProvider = ({ children }) => {
                     console.log(error);
                 });
         },
+
         addDollars: async () => {
             await axios.get(`${url}/api/v1/portfolios/1`, config)
                 .then(function (response) {
@@ -141,13 +148,14 @@ export const EventsProvider = ({ children }) => {
         createPortfolio: async () => {
             await axios.post(`${url}/api/v1/portfolios/`, {
                 "portId": 1,
-                "stockName": "AAPL",
-                "numOfUnits": 75,
-                "initCost": 60.00
+                "stockName": "dollars",
+                "numOfUnits": 10000,
+                "initCost": 1
             }, config
             )
                 .then(function (response) {
                     console.log(response);
+                    dispatch({type: 'createPortfolio', value: response.data})
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -163,12 +171,79 @@ export const EventsProvider = ({ children }) => {
                 .catch(function (error) {
                     console.log(error);
                 });
+        },
+        getUserGroupMemberships: async () => {
+            await axios.get(`http://${URL}:3000/api/v1/groups`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "group", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        getUserGroupOwnships: async () => {
+            await axios.get(`http://${URL}:3000/api/v1/groupowns`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "groupOwn", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        createGroup: async groupTitle => {
+            await axios.post(`http://${URL}:3000/api/v1/groupowns`,
+                { "groupTitle": groupTitle }, config)
+                .then(function (response) {
+                    console.log(response);
+                    dispatch({ type: "createGroupRes", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        addGroupMember: async (name, groupTitle) => {
+            await axios.post(`http://${URL}:3000/api/v1/groups`,
+                { "name": name, "groupTitle": groupTitle }, config)
+                .then(function (response) {
+                    console.log(response);
+                    dispatch({ type: "addMemberRes", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        getTitle: async () => {
+            await axios.get(`http://${URL}:3000/api/v1/stats/title`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "title", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        getStats: async () => {
+            await axios.get(`${url}/api/v1/stats`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "stats", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
     }
 
     return (
-            <EventsContext.Provider value={[state, communicationEvents]}>
-                {children}
-            </EventsContext.Provider>
+        <EventsContext.Provider value={[state, communicationEvents]}>
+            {children}
+        </EventsContext.Provider>
     )
 }

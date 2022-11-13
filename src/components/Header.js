@@ -23,12 +23,14 @@ export default function Header(props) {
                     <div id='menu-wrapper'>
                         {Object.keys(props.pageState).map((page, idx) => {
                             const text = props.pageState[page].text
+                            const disabled = props.pageState[page].disabled
                             if(text) {
                                 return (
                                     <HeaderItem
                                         setPage={() => props.setPage(page)}
                                         key={idx}
                                         text={text}
+                                        disabled={disabled}
                                     />)
                             } else {
                             return (
@@ -42,7 +44,8 @@ export default function Header(props) {
                     </div>
 
                     <div id='icon-wrapper'>
-                        <IconButton>
+                        <IconButton
+                        onClick={() => props.setPage("profile")}>
                             <Avatar
                                 src='/images/stonks.png'
                                 alt='profile-avatar'

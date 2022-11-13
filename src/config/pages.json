@@ -18,5 +18,10 @@
     "help": {
         "text": "FAQs",
         "active": false
+    },
+    "profile": {
+        "text": " ",
+        "active": false,
+        "disabled": true
     }
 }

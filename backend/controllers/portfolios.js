@@ -381,14 +381,15 @@ const updatePortfolio = async (req, res) => {
     }
 }
 
-// This is the API for selling stocks. Note that although this is a 
-// delete request, it returns a value...in particular the total value of 
+// This is the API for selling stocks. Note that although this is a
+// delete request, it returns a value...in particular the total value of
 // what they just sold. This should immediately be used to present the
-// user with what money they can reinvest. When making this DELETE 
-// request, the following JSON input is expected to  be passed in the 
+// user with what money they can reinvest. When making this DELETE
+// request, the following JSON input is expected to  be passed in the
 // req.body:
 // {
-//      "stockName": (whatever stock ticker name as a string)
+//      "stockName": (whatever stock ticker name as a string),
+//      "numOfUnits": (number of units they're selling)
 // }
 // We can adapt this later to accept whole dollar values and calculate
 // numOfUnits from that.
@@ -398,7 +399,7 @@ const sellPortfolioItem = async (req, res) => {
 
     const userID = req.user.userId
     const portID = req.params.id
-    const {stockName} = req.body
+    const {stockName, numOfUnits} = req.body
 
     const portfolioInfo = await Portfolio.find()
 
@@ -448,23 +449,56 @@ const sellPortfolioItem = async (req, res) => {
     if (userID){
         if (portID){
             if (stockName){
-                // This may return multiple items, so be careful.
-                stockItem = portfolioInfo.filter((portItem) => (String(portItem.userId)===String(userID) && Number(portItem.portId)==Number(portID) && String(portItem.stockName)===String(stockName)))
-                // If we return nothing, the item doesn't exist so don't try and sell.
-                if (stockItem.length > 0){
-                    // Get the current price.
-                    currItem = currInfo.filter((infoItem) => (infoItem.stockName===stockName))
-                    // Compute the sale value of all entries.
-	                for (let i = 0; i < stockItem.length; i++) {
-                        saleValue = (stockItem[i].numOfUnits * Number(currItem[0].currentCost))
-                        // Add this money to the user's dollars value.
-                        currentFunds = await Portfolio.find({userId: stockItem[i].userId, portId: stockItem[i].portId, stockName: "dollars"});
-                        let newAvailableFunds = currentFunds[0].numOfUnits + saleValue
-                        await Portfolio.findOneAndUpdate({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"}, {numOfUnits: newAvailableFunds})
-                        // Finally, remove the sold item.
-                        await Portfolio.deleteOne({_id: stockItem[i]._id})
-			            totalSaleValue += saleValue
-		            }
+                if (numOfUnits > 0){
+                    // This may return multiple items, so be careful.
+                    stockItem = portfolioInfo.filter((portItem) => (String(portItem.userId)===String(userID) && Number(portItem.portId)==Number(portID) && String(portItem.stockName)===String(stockName)))
+                    // If we return nothing, the item doesn't exist so don't try and sell.
+                    if (stockItem.length > 0){
+                        // Get the current price.
+                        currItem = currInfo.filter((infoItem) => (infoItem.stockName===stockName))
+
+                        // Compute the number of shares owned for all entries.
+                        numOfOwnedUnits = 0
+                        for (let i = 0; i < stockItem.length; i++) {
+                            numOfOwnedUnits += stockItem[i].numOfUnits
+                        }
+
+                        // Can the sale be made for that amount?
+                        if (numOfOwnedUnits >= numOfUnits) {
+                            // Start looping through the entries.
+                            for (let j = 0; j < stockItem.length; j++) {
+                                // Get the units just for this entry
+                                remainingUnitsToSell = numOfUnits - stockItem[j].numOfUnits
+
+                                // Calculate sale value based on how much stock there is.
+                                if (remainingUnitsToSell < 0) {
+                                    // Selling part of this entry will satisfy the sale.
+                                    saleValue += (numOfUnits * Number(currItem[0].currentCost))
+                                    newUnits = stockItem[j].numOfUnits - numOfUnits
+                                    await Portfolio.findOneAndUpdate({userId: stockItem[j].userId, portId: stockItem[j].portId, stockName: stockItem[j].stockName}, {numOfUnits: newUnits})
+                                    break
+                                }
+                                else if (remainingUnitsToSell == 0) {
+                                    // Selling all of this entry will satisfy the sale.
+                                    saleValue += (numOfUnits * Number(currItem[0].currentCost))
+                                    await Portfolio.deleteOne({_id: stockItem[j]._id})
+                                    break
+                                }
+                                else {
+                                    // All of this entry must be sold plus more from another entry.
+                                    saleValue += (stockItem[j].numOfUnits * Number(currItem[0].currentCost))
+                                    numOfUnits = numOfUnits = stockItem[j].numOfUnits
+                                    await Portfolio.deleteOne({_id: stockItem[j]._id})
+                                }
+                            }
+
+                            // Add this money to the user's dollars value.
+                            currentFunds = await Portfolio.find({userId: userID, portId: portID, stockName: "dollars"});
+                            let newAvailableFunds = currentFunds[0].numOfUnits + saleValue
+                            await Portfolio.findOneAndUpdate({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"}, {numOfUnits: newAvailableFunds})
+                            totalSaleValue += saleValue
+                        }
+                    }
                 }
             }
         }
@@ -583,15 +617,23 @@ function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
         })
 
         indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
-        returnItem = ({stockName:pI.stockName,return:indivReturn})
-        returnCollection.push(returnItem)
+
+        if (returnCollection.find(elem => elem.stockName === pI.stockName)) {
+            existingItemIndex = returnCollection.findIndex(element => element.stockName === pI.stockName)
+            newIndivReturn = indivReturn + returnCollection[existingItemIndex].returnVal
+            returnCollection[existingItemIndex].returnVal = newIndivReturn
+        }
+        else {
+            returnItem = ({stockName:pI.stockName,returnVal:indivReturn})
+            returnCollection.push(returnItem)
+        }
     }
 
     return returnCollection
 }
 
 // This method will return the individual holding of each stock the
-// user currently owns in a particular portfolio. It is designed to 
+// user currently owns in a particular portfolio. It is designed to
 // be used with generating that pie chart on that one window.
 function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
@@ -619,9 +661,20 @@ function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
         })
 
         indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
-        indivHolding = ((indivReturn / currentValue) * 100)
-        holdingItem = ({stockName:pI.stockName,holding:indivHolding})
-        holdingCollection.push(holdingItem)
+
+        if (holdingCollection.find(elem => elem.stockName === pI.stockName)){
+            // Reclaim the original holding value
+            existingItemIndex = holdingCollection.findIndex(element => element.stockName === pI.stockName)
+            originalReturn = ((holdingCollection[existingItemIndex].holding * currentValue) / 100)
+            newIndivReturn = originalReturn + indivReturn
+            newIndivHolding = ((newIndivReturn / currentValue) * 100)
+            holdingCollection[existingItemIndex].holding = newIndivHolding
+        }
+        else {
+            indivHolding = ((indivReturn / currentValue) * 100)
+            holdingItem = ({stockName:pI.stockName,holding:indivHolding})
+            holdingCollection.push(holdingItem)
+        }
     }
 
     return holdingCollection
@@ -647,7 +700,7 @@ function totalValueKernel(userID, portID, portfolioInfo, currInfo){
 
     let sumValue = 0
     for (returnItem of stockReturn){
-        sumValue += returnItem.return
+        sumValue += returnItem.returnVal
     }
 
     return sumValue

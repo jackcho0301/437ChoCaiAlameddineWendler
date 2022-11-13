@@ -8,11 +8,13 @@ import HomePage from './components/HomePage'
 import MyRankPage from './components/MyRankPage'
 import PortfolioPage from './components/PortfolioPage'
 import HelpPage from './components/HelpPage'
+import ProfilePage from './components/ProfilePage'
 import Swal from 'sweetalert2'
 import './Swal.css'
 import { UserContext } from "./context/User"
 import { EventsContext } from './context/Events';
 // import { login } from "./context/Events"
+import { Box } from '@mui/material'
 
 const DEBUG = {
   pageState: false,
@@ -63,7 +65,7 @@ function App() {
           <Header
             pageState={pageState}
             setPage={setPageActive} />
-          <div className='divide-10'/>
+          {/* <Box sx={{m: 2}}/> */}
           {pageState.home.active &&
             <HomePage/>}
           {pageState.portfolio.active &&
@@ -74,6 +76,8 @@ function App() {
             <LeaderboardPage/>}
           {pageState.help.active &&
             <HelpPage/>}
+          {pageState.profile.active &&
+	          <ProfilePage/>}
 
         </div>
       )
