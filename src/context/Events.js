@@ -100,7 +100,7 @@ export const EventsProvider = ({ children }) => {
         sellStock: async (stockname, numofunits, cost) => {
             // let deleteConfig = structuredClone(config)
             let deleteConfig = JSON.parse(JSON.stringify(config))
-            deleteConfig["data"] = { 'stockName': stockname, "numOfUnits": Number(numofunits), "salePrice": cost }
+            deleteConfig["data"] = { 'stockName': stockname, "numOfUnits": Number(numofunits), "price": cost }
             await axios.delete(`${url}/api/v1/portfolios/1`, deleteConfig)
                 .then(function (response) {
                     DEBUG.sellStock && console.log('Sell Stock response:', response.data);

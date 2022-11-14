@@ -19,9 +19,9 @@ export const values = {
     registeredUser: '',
     loggedInUser: '',
     allScores: [{ name: 'Loading', score: 0 }],
-    boughtStock: {},
-    soldStock: {},
-    dollarsAdded: 0,
+    boughtStock: [],
+    soldStock: [],
+    dollarsAdded: [],
     currentPortfolio: {},
     groupMemberships: {},
     groupOwnships: {},
@@ -54,21 +54,27 @@ export const reducer = (state, action) => {
             }
         }
         case "boughtStock": {
+            let bought = state.boughtStock
+            bought.push(action.value.data)
             return {
                 ...state,
-                boughtStock: state.boughtStock + action.value.data
+                boughtStock: bought
             }
         }
         case "soldStock": {
+            let sold = state.soldStock
+            sold.push(action.value.data)
             return {
                 ...state,
-                soldStock: state.soldStock + action.value.data
+                soldStock: sold
             }
         }
         case "dollarsAdded": {
+            let added = state.dollarsAdded
+            added.push(action.value.data)
             return {
                 ...state,
-                dollarsAdded: state.dollarsAdded + action.value.data
+                dollarsAdded: added
             }
         }
 

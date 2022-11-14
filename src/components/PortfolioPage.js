@@ -63,13 +63,30 @@ export default function PortfolioPage(props) {
         }
 
         const getPortfolioData = returns => {
-            console.log(returns)
+            // console.log(returns)
             if (action.type === 'pie-chart') {
                 try {
                     return returns.map(item => {
+                        let fillOptions={}
+                        // if(item.stockName == 'dollars') {
+                        //     fillOptions.fill = 'green'
+                        // } else {
+                        //     function getRandomColor() {
+                        //         var letters = '0123456789abcdef';
+                        //         var color = '#';
+                        //         for (var i = 0; i < 6; i++) {
+                        //             color += letters[Math.floor(Math.random() * 16)];
+                        //         }
+                        //         return color;
+                        //     }
+                        //     fillOptions.fill = getRandomColor()
+                        // }
+                        const name = item.stockName == 'dollars' ? 'Cash' : item.stockName
+                        
                         return {
-                            x: item.stockName,
-                            y: Math.round(item.returnVal / 100)
+                            x: name,
+                            y: Math.round(item.returnVal / 100),
+                            ...fillOptions
                         }
                     })
                 } catch (error) {
@@ -78,14 +95,45 @@ export default function PortfolioPage(props) {
                 }
             } else if (action.type == 'table') {
                 return returns.map(item => {
+                    const name = item.stockName == 'dollars' ? 'Cash' : item.stockName
                     return [
-                        item.stockName,
-                        '$' + commaSeparate(item.returnVal.toFixed(2)),
-                        `${(stockHoldings[item.stockName] / 100)}%`,
+                        name,
+                        '$' + commaSeparate((item.returnVal).toFixed(2)),
+                        `${stockHoldings[item.stockName]/100}%`,
                     ]
                 })
             }
 
+        }
+
+        const cashSort = payload => {
+            let cashSecond = payload.sort((a, b) => {
+                if (a.x == "Cash") {
+                    return -1;
+                } else if (b.x == "Cash") {
+                    return 1;
+                } else {
+                    return (a.x < b.x ? -1 : 1);
+                }
+            })
+
+            if(cashSecond.length > 1) {
+                [cashSecond[0], cashSecond[1]] = [cashSecond[1], cashSecond[0]]
+            }
+
+            return cashSecond
+        }
+
+        const cashSortArray = payload => {
+            return payload.sort((a, b) => {
+                if (a[0] == "Cash") {
+                    return -1;
+                } else if (b[0] == "Cash") {
+                    return 1;
+                } else {
+                    return (a[0] < b[0] ? -1 : 1);
+                }
+            })
         }
 
 
@@ -95,7 +143,7 @@ export default function PortfolioPage(props) {
                     <MUIDataTable
                         // title="Current Portfolio"
                         className='stock-data-table'
-                        data={getPortfolioData(action.payload)}
+                        data={cashSortArray(getPortfolioData(action.payload))}
                         columns={["Stock", "Holding Value", "Holding Percent"]}
                     />
                 )
@@ -103,7 +151,12 @@ export default function PortfolioPage(props) {
             case 'pie-chart': {
                 return (
                     <VictoryPie
-                        data={getPortfolioData(action.payload)}
+                        data={cashSort(getPortfolioData(action.payload))}
+                        // style={{
+                        //     data: {
+                        //       fill: ({ datum }) => datum.fill,
+                        //     }
+                        //   }}
                         colorScale={"qualitative"}
                         // style={{
                         //     data: {
@@ -140,7 +193,7 @@ export default function PortfolioPage(props) {
     useEffect(() => {
         callEvent.getPortfolio()
         callEvent.getStats()
-    }, [backend.boughtStock, backend.soldStock, backend.createdPortfolio])
+    }, [JSON.stringify(backend.boughtStock), JSON.stringify(backend.soldStock), backend.createdPortfolio])
 
     useEffect(() => {
         console.log('Current returns portfolio:', currentReturnsPortfolio)
@@ -157,12 +210,13 @@ export default function PortfolioPage(props) {
         const moneyInvested = 10000
         setPortfolioStats({
             // cost: portfolio.coi,
+            // return: portfolio.totalReturnVal,
+            // roi: portfolio.roiPercent
             cost: moneyInvested,
             return: portfolio.totalVal - moneyInvested,
-            roi: Math.round((portfolio.totalVal - moneyInvested) / moneyInvested * 100) / 100
+            roi: Math.round((portfolio.totalVal - moneyInvested) / moneyInvested * 100)
         })
-        setToggleRefresh(false)
-    }, [backend.boughtStock, backend.soldStock, backend.dollarsAdded, backend.currentPortfolio, toggleRefresh])
+    }, [JSON.stringify(backend.boughtStock), JSON.stringify(backend.soldStock), JSON.stringify(backend.dollarsAdded), JSON.stringify(backend.currentPortfolio)])
 
     useEffect(() => {
         DEBUG.stockParams && console.log('stock params (buy=0, sell=1)')

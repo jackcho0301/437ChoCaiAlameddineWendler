@@ -1,1 +1,30 @@
 Server is listening on port 3000...
+new cost: undefined
+new cost: undefined
+new cost: undefined
+new cost: undefined
+currItem: { stockName: 'AAPL', currentCost: 150, newCost: 149.7 }
+new cost: undefined
+new cost: undefined
+9850.25
+new cost: undefined
+new cost: 149.75
+new cost: undefined
+new cost: 149.75
+new cost: undefined
+new cost: 149.75
+9700.51
+new cost: undefined
+new cost: 149.74
+new cost: 149.74
+new cost: undefined
+new cost: 149.74
+new cost: 149.74
+new cost: undefined
+new cost: 149.74
+new cost: 149.74
+currItem: { stockName: 'AAPL', currentCost: 150, newCost: 149.74 }
+new cost: undefined
+new cost: 149.74
+new cost: undefined
+new cost: 149.74
