@@ -616,7 +616,7 @@ function totalReturnKernel(userID, portID, portfolioInfo, currInfo){
         })
 
         // currentValue += (pI.numOfUnits * currentItem[0].currentCost)
-        currentValue += (pI.numOfUnits * temp_prices[currentItem.stockName])
+        currentValue += (pI.numOfUnits * temp_prices[currentItem[0].stockName])
     }
 
     // Calculate the total return.
@@ -675,7 +675,7 @@ function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
         })
 
         // currentValue += (pI.numOfUnits * currentItem[0].currentCost)
-        currentValue += (pI.numOfUnits * temp_prices[currentItem.stockName])
+        currentValue += (pI.numOfUnits * temp_prices[currentItem[0].stockName])
     }
 
     let holdingCollection = []
@@ -688,7 +688,7 @@ function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
         })
 
         // indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
-        indivReturn = (pI.numOfUnits * temp_prices[currentItem.stockName])
+        indivReturn = (pI.numOfUnits * temp_prices[currentItem[0].stockName])
 
         if (holdingCollection.find(elem => elem.stockName === pI.stockName)){
             // Reclaim the original holding value
