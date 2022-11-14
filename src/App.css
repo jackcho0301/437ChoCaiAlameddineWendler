@@ -43,6 +43,8 @@
 }
 
 #logout-btn {
-  margin-right : 10px;
+  margin-left : 65px;
+  margin-right: 65px;
+  margin-bottom : 19px;
   cursor: pointer;
 }
