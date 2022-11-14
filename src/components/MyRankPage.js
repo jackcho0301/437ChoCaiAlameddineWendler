@@ -77,13 +77,14 @@ export default function MyRankPage(props) {
     return (
         <div class='my-rank-page' id='my-rank-page'>
 	    <header></header>
-            <h1>Your Current Quarter Rank is:</h1>
+            <h2>Your Current Quarter Rank is:</h2>
 	    {(rankNumber != 0 && rankTotal != 0)
 	        && <>
 		    <h1>{rankNumber} out of {rankTotal}</h1>
 		</>
 	    }
-	    <h1>Your Lifetime Rank History is:</h1>
+	    <h2>Your Lifetime Rank History is:</h2>
+		<h1>
             {(rankStats.length > 1)
 	        && <>
 		    {
@@ -91,7 +92,8 @@ export default function MyRankPage(props) {
 		    }		    
 	        </>
             }
-	    <h1>Your Current Title is:</h1>
+			</h1>
+	    <h2>Your Current Title is:</h2>
 	    {(rankTitle != '')
 		&& <>
 		    <h1>{rankTitle}</h1>

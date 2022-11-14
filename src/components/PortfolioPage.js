@@ -44,6 +44,14 @@ export default function PortfolioPage(props) {
 
     const [displayMode, setDisplayMode] = React.useState('pie-chart')
 
+    const commaSeparate = num => {
+        try {
+            return num.toLocaleString('en', { useGrouping: true })
+        } catch {
+            return num
+        }
+    }
+
     const [currentPortfolio, reduceCurrentPortfolio] = React.useReducer((currentPortfolio, action) => {
         const stockHoldings = {}
         try {
@@ -61,7 +69,7 @@ export default function PortfolioPage(props) {
                     return returns.map(item => {
                         return {
                             x: item.stockName,
-                            y: Math.round(item.returnVal / 100, 2)
+                            y: Math.round(item.returnVal / 100)
                         }
                     })
                 } catch (error) {
@@ -72,7 +80,7 @@ export default function PortfolioPage(props) {
                 return returns.map(item => {
                     return [
                         item.stockName,
-                        Math.round(item.returnVal / 100, 2),
+                        '$' + commaSeparate(item.returnVal.toFixed(2)),
                         `${(stockHoldings[item.stockName] / 100)}%`,
                     ]
                 })
@@ -88,7 +96,7 @@ export default function PortfolioPage(props) {
                         // title="Current Portfolio"
                         className='stock-data-table'
                         data={getPortfolioData(action.payload)}
-                        columns={["Stock", "Holding Amount", "Holding Percent"]}
+                        columns={["Stock", "Holding Value", "Holding Percent"]}
                     />
                 )
             }
@@ -148,8 +156,8 @@ export default function PortfolioPage(props) {
         setCurrentHoldingPortfolio(portfolio.stockHoldings)
         setPortfolioStats({
             cost: portfolio.coi,
-            return: portfolio.totalReturnVal,
-            roi: Math.round(portfolio.roiPercent * 100) / 100
+            return: portfolio.totalVal - portfolio.coi,
+            roi: Math.round((portfolio.totalVal - portfolio.coi) / portfolio.coi * 100) / 100
         })
         setToggleRefresh(false)
     }, [backend.boughtStock, backend.soldStock, backend.dollarsAdded, backend.currentPortfolio, toggleRefresh])
@@ -250,7 +258,7 @@ export default function PortfolioPage(props) {
 
 
     const handleSellStock = () => {
-        callEvent.sellStock(sellStockParams.ticker, sellStockParams.number)
+        callEvent.sellStock(sellStockParams.ticker, sellStockParams.number, sellValue.value)
     }
 
     const calculateSellPrice = () => {
@@ -272,13 +280,7 @@ export default function PortfolioPage(props) {
         calculateSellPrice()
     }, [buyStockParams, sellStockParams])
 
-    const commaSeparate = num => {
-        try {
-            return num.toLocaleString('en', { useGrouping: true })
-        } catch {
-            return num
-        }
-    }
+
 
 
     const buyValueString = buyValue.value ? `${commaSeparate(((Math.round(buyValue.value * 100)) / 100).toFixed(2))} ${buyValue.currency}` : ''
@@ -347,11 +349,11 @@ export default function PortfolioPage(props) {
                     <div className='portfolio-return'>
                         {/* <h2>Portfolio Return</h2> */}
                         {/* <p>{JSON.stringify(currentHoldingPortfolio, null, 2)}</p> */}
-                        <div 
-                        className='inner-portfolio-return'
-                        style={{
-                            marginRight: '30px'
-                        }}
+                        <div
+                            className='inner-portfolio-return'
+                            style={{
+                                marginRight: '30px'
+                            }}
                         >
                             <div>
                                 <h3>Total Invested</h3>
@@ -402,7 +404,7 @@ export default function PortfolioPage(props) {
             </div>
 
             <div className='portfolio-actions'>
-                <Button variant='contained' onClick={() => { callEvent.createPortfolio(); callEvent.getPortfolio() }}>New Portfolio</Button>
+                {!!backend.portfolioLoaded || <Button variant='contained' onClick={() => { callEvent.createPortfolio(); callEvent.getPortfolio() }}>New Portfolio</Button>}
                 {/* <div className='preview-value'>
                     <div>
                         <h3>Buy Price</h3>

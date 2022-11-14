@@ -31,7 +31,7 @@ function App() {
 
 
   useEffect(() => {
-    DEBUG.pageState && console.log(pageState)
+    DEBUG.pageState && console.log("Page state:", pageState)
   }, [pageState])
 
   const setPageActive = pageName => {

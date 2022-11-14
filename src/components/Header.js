@@ -8,6 +8,7 @@ export default function Header(props) {
     const homeButton = (
     <IconButton
         id='home-button'
+        onClick={() => props.setPage('home')}
     >
         <HomeIcon/>
     </IconButton>
@@ -35,7 +36,7 @@ export default function Header(props) {
                             } else {
                             return (
                                 <HeaderItem
-                                    setPage={() => props.setPage(page)}
+                                    setPage={() => props.setPage('home')}
                                     key={idx}
                                     content={homeButton}
                                 />)

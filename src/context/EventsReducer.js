@@ -29,7 +29,8 @@ export const values = {
     addMemberResponse: {},
     currentTitle: {},
     currentStats: {},
-    createdPortfolio: {}
+    createdPortfolio: {},
+    portfolioLoaded: false
 }
 
 export const reducer = (state, action) => {
@@ -55,20 +56,19 @@ export const reducer = (state, action) => {
         case "boughtStock": {
             return {
                 ...state,
-                boughtStock: action.value.data
+                boughtStock: state.boughtStock + action.value.data
             }
         }
         case "soldStock": {
             return {
                 ...state,
-                soldStock: action.value.data
+                soldStock: state.soldStock + action.value.data
             }
         }
-        //TODO: set up bought and dollars to be cumulative
         case "dollarsAdded": {
             return {
                 ...state,
-                dollarsAdded: action.value
+                dollarsAdded: state.dollarsAdded + action.value.data
             }
         }
 
@@ -76,6 +76,13 @@ export const reducer = (state, action) => {
             return {
                 ...state,
                 currentPortfolio: action.value
+            }
+        }
+
+        case "portfolioLoaded": {
+            return {
+                ...state,
+                portfolioLoaded: true
             }
         }
 
