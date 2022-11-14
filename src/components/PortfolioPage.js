@@ -154,10 +154,12 @@ export default function PortfolioPage(props) {
         const portfolio = backend.currentPortfolio
         setCurrentReturnsPortfolio(portfolio.stockReturns)
         setCurrentHoldingPortfolio(portfolio.stockHoldings)
+        const moneyInvested = 10000
         setPortfolioStats({
-            cost: portfolio.coi,
-            return: portfolio.totalVal - portfolio.coi,
-            roi: Math.round((portfolio.totalVal - portfolio.coi) / portfolio.coi * 100) / 100
+            // cost: portfolio.coi,
+            cost: moneyInvested,
+            return: portfolio.totalVal - moneyInvested,
+            roi: Math.round((portfolio.totalVal - moneyInvested) / moneyInvested * 100) / 100
         })
         setToggleRefresh(false)
     }, [backend.boughtStock, backend.soldStock, backend.dollarsAdded, backend.currentPortfolio, toggleRefresh])
@@ -174,6 +176,10 @@ export default function PortfolioPage(props) {
                 currency: stocks[sellStockParams.ticker].price.currency
             })
         } catch (error) {
+            setSellValue({
+                value: 0,
+                currency: 'USD'
+            })
             DEBUG.transactionValue && console.log(stocks)
             DEBUG.transactionValue && console.log(error)
         }
@@ -187,6 +193,10 @@ export default function PortfolioPage(props) {
                 currency: stocks[buyStockParams.ticker].price.currency
             })
         } catch (error) {
+            setBuyValue({
+                value: 0,
+                currency: 'USD'
+            })
             DEBUG.transactionValue && console.log(stocks)
             DEBUG.transactionValue && console.log(error)
         }
@@ -258,7 +268,7 @@ export default function PortfolioPage(props) {
 
 
     const handleSellStock = () => {
-        callEvent.sellStock(sellStockParams.ticker, sellStockParams.number, sellValue.value)
+        callEvent.sellStock(sellStockParams.ticker, sellStockParams.number, sellValue.value/sellStockParams.number)
     }
 
     const calculateSellPrice = () => {
@@ -374,7 +384,7 @@ export default function PortfolioPage(props) {
                     </div>
 
                 </>}
-            <div className='portfolio-display-mode'>
+            {backend.portfolioLoaded && <div className='portfolio-display-mode'>
                 <Button
                     variant='contained'
                     style={{
@@ -401,7 +411,7 @@ export default function PortfolioPage(props) {
                     Table
                 </Button>
 
-            </div>
+            </div>}
 
             <div className='portfolio-actions'>
                 {!!backend.portfolioLoaded || <Button variant='contained' onClick={() => { callEvent.createPortfolio(); callEvent.getPortfolio() }}>New Portfolio</Button>}
@@ -419,8 +429,8 @@ export default function PortfolioPage(props) {
                 <div className='buy-stock'>
                     <Button
                         variant='contained'
-                        onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value)}
-                        disabled={!(buyStockParams.ticker && buyStockParams.number)}
+                        onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value/buyStockParams.number)}
+                        disabled={!buyValueString}
                     >
                         Buy
                     </Button>
@@ -453,7 +463,7 @@ export default function PortfolioPage(props) {
                     <Button
                         variant='contained'
                         onClick={handleSellStock}
-                        disabled={!(sellStockParams.ticker && sellStockParams.number)}
+                        disabled={!sellValueString}
                     // disabled={!sellStockParams.ticker}
                     >
                         Sell
