@@ -15,6 +15,7 @@ import './Swal.css'
 import { UserContext } from "./context/User"
 import { EventsContext } from './context/Events';
 // import { login } from "./context/Events"
+import { Box } from '@mui/material'
 
 const DEBUG = {
   pageState: false,
@@ -31,7 +32,7 @@ function App() {
 
 
   useEffect(() => {
-    DEBUG.pageState && console.log(pageState)
+    DEBUG.pageState && console.log("Page state:", pageState)
   }, [pageState])
 
   const setPageActive = pageName => {
@@ -65,7 +66,7 @@ function App() {
           <Header
             pageState={pageState}
             setPage={setPageActive} />
-          <div className='divide-10'/>
+          {/* <Box sx={{m: 2}}/> */}
           {pageState.home.active &&
             <HomePage/>}
           {pageState.portfolio.active &&
@@ -80,7 +81,6 @@ function App() {
             <LogoutPage/>}
 	        {pageState.profile.active &&
 	          <ProfilePage/>}
-            
 
         </div>
       )
@@ -92,7 +92,7 @@ function App() {
 
   useEffect(() => {
     // DEBUG.eventsState && console.log("Events state:", JSON.stringify(events, 0, 2))
-    DEBUG.eventsState && console.log("Events state:", events)
+    DEBUG.eventsState && console.log("Backend events state:", events)
   }, [events])
 
   return (

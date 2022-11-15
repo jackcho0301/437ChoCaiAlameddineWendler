@@ -1,9 +1,9 @@
 .portfolio-page {
-    height: 100vh;
     display: flex;
     justify-content: center;
     flex-direction: column;
     margin-top: 10vh;
+    align-items: center;
 }
 
 /* .portfolio-page Button {
@@ -26,10 +26,17 @@
 
 .inner-portfolio-return {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px
 }
 
 .inner-portfolio-return * {
-    margin: auto
+    margin: auto;
+}
+
+.stock-data-table {
+    width: 80%;
 }
 
 .stock-data-table * {
@@ -47,8 +54,78 @@
 
 .portfolio-return {
     margin-bottom: 20px;
+    /* margin-top: 20px; */
+    width: 100%;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    background-color: azure;
+
 }
 
-.buy-stock, .sell-stock {
+.buy-stock,
+.sell-stock {
     display: flex;
+}
+
+/* .preview-buy-table-head-row {
+    
+} */
+
+.preview-buy-table tr * {
+    font-weight: 700;
+    color: white !important
+}
+
+.preview-buy-table tbody * {
+    font-weight: 700;
+    color: white !important
+}
+
+/* .preview-buy-table tr {
+    height: 10px;
+}
+
+.preview-buy-table tr td {
+    height: auto !important;
+} */
+
+/* .preview-value {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+} */
+
+.preview-value input {
+    font-weight: 850;
+    /* font-size: 18px */
+}
+
+.preview-value {
+    height: 1.4375em
+}
+
+.stock-display {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+
+.portfolio-display-mode {
+    display: flex;
+    justify-content: center;
+    border: 1px solid gray;
+    width: 20vw;
+    margin-top: 20px;
+}
+
+.portfolio-display-mode Button {
+    margin: 2%;
+    width: 8.5vw;
+    font-size: 1vw;
+}
+
+.stock-display {
+    width: 80vw;
 }

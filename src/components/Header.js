@@ -8,6 +8,7 @@ export default function Header(props) {
     const homeButton = (
     <IconButton
         id='home-button'
+        onClick={() => props.setPage('home')}
     >
         <HomeIcon/>
     </IconButton>
@@ -23,6 +24,7 @@ export default function Header(props) {
                     <div id='menu-wrapper'>
                         {Object.keys(props.pageState).map((page, idx) => {
                             const text = props.pageState[page].text
+                            const disabled = props.pageState[page].disabled
                             if (text == "Profile" || text == "Log Out")
                             {
                                 // Do Nothing
@@ -33,11 +35,12 @@ export default function Header(props) {
                                         setPage={() => props.setPage(page)}
                                         key={idx}
                                         text={text}
+                                        disabled={disabled}
                                     />)
                             } else {
                             return (
                                 <HeaderItem
-                                    setPage={() => props.setPage(page)}
+                                    setPage={() => props.setPage('home')}
                                     key={idx}
                                     content={homeButton}
                                 />)

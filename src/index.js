@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { UserProvider } from './context/User'
 import { EventsProvider } from './context/Events'
+import { StocksProvider } from './context/Stocks';
 
 const logOutput = true
 
@@ -13,12 +14,13 @@ if (process.env.NODE_ENV !== "development" || !logOutput)
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <UserProvider>
-    <EventsProvider>
-      <App />
-    </EventsProvider>
-  </UserProvider>
-
+  <StocksProvider>
+    <UserProvider>
+      <EventsProvider>
+        <App />
+      </EventsProvider>
+    </UserProvider>
+  </StocksProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -9,6 +9,7 @@ export default function HeaderItem(props) {
                 <Button
                     className='header-item-button'
                     onClick={props.setPage}
+                    disabled={props.disabled}
                 >
                     <h1 className={`header-item-text ${props.text.toLowerCase()}`}>
                         {props.text}

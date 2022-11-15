@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import axios from 'axios'
 
 
 const DEBUG = {
@@ -19,10 +18,10 @@ const DEBUG = {
 export const values = {
     registeredUser: '',
     loggedInUser: '',
-    allScores: [{name: 'Loading', score: 0}],
-    boughtStock: {},
-    soldStock: {},
-    dollarsAdded: 0,
+    allScores: [{ name: 'Loading', score: 0 }],
+    boughtStock: [],
+    soldStock: [],
+    dollarsAdded: [],
     currentPortfolio: {},
     groupMemberships: {},
     groupOwnships: {},
@@ -30,7 +29,9 @@ export const values = {
     addMemberResponse: {},
     currentTitle: {},
     currentStats: {},
-    profile: {},
+    createdPortfolio: {},
+    portfolioLoaded: false,
+    profile: {}
 }
 
 export const reducer = (state, action) => {
@@ -54,22 +55,27 @@ export const reducer = (state, action) => {
             }
         }
         case "boughtStock": {
+            let bought = state.boughtStock
+            bought.push(action.value.data)
             return {
                 ...state,
-                boughtStock: action.value
+                boughtStock: bought
             }
         }
         case "soldStock": {
+            let sold = state.soldStock
+            sold.push(action.value.data)
             return {
                 ...state,
-                soldStock: action.value
+                soldStock: sold
             }
         }
-        //TODO: set up bought and dollars to be cumulative
         case "dollarsAdded": {
+            let added = state.dollarsAdded
+            added.push(action.value.data)
             return {
                 ...state,
-                dollarsAdded: action.value
+                dollarsAdded: added
             }
         }
 
@@ -79,53 +85,67 @@ export const reducer = (state, action) => {
                 currentPortfolio: action.value
             }
         }
+
+        case "portfolioLoaded": {
+            return {
+                ...state,
+                portfolioLoaded: true
+            }
+        }
+
         case "group": {
-	    return {
-		...state,
-		groupMemberships: action.value
-	    }
-	}
-	case "groupOwn": {
-	    return {
-		...state,
-		groupOwnships: action.value
-	    }
-	}
+            return {
+                ...state,
+                groupMemberships: action.value
+            }
+        }
+        case "groupOwn": {
+            return {
+                ...state,
+                groupOwnships: action.value
+            }
+        }
         case "createGroupRes": {
-	    return {
-		...state,
-		createGroupResponse: action.value
-	    }
-	}
-	case "addMemberRes": {
-	    return {
-	        ...state,
-		addMemberResponse: action.value
-	    }
-	}
-	case "title": {
-	    return {
-		...state,
-		currentTitle: action.value
-	    }
-	}
+            return {
+                ...state,
+                createGroupResponse: action.value
+            }
+        }
+        case "addMemberRes": {
+            return {
+                ...state,
+                addMemberResponse: action.value
+            }
+        }
+        case "title": {
+            return {
+                ...state,
+                currentTitle: action.value
+            }
+        }
         case "stats": {
-	    return {
-		...state,
-		currentStats: action.value
-	    }
-	}
-    case "profile": {
-	    return {
-	        ...state,
-		profile: action.value
-	    }
-	}
-    case "logout": {
-	    return {
-	        ...state,
-		logoutResponse: {}
-	    }
-	}
+            return {
+                ...state,
+                currentStats: action.value
+            }
+        }
+        case "createPortfolio": {
+            return {
+                ...state,
+                createdPortfolio: action.value
+            }
+        }
+        case "profile": {
+	          return {
+	              ...state,
+		            profile: action.value
+	          }
+	      }
+        case "logout": {
+	          return {
+	              ...state,
+		            logoutResponse: {}
+	          }
+	      }
     }
 }

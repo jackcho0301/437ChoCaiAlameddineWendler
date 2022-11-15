@@ -101,13 +101,13 @@ export default function LeaderboardPage(props) {
 
     return (
         <div id='leaderboard-page'>
-            <IconButton
+            {/* <IconButton
                 variant="contained"
                 onClick={() => {handleRefreshScores(); setAllowScoresToLoad(true)}}
                 className='refresh-scores'
             >
                 <RefreshIcon/>
-            </IconButton>
+            </IconButton> */}
             {scoresLoaded ? leaderboard : 'LOADING...'}
             {/* <DataGrid
                 rows={rows}

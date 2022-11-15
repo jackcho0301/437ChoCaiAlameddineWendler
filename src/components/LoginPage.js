@@ -31,13 +31,6 @@ export default function LoginPage(props) {
         return conditions.every(x => x)
     }
 
-    const config = {
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        withCredentials: true
-    }
-
     const setLoggedIn = () => {
         DEBUG.loggedIn && console.log('credentials: ', credentials)
         props.setUserLoggedIn(credentials.username, credentials.password)

@@ -2,12 +2,16 @@ import React, { useEffect } from 'react'
 import './PortfolioPage.css'
 import { EventsContext } from '../context/Events'
 import { UserContext } from '../context/User'
-import { Button, IconButton, TextField, Box } from '@mui/material'
+import { Button, IconButton, TextField, Box, Paper, Typography, Card, CardContent, TableRow, TableHead, TableCell, TableBody, Table, TableContainer, Divider } from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh';
 import MUIDataTable from "mui-datatables";
+import { StocksContext } from '../context/Stocks'
+import { VictoryPie, VictoryChart } from 'victory'
 
 const DEBUG = {
-    stockParams: false
+    stockParams: false,
+    stockState: true,
+    transactionValue: false
 }
 
 export default function PortfolioPage(props) {
@@ -15,7 +19,6 @@ export default function PortfolioPage(props) {
     const [backend, callEvent] = React.useContext(EventsContext)
     const [currentReturnsPortfolio, setCurrentReturnsPortfolio] = React.useState([{}])
     const [currentHoldingPortfolio, setCurrentHoldingPortfolio] = React.useState([{}])
-    const [displayPortfolio, setDisplayPortfolio] = React.useState([{}])
     const [portfolioStats, setPortfolioStats] = React.useState({
         cost: 0,
         return: 0,
@@ -24,15 +27,160 @@ export default function PortfolioPage(props) {
     const [toggleRefresh, setToggleRefresh] = React.useState(false)
     const [buyStockParams, setBuyStockParams] = React.useState({
         ticker: '',
-        number: 0,
-	amount: 0
+        number: 0
     })
     const [sellStockParams, setSellStockParams] = React.useState({
         ticker: '',
-        number: 0
+        number: 0,
     })
-    const [buyStockMessage, setBuyStockMessage] = React.useState([{}])
-    const [sellStockMessage, setSellStockMessage] = React.useState([{}])
+    const [sellValue, setSellValue] = React.useState({
+        value: 0,
+        currency: ''
+    })
+    const [buyValue, setBuyValue] = React.useState({
+        value: 0,
+        currency: ''
+    })
+
+    const [displayMode, setDisplayMode] = React.useState('pie-chart')
+
+    const commaSeparate = num => {
+        try {
+            return num.toLocaleString('en', { useGrouping: true })
+        } catch {
+            return num
+        }
+    }
+
+    const [currentPortfolio, reduceCurrentPortfolio] = React.useReducer((currentPortfolio, action) => {
+        const stockHoldings = {}
+        try {
+            for (const stock of currentHoldingPortfolio) {
+                stockHoldings[stock.stockName] = Math.round(stock.holding * 100)
+            }
+        } catch {
+            ;
+        }
+
+        const getPortfolioData = returns => {
+            // console.log(returns)
+            if (action.type === 'pie-chart') {
+                try {
+                    return returns.map(item => {
+                        let fillOptions={}
+                        // if(item.stockName == 'dollars') {
+                        //     fillOptions.fill = 'green'
+                        // } else {
+                        //     function getRandomColor() {
+                        //         var letters = '0123456789abcdef';
+                        //         var color = '#';
+                        //         for (var i = 0; i < 6; i++) {
+                        //             color += letters[Math.floor(Math.random() * 16)];
+                        //         }
+                        //         return color;
+                        //     }
+                        //     fillOptions.fill = getRandomColor()
+                        // }
+                        const name = item.stockName == 'dollars' ? 'Cash' : item.stockName
+                        
+                        return {
+                            x: name,
+                            y: Math.round(item.returnVal / 100),
+                            ...fillOptions
+                        }
+                    })
+                } catch (error) {
+                    console.error(error)
+                    return [{}]
+                }
+            } else if (action.type == 'table') {
+                return returns.map(item => {
+                    const name = item.stockName == 'dollars' ? 'Cash' : item.stockName
+                    return [
+                        name,
+                        '$' + commaSeparate((item.returnVal).toFixed(2)),
+                        `${stockHoldings[item.stockName]/100}%`,
+                    ]
+                })
+            }
+
+        }
+
+        const cashSort = payload => {
+            let cashSecond = payload.sort((a, b) => {
+                if (a.x == "Cash") {
+                    return -1;
+                } else if (b.x == "Cash") {
+                    return 1;
+                } else {
+                    return (a.x < b.x ? -1 : 1);
+                }
+            })
+
+            if(cashSecond.length > 1) {
+                [cashSecond[0], cashSecond[1]] = [cashSecond[1], cashSecond[0]]
+            }
+
+            return cashSecond
+        }
+
+        const cashSortArray = payload => {
+            return payload.sort((a, b) => {
+                if (a[0] == "Cash") {
+                    return -1;
+                } else if (b[0] == "Cash") {
+                    return 1;
+                } else {
+                    return (a[0] < b[0] ? -1 : 1);
+                }
+            })
+        }
+
+
+        switch (action.type) {
+            case 'table': {
+                return (
+                    <MUIDataTable
+                        // title="Current Portfolio"
+                        className='stock-data-table'
+                        data={cashSortArray(getPortfolioData(action.payload))}
+                        columns={["Stock", "Holding Value", "Holding Percent"]}
+                    />
+                )
+            }
+            case 'pie-chart': {
+                return (
+                    <VictoryPie
+                        data={cashSort(getPortfolioData(action.payload))}
+                        // style={{
+                        //     data: {
+                        //       fill: ({ datum }) => datum.fill,
+                        //     }
+                        //   }}
+                        colorScale={"qualitative"}
+                        // style={{
+                        //     data: {
+                        //         fill: ({ x }) => {
+                        //             if (x == 'dollars') {
+                        //                 return 'green'
+                        //             }
+                        //         }
+                        //     }
+                        // }}
+                        height={750}
+                        width={2000}
+                    // backgroundStyle={{ fill: "tomato", opacity: 0.6 }}
+                    // backgroundPadding={{ bottom: 5, top: 5 }}
+
+                    />
+                )
+            }
+        }
+    }, []);
+
+    const [stocks, updateStocks] = React.useContext(StocksContext)
+
+    // console.log('stock state',stocks,'update', updateStocks)
 
     // useEffect(() => {
     //     modifyUser({type: "portfolio", value: getPortfolio())
@@ -41,6 +189,11 @@ export default function PortfolioPage(props) {
     // useEffect(() => {
     //     callEvent.getPortfolio()
     // }, [backend])
+
+    useEffect(() => {
+        callEvent.getPortfolio()
+        callEvent.getStats()
+    }, [JSON.stringify(backend.boughtStock), JSON.stringify(backend.soldStock), backend.createdPortfolio])
 
     useEffect(() => {
         console.log('Current returns portfolio:', currentReturnsPortfolio)
@@ -54,57 +207,65 @@ export default function PortfolioPage(props) {
         const portfolio = backend.currentPortfolio
         setCurrentReturnsPortfolio(portfolio.stockReturns)
         setCurrentHoldingPortfolio(portfolio.stockHoldings)
-        // if(JSON.stringify(currentHoldingPortfolio) != '{}' && 
-        // currentHoldingPortfolio != undefined && 
-        // JSON.stringify(currentReturnsPortfolio) != '{}' &&
-        // currentReturnsPortfolio != undefined) {
-        //     let tablePortfolio = JSON.parse(JSON.stringify(currentHoldingPortfolio))
-        //     console.log(tablePortfolio)
-        //     tablePortfolio.forEach((stock, idx) => {
-        //         stock = { ...stock, ...currentHoldingPortfolio[idx] }
-        //     })
-        //     console.log('TABLEE', tablePortfolio)
-        //     setDisplayPortfolio(tablePortfolio)
-        // }
+        const moneyInvested = 10000
         setPortfolioStats({
-            cost: portfolio.coi,
-            return: portfolio.totalReturnVal,
-            roi: Math.round(portfolio.roiPercent * 100) / 100
+            // cost: portfolio.coi,
+            // return: portfolio.totalReturnVal,
+            // roi: portfolio.roiPercent
+            cost: moneyInvested,
+            return: portfolio.totalVal - moneyInvested,
+            roi: Math.round((portfolio.totalVal - moneyInvested) / moneyInvested * 100)
         })
-        setToggleRefresh(false)
-    }, [backend.boughtStock, backend.soldStock, backend.dollarsAdded, backend.currentPortfolio, toggleRefresh])
+    }, [JSON.stringify(backend.boughtStock), JSON.stringify(backend.soldStock), JSON.stringify(backend.dollarsAdded), JSON.stringify(backend.currentPortfolio)])
 
     useEffect(() => {
-        DEBUG.stockParams && console.log('stock params (buy=0, sell=1)') 
+        DEBUG.stockParams && console.log('stock params (buy=0, sell=1)')
         DEBUG.stockParams && console.table([buyStockParams, sellStockParams])
     }, [buyStockParams, sellStockParams])
 
     useEffect(() => {
-        setBuyStockMessage(backend.boughtStock)
-    }, [backend.boughtStock])
+        try {
+            setSellValue({
+                value: stocks[sellStockParams.ticker].price.price * sellStockParams.number,
+                currency: stocks[sellStockParams.ticker].price.currency
+            })
+        } catch (error) {
+            setSellValue({
+                value: 0,
+                currency: 'USD'
+            })
+            DEBUG.transactionValue && console.log(stocks)
+            DEBUG.transactionValue && console.log(error)
+        }
+
+    }, [stocks, sellStockParams])
 
     useEffect(() => {
-	setSellStockMessage(backend.soldStock)
-    }, [backend.soldStock])
-
-    // console.log(displayPortfolio)
-
-    const stockHoldings = {}
-    try {
-        for (const stock of currentHoldingPortfolio) {
-            stockHoldings[stock.stockName] = Math.round(stock.holding * 100)
+        try {
+            setBuyValue({
+                value: stocks[buyStockParams.ticker].price.price * buyStockParams.number,
+                currency: stocks[buyStockParams.ticker].price.currency
+            })
+        } catch (error) {
+            setBuyValue({
+                value: 0,
+                currency: 'USD'
+            })
+            DEBUG.transactionValue && console.log(stocks)
+            DEBUG.transactionValue && console.log(error)
         }
-    } catch {
-        ;
-    }
+    }, [stocks, buyStockParams])
+
+    useEffect(() => {
+        DEBUG.stockState && console.log("Stock state:", stocks)
+    }, [stocks])
 
     const buySellControls = isBuy => {
         const changeTicker = event => {
             isBuy ?
                 setBuyStockParams({
                     number: buyStockParams.number,
-                    ticker: event.target.value.toUpperCase(),
-		    amount: buyStockParams.amount
+                    ticker: event.target.value.toUpperCase()
                 })
                 :
                 setSellStockParams({
@@ -116,8 +277,7 @@ export default function PortfolioPage(props) {
             isBuy ?
                 setBuyStockParams({
                     ticker: buyStockParams.ticker,
-                    number: event.target.value,
-		    amount: buyStockParams.amount
+                    number: event.target.value
                 })
                 :
                 setSellStockParams({
@@ -125,19 +285,6 @@ export default function PortfolioPage(props) {
                     number: event.target.value
                 })
         }
-	const changeAmount = event => {
-	    isBuy ?
-		setBuyStockParams({
-		    ticker: buyStockParams.ticker,
-		    number: buyStockParams.number,
-		    amount: event.target.value
-		})
-		:
-		setSellStockParams({
-		    ticker: sellStockParams.ticker,
-		    number: sellStockParams.number
-		})
-	}
 
         return (
             <Box
@@ -149,43 +296,80 @@ export default function PortfolioPage(props) {
                 autoComplete="off"
             >
                 <TextField
-                    id="stock-ticker"
+                    // id="stock-ticker"
                     label="Ticker"
                     variant="filled"
                     onChange={event => changeTicker(event)}
                     inputProps={{ style: { textTransform: "uppercase" } }}
                 />
                 <TextField
-                    id="stock-number"
+                    // id="stock-number"
                     label="Number of Shares"
                     variant="filled"
                     onChange={event => changeNumber(event)}
                 />
-		{isBuy &&
-		<TextField
-		    id="stock-amount"
-		    label="Dollar Value"
-		    variant="filled"
-		    onChange={event => changeAmount(event)}
-		/>}
+                <TextField
+                    className='preview-value'
+                    label={isBuy ? "Buy Price" : "Sale Value"}
+                    variant="filled"
+                    value={isBuy ? buyValueString : sellValueString}
+                    disabled
+                />
             </Box>
         );
     }
 
-    // const REFRESH_RATE = 1000
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         callEvent.getPortfolio();
-    //     }, REFRESH_RATE);
-    //     return () => clearInterval(interval);
-    // }, [])
+
+    const handleSellStock = () => {
+        callEvent.sellStock(sellStockParams.ticker, sellStockParams.number, sellValue.value/sellStockParams.number)
+    }
+
+    const calculateSellPrice = () => {
+        if (sellStockParams.ticker && sellStockParams.number) {
+            updateStocks.new(sellStockParams.ticker)
+            updateStocks.price(sellStockParams.ticker)
+        }
+    }
+
+    const calculateBuyPrice = () => {
+        if (buyStockParams.ticker && buyStockParams.number) {
+            updateStocks.new(buyStockParams.ticker)
+            updateStocks.price(buyStockParams.ticker)
+        }
+    }
+
+    useEffect(() => {
+        calculateBuyPrice()
+        calculateSellPrice()
+    }, [buyStockParams, sellStockParams])
+
+
+
+
+    const buyValueString = buyValue.value ? `${commaSeparate(((Math.round(buyValue.value * 100)) / 100).toFixed(2))} ${buyValue.currency}` : ''
+    const sellValueString = sellValue.value ? `${commaSeparate(((Math.round(sellValue.value * 100)) / 100).toFixed(2))} ${sellValue.currency}` : ''
+
+
+
+    useEffect(() => {
+        currentReturnsPortfolio && reduceCurrentPortfolio({ type: displayMode, payload: currentReturnsPortfolio })
+    }, [currentReturnsPortfolio, displayMode])
+
+
+
 
     return (
         <div className='portfolio-page'>
             {/* placeholder, will be moved to user dropdown */}
-            <Button onClick={callEvent.logout}>Log out</Button>
-            <div className='portfolio-text-and-refresh'>
+            <div style={{
+                marginLeft: '20px',
+                backgroundColor: 'aliceblue',
+                width: '100%'
+            }}>
+                <h1>Current Portfolio</h1>
+            </div>
+            {/* <div className='portfolio-text-and-refresh'>
                 <IconButton
                     variant='contained'
                     onClick={callEvent.getPortfolio}
@@ -195,12 +379,12 @@ export default function PortfolioPage(props) {
                 </IconButton>
                 <h1>Current Portfolio</h1>
                 <IconButton
-                    onClick={callEvent.getPortfolio}
+                    onClick={() => { callEvent.getPortfolio(); updateStocks.new('AAPL'); updateStocks.price('AAPL') }}
                     className='refresh-portfolio'
                 >
                     <RefreshIcon fontSize='large' />
                 </IconButton>
-            </div>
+            </div> */}
 
             {/* {JSON.stringify(displayPortfolio) == '{}' ||
                 <PortfolioTable rows={displayPortfolio} />} */}
@@ -223,71 +407,143 @@ export default function PortfolioPage(props) {
 
             {(currentReturnsPortfolio != undefined && currentReturnsPortfolio.length > 0)
                 && <>
+                    {/* <h3 style={{ marginBottom: 0 }}>Display Mode</h3> */}
+
+
                     <div className='portfolio-return'>
                         {/* <h2>Portfolio Return</h2> */}
                         {/* <p>{JSON.stringify(currentHoldingPortfolio, null, 2)}</p> */}
-                        <div className='inner-portfolio-return'>
+                        <div
+                            className='inner-portfolio-return'
+                            style={{
+                                marginRight: '30px'
+                            }}
+                        >
                             <div>
                                 <h3>Total Invested</h3>
-                                <p>{portfolioStats.cost}</p>
+                                <p>${commaSeparate(portfolioStats.cost)}</p>
                             </div>
                             <div>
                                 <h3>Total Profit</h3>
-                                <p>{portfolioStats.return}</p>
+                                <p>${commaSeparate(portfolioStats.return)}</p>
                             </div>
                             <div>
-                                <h3>ROI</h3>
-                                <p>{portfolioStats.roi}%</p>
+                                <h3>Total ROI</h3>
+                                <p>{commaSeparate(portfolioStats.roi)}%</p>
                             </div>
                         </div>
                     </div>
-                    <MUIDataTable
-                        title="Stock Holdings"
-                        className='stock-data-table'
-                        data={currentReturnsPortfolio.map(item => {
-                            return [
-                                item.stockName,
-                                item.returnVal,
-                                `${(stockHoldings[item.stockName] / 100)}%`,
-                                // `${Math.round(item.return / stockHoldings[item.stockName])}%`,
-                            ]
-                        })}
-                        columns={["Stock", "Holding ($)", "Holding (%)"]}
-                    />
+                    <div className='stock-display'>
+                        {currentPortfolio}
+                    </div>
+
                 </>}
+            {backend.portfolioLoaded && <div className='portfolio-display-mode'>
+                <Button
+                    variant='contained'
+                    style={{
+                        backgroundColor: displayMode == 'pie-chart' ? 'black' : 'rgb(245,245,245)',
+                        color: displayMode == 'pie-chart' ? 'white' : 'black'
+                    }}
+                    onClick={() => setDisplayMode('pie-chart')}
+                >
+                    Chart
+                </Button>
+                <Divider
+                    orientation='vertical'
+                    className='sign-in-register-divider'
+                    flexItem
+                />
+                <Button
+                    variant='contained'
+                    style={{  // TODO: refactor to makestyles
+                        backgroundColor: displayMode == 'pie-chart' ? 'rgb(245,245,245)' : 'black',
+                        color: displayMode == 'pie-chart' ? 'black' : 'white'
+                    }}
+                    onClick={() => setDisplayMode('table')}
+                >
+                    Table
+                </Button>
+
+            </div>}
 
             <div className='portfolio-actions'>
-                <Button variant='contained' onClick={() => { callEvent.createPortfolio(); callEvent.getPortfolio() }}>New Portfolio</Button>
+                {!!backend.portfolioLoaded || <Button variant='contained' onClick={() => { callEvent.createPortfolio(); callEvent.getPortfolio() }}>New Portfolio</Button>}
+                {/* <div className='preview-value'>
+                    <div>
+                        <h3>Buy Price</h3>
+                        <h4>{buyValueString}</h4>
+                    </div>
+                    <div>
+                        <h3>Sale Value</h3>
+                        <h4>{sellValueString}</h4>
+                    </div>
+                </div> */}
+
                 <div className='buy-stock'>
                     <Button
                         variant='contained'
-                        onClick={() => { callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyStockParams.amount); callEvent.getPortfolio() }}
-                        disabled={!(buyStockParams.ticker && (buyStockParams.number || buyStockParams.amount))}
+                        onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value/buyStockParams.number)}
+                        disabled={!buyValueString}
                     >
                         Buy
                     </Button>
                     {buySellControls(true)}
-	            {(buyStockMessage.msg != undefined)
-			&& <>
-			    <label>{buyStockMessage.msg}</label>
-			</>
-		    }
+                    {/* <Table className='preview-buy-table' options={{padding: 'dense'}}>
+                        <TableHead>
+                            <TableRow className='preview-buy-table-head-row'>
+                                <TableCell size='small'>Stock</TableCell>
+                                <TableCell size='small'>Shares</TableCell>
+                                <TableCell size='small'>Cost</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell sx={{height: '10px'}}>{buyStockParams.ticker}</TableCell>
+                                <TableCell sx={{height: '10px'}}>{buyStockParams.number}</TableCell>
+                                <TableCell sx={{height: '10px'}}>{`${((Math.round(buyValue.value * 100)) / 100).toFixed(2)} ${buyValue.currency}`}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table> */}
+                    {/* <Button
+                        variant='contained'
+                        onClick={calculateBuyPrice}
+                    >
+                        Preview Cost
+                    </Button> */}
+
                 </div>
                 <div className='sell-stock'>
-                    <Button 
-                        variant='contained' 
-                        onClick={() => { callEvent.sellStock(sellStockParams.ticker, sellStockParams.number); callEvent.getPortfolio() }}
-                        disabled={!(sellStockParams.ticker && sellStockParams.number)}
+                    <Button
+                        variant='contained'
+                        onClick={handleSellStock}
+                        disabled={!sellValueString}
+                    // disabled={!sellStockParams.ticker}
                     >
                         Sell
                     </Button>
                     {buySellControls(false)}
-	            {(sellStockMessage.msg != undefined)
-	                && <>
-		            <label>{sellStockMessage.msg}</label>
-		        </>
-		    }
+                    {/* <Card
+                        elevation={3}
+                        className="sell-price"
+                    >
+                        <CardContent>
+                            <h1>Total Sell Value</h1>
+                            <Typography>
+                                {sellValue}
+                            </Typography>
+                            <Button
+                                variant='contained'
+                                onClick={calculateSellPrice}
+                            >
+                                Refresh
+                            </Button>
+
+                        </CardContent>
+                    </Card> */}
                 </div>
+
+
             </div>
 
 

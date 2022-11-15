@@ -92,7 +92,6 @@ app.use('/api/v1/groupowns', extractUserIdMiddleware, groupOwnshipsRouter) //aut
 app.use('/api/v1/profilePic', extractUserIdMiddleware, profilePicRouter) // authentication middleware placed
 app.use('/api/v1/profile', extractUserIdMiddleware, profileRouter)// authentication middleware placed
 
-
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
