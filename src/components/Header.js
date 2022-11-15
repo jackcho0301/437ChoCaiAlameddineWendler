@@ -25,7 +25,11 @@ export default function Header(props) {
                         {Object.keys(props.pageState).map((page, idx) => {
                             const text = props.pageState[page].text
                             const disabled = props.pageState[page].disabled
-                            if(text) {
+                            if (text == "Profile" || text == "Log Out")
+                            {
+                                // Do Nothing
+                            }
+                            else if(text) {
                                 return (
                                     <HeaderItem
                                         setPage={() => props.setPage(page)}
@@ -44,9 +48,14 @@ export default function Header(props) {
                         })}
                     </div>
 
+                    <div id='logout-wrapper'>
+                        <p id="logout-btn" onClick={() => props.setPage("logout")}>
+                            <strong>Log Out</strong>
+                        </p>
+                    </div>
+
                     <div id='icon-wrapper'>
-                        <IconButton
-                        onClick={() => props.setPage("profile")}>
+                        <IconButton onClick={() => props.setPage("profile")}>
                             <Avatar
                                 src='/images/stonks.png'
                                 alt='profile-avatar'

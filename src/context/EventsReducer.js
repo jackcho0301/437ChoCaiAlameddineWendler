@@ -30,7 +30,8 @@ export const values = {
     currentTitle: {},
     currentStats: {},
     createdPortfolio: {},
-    portfolioLoaded: false
+    portfolioLoaded: false,
+    profile: {}
 }
 
 export const reducer = (state, action) => {
@@ -134,5 +135,17 @@ export const reducer = (state, action) => {
                 createdPortfolio: action.value
             }
         }
+        case "profile": {
+	          return {
+	              ...state,
+		            profile: action.value
+	          }
+	      }
+        case "logout": {
+	          return {
+	              ...state,
+		            logoutResponse: {}
+	          }
+	      }
     }
 }

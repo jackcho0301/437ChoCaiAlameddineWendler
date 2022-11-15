@@ -5,6 +5,8 @@ import { url } from "../config/constants"
 
 
 
+const URL = "localhost"
+
 export const EventsContext = React.createContext({
     state: values,
     dispatch: () => null
@@ -21,7 +23,8 @@ const DEBUG = {
     getUserGroupOwnships: true,
     createGroup: true,
     addGroupMember: true,
-    getTitle: true
+    getTitle: true,
+    getMyProfile: true,
 }
 
 
@@ -239,7 +242,97 @@ export const EventsProvider = ({ children }) => {
                 .catch(function (error) {
                     console.log(error);
                 });
-        }
+        },
+
+        logout: async () => {
+            await axios.post(`http://${URL}:3000/api/v1/auth/logout`, {}, config)
+            .then(function (response) {
+              console.log(response);
+              window.location.reload()
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+          },
+
+	getUserGroupMemberships: async () => {
+	    await axios.get(`http://${URL}:3000/api/v1/groups`, config)
+	        .then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "group", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+	
+	getUserGroupOwnships: async () => {
+            await axios.get(`http://${URL}:3000/api/v1/groupowns`, config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "groupOwn", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+	
+	createGroup: async groupTitle => {
+	    await axios.post(`http://${URL}:3000/api/v1/groupowns`,
+                {"groupTitle":groupTitle}, config)
+		.then (function (response) {
+		    console.log(response);
+		    dispatch({ type: "createGroupRes", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+	
+	addGroupMember: async (name, groupTitle) => {
+	    await axios.post(`http://${URL}:3000/api/v1/groups`, 
+		{"name":name,"groupTitle":groupTitle}, config)
+		.then (function (response) {
+		    console.log(response);
+		    dispatch({ type: "addMemberRes", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+
+	getTitle: async () => {
+	    await axios.get(`http://${URL}:3000/api/v1/stats/title`, config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "title", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+	
+	getStats: async () => {
+	    await axios.get(`http://${URL}:3000/api/v1/stats`, config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "stats", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+
+    getMyProfile: async () => {
+        await axios.get(`http://${URL}:3000/api/v1/profile`, config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "profile", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
     }
 
     return (

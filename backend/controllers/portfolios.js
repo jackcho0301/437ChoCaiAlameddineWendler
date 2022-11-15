@@ -255,6 +255,7 @@ const updatePortfolio = async (req, res) => {
 	            // First see if this stock exists. Note this will have to be checked against
 		    // the TwelveData API or cache later.
 		    currItem = currentUsedData.filter((infoItem) => (infoItem.stockName===stockName))
+
             currItem[0].newCost = initCost ? initCost : currItem[0].currentCost
             
             if(initCost) {
@@ -389,6 +390,7 @@ const sellPortfolioItem = async (req, res) => {
 
     const userID = req.user.userId
     const portID = req.params.id
+
     const {stockName, numOfUnits, price} = req.body
 
     const portfolioInfo = await Portfolio.find()
@@ -593,7 +595,7 @@ function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
                 return infoItem
             }
         })
-        
+
         let indivReturn = 0
         if (currentItem[0].newCost) {
             indivReturn = (pI.numOfUnits * currentItem[0].newCost)
