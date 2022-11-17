@@ -1,5 +1,3 @@
-let {currentData} = require('./testdata')
-let {currentDataTwo} = require('./testdata2')
 const Portfolio = require('../models/Portfolio')
 const User = require('../models/User')
 const fetch = require('node-fetch')
@@ -7,12 +5,12 @@ const {StatusCodes} = require('http-status-codes')
 const {BadRequestError, UnauthenticatedError} = require('../errors');
 const NodeCache = require('node-cache');
 // Testing Only - Delete Later
-const Stat = require('../models/Stat')
-
-let currentUsedData = currentData
-let testTicker = 0
+//const Stat = require('../models/Stat')
+const fs = require('fs')
 
 const currentCache = new NodeCache({stdTTL:100,checkperiod:86400});
+
+let currentData = readPrices()
 
 // Upon calling this API, a new entry will be inserted in portfolios
 // for a special stock called "dollars" along with the default
@@ -66,15 +64,6 @@ const createPortfolio = async (req, res) => {
 const getRankings = async (req, res) => {
     const portfolioInfo = await Portfolio.find();
     const userInfo = await User.find();
-
-    if (testTicker == 0) {
-        currentUsedData = currentData
-	testTicker = 1
-    }
-    else {
-	currentUsedData = currentDataTwo
-	testTicker = 0
-    }
 
     let rankCollection = []
 
@@ -254,13 +243,20 @@ const updatePortfolio = async (req, res) => {
 		    // Assume the user wants to purchase shares directly at the current price.
 	            // First see if this stock exists. Note this will have to be checked against
 		    // the TwelveData API or cache later.
-		    currItem = currentUsedData.filter((infoItem) => (infoItem.stockName===stockName))
+		    currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
 
-            currItem[0].newCost = initCost ? initCost : currItem[0].currentCost
+		    if (currItem.length == 0) {
+		        newItem = {stockName:stockName,currentCost:initCost}
+			currentData.push(newItem)
+			writePrices(currentData)
+			currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
+		    }
+
+                    currItem[0].currentCost = initCost ? initCost : currItem[0].currentCost
             
-            if(initCost) {
-                currentCache.set(currItem[0].stockName, currItem[0].newCost, 0)
-            }
+                    if(initCost) {
+                        currentCache.set(currItem[0].stockName, currItem[0].currentCost, 0)
+                    }
 		    if (currItem.length == 0){
 			stockDoesntExist = true
 		    }
@@ -270,7 +266,6 @@ const updatePortfolio = async (req, res) => {
 			currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
 			// This should always return something.
 			let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * currItem[0].newCost)
-			console.log(afterPurchaseFunds)
 			// If the answer is negative...
 			if (afterPurchaseFunds < 0){
 		            // Cancel the sale...user cannot "buy naked" at this time.
@@ -278,18 +273,15 @@ const updatePortfolio = async (req, res) => {
 			}
 			else {
 			    // Do we create a new item or add to an existing one? Searcg for an existing item first.
-			    searchItem = await Portfolio.find({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].newCost})
+			    searchItem = await Portfolio.find({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].currentCost})
 			    if (searchItem.length > 0) {
 		                // Just add to the existing item.
 				newNumOfUnits = numOfUnits + searchItem[0].numOfUnits
-				console.log('old units:', numOfUnits)
-				console.log('added units:', searchItem[0].numOfUnits)
-				console.log('total units:', newNumOfUnits)
-				await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].newCost}, {numOfUnits:newNumOfUnits})
+				await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].currentCost}, {numOfUnits:newNumOfUnits})
 			    }
 			    else {
 				// Make a brand new entry.
-			        portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:currItem[0].newCost})
+			        portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:numOfUnits, initCost:currItem[0].currentCost})
 			        await Portfolio.create(portItem);
 			    }
 			    // Update the money
@@ -305,7 +297,7 @@ const updatePortfolio = async (req, res) => {
 		    // Assume that an initCost for a flat stock rate was submitted.
                     // First see if this stock exists. Note this will have to be checked
                     // against the TwelveData API or cache later.
-                    currItem = currentUsedData.filter((infoItem) => (infoItem.stockName===stockName))
+                    currItem = currentData.filter((infoItem) => (infoItem.stockName===stockName))
                     if (currItem.length == 0){
                         stockDoesntExist = true
                     }
@@ -322,21 +314,21 @@ const updatePortfolio = async (req, res) => {
                         }
                         else {
 			    // Calculate the number of units. Note we should convert to float just in case.
-			    calcNumOfUnits = ((initCost*1.0) / currItem[0].newCost)
+			    calcNumOfUnits = ((initCost*1.0) / currItem[0].currentCost)
 			    if (calcNumOfUnits == 0){
 		                invalidPurchaseAmount = true
 			    }
 			    else {
 				// Do we create a new item or add to an existing one? Search for an existing item first.
-				searchItem = await Portfolio.find({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].newCost})
+				searchItem = await Portfolio.find({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].currentCost})
 				if (searchItem.length > 0) {
 				    // Just add to the existing item.
 				    newNumOfUnits = calcNumOfUnits + searchItem[0].numOfUnits
-				    await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].newCost}, {numOfUnits:newNumOfUnits})
+				    await Portfolio.findOneAndUpdate({userId:userID, portId:portID, stockName:stockName, initCost:currItem[0].currentCost}, {numOfUnits:newNumOfUnits})
 				}
 				else {
 				    // Make a brand new entry.
-                                    portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:calcNumOfUnits, initCost:currItem[0].newCost})
+                                    portItem = ({userId:userID, portId:portID, stockName:stockName, numOfUnits:calcNumOfUnits, initCost:currItem[0].currentCost})
                                     await Portfolio.create(portItem);
 				}
 
@@ -431,9 +423,9 @@ const sellPortfolioItem = async (req, res) => {
                     if (stockItem.length > 0){
                         // Get the current price.
                         currItem = currInfo.filter((infoItem) => (infoItem.stockName===stockName))
-                        currItem[0].newCost = price ? price : currItem[0].currentCost
+                        currItem[0].currentCost = price ? price : currItem[0].currentCost
                         if(price) {
-                            currentCache.set(currItem[0].stockName, currItem[0].newCost, 0)
+                            currentCache.set(currItem[0].stockName, currItem[0].currentCost, 0)
                         }
                         
 			// Compute the number of shares owned for all entries.
@@ -448,25 +440,24 @@ const sellPortfolioItem = async (req, res) => {
 			    for (let j = 0; j < stockItem.length; j++) {
 			        // Get the units just for this entry
 				remainingUnitsToSell = numOfUnits - stockItem[j].numOfUnits
-                console.log('currItem:', currItem[0])             
                 
 				// Calculate sale value based on how much stock there is.
 				if (remainingUnitsToSell < 0) {
 				    // Selling part of this entry will satisfy the sale.
-				    saleValue += (numOfUnits * Number(currItem[0].newCost))
+				    saleValue += (numOfUnits * Number(currItem[0].currentCost))
 				    newUnits = stockItem[j].numOfUnits - numOfUnits
 				    await Portfolio.findOneAndUpdate({userId: stockItem[j].userId, portId: stockItem[j].portId, stockName: stockItem[j].stockName}, {numOfUnits: newUnits})
 				    break
 				}
 				else if (remainingUnitsToSell == 0) {
 				    // Selling all of this entry will satisfy the sale.
-				    saleValue += (numOfUnits * Number(currItem[0].newCost))
+				    saleValue += (numOfUnits * Number(currItem[0].currentCost))
 				    await Portfolio.deleteOne({_id: stockItem[j]._id})
 				    break
 				}
 				else {
 				    // All of this entry must be sold plus more from another entry.
-				    saleValue += (stockItem[j].numOfUnits * Number(currItem[0].newCost))
+				    saleValue += (stockItem[j].numOfUnits * Number(currItem[0].currentCost))
 				    numOfUnits = numOfUnits = stockItem[j].numOfUnits
 				    await Portfolio.deleteOne({_id: stockItem[j]._id})
 				}
@@ -520,7 +511,7 @@ function retrievePortInfoKernel(userID, portID, portfolioInfo){
 // from the user's portfolio, accesses the same name from the stock API (ideally),
 // and returns the current price.
 function retrieveCurrInfoKernel(userID, portID, portfolioInfo){
-    let currInfo = [...currentUsedData]
+    let currInfo = [...currentData]
 
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
 
@@ -590,15 +581,15 @@ function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
     let returnCollection = []
     for (pI of portInfo){
         // Should only ever return one item
-        currentItem = currentUsedData.filter((infoItem) => {
+        currentItem = currentData.filter((infoItem) => {
             if (pI.stockName === infoItem.stockName){
                 return infoItem
             }
         })
 
         let indivReturn = 0
-        if (currentItem[0].newCost) {
-            indivReturn = (pI.numOfUnits * currentItem[0].newCost)
+        if (currentItem[0].currentCost) {
+            indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
 
         } else if (currentCache.get(currentItem[0].stockName)){
             indivReturn = (pI.numOfUnits * currentCache.get(currentItem[0].stockName))
@@ -606,7 +597,6 @@ function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
             indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
 
         }
-        console.log('new cost:', currentItem[0].newCost)
 	
 	if (returnCollection.find(elem => elem.stockName === pI.stockName)) {
 	    existingItemIndex = returnCollection.findIndex(element => element.stockName === pI.stockName)
@@ -704,7 +694,6 @@ function totalValueKernel(userID, portID, portfolioInfo, currInfo){
 // be all the front end needs to build the leaderboard.
 function rankingKernel(portfolioInfo, currInfo, userInfo){
     let rankCollection = []
-    console.log(userInfo)
 
     for (user of userInfo)
     {
@@ -716,6 +705,32 @@ function rankingKernel(portfolioInfo, currInfo, userInfo){
     rankCollection.sort((a,b) => b.score - a.score)
 
     return rankCollection
+}
+
+function readPrices() {
+    let fdata
+
+    try {
+	fdata = fs.readFileSync('storedPrices.js', {encoding:'utf8',flag:'r'})
+    } catch (error) {
+        console.error(error)
+    }
+
+    data = JSON.parse(fdata.toString())
+
+    return data
+}
+
+function writePrices(data) {
+    let tdata = JSON.stringify(data)
+
+    try {
+	fs.writeFileSync('storedPrices.js', tdata)
+    } catch (error) {
+	console.error(error)
+    }
+
+    return
 }
 
 module.exports = { 
