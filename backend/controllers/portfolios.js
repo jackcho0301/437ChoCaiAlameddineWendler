@@ -265,7 +265,7 @@ const updatePortfolio = async (req, res) => {
 			// has the funds for it...
 			currentFunds = await Portfolio.find({userId:userID, portId:portID, stockName:"dollars"})
 			// This should always return something.
-			let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * currItem[0].newCost)
+			let afterPurchaseFunds = currentFunds[0].numOfUnits - (numOfUnits * currItem[0].currentCost)
 			// If the answer is negative...
 			if (afterPurchaseFunds < 0){
 		            // Cancel the sale...user cannot "buy naked" at this time.
