@@ -598,15 +598,17 @@ function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
 
         }
 	
-	if (returnCollection.find(elem => elem.stockName === pI.stockName)) {
-	    existingItemIndex = returnCollection.findIndex(element => element.stockName === pI.stockName)
-	    newIndivReturn = indivReturn + returnCollection[existingItemIndex].returnVal
-	    returnCollection[existingItemIndex].returnVal = newIndivReturn
-	}
-	else {
-            returnItem = ({stockName:pI.stockName,returnVal:indivReturn})
+        if (returnCollection.find(elem => elem.stockName === pI.stockName)) {
+            existingItemIndex = returnCollection.findIndex(element => element.stockName === pI.stockName)
+            newIndivReturn = indivReturn + returnCollection[existingItemIndex].returnVal
+            newNumOfShares = pI.numOfUnits + returnCollection[existingItemIndex].numOfShares
+            returnCollection[existingItemIndex].returnVal = newIndivReturn
+            returnCollection[existingItemIndex].numOfShares = newNumOfShares
+        }
+        else {
+            returnItem = ({stockName:pI.stockName,returnVal:indivReturn,numOfShares:pI.numOfUnits})
             returnCollection.push(returnItem)
-	}
+        }
     }
 
     return returnCollection
@@ -642,19 +644,21 @@ function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
 
         indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
 
-	if (holdingCollection.find(elem => elem.stockName === pI.stockName)){
-	    // Reclaim the original holding value
-	    existingItemIndex = holdingCollection.findIndex(element => element.stockName === pI.stockName)
-	    originalReturn = ((holdingCollection[existingItemIndex].holding * currentValue) / 100)
-	    newIndivReturn = originalReturn + indivReturn
-	    newIndivHolding = ((newIndivReturn / currentValue) * 100)
-	    holdingCollection[existingItemIndex].holding = newIndivHolding
-	}
-	else {
+        if (holdingCollection.find(elem => elem.stockName === pI.stockName)){
+            // Reclaim the original holding value
+            existingItemIndex = holdingCollection.findIndex(element => element.stockName === pI.stockName)
+            originalReturn = ((holdingCollection[existingItemIndex].holding * currentValue) / 100)
+            newIndivReturn = originalReturn + indivReturn
+            newIndivHolding = ((newIndivReturn / currentValue) * 100)
+            newNumOfShares = pI.numOfUnits + holdingCollection[existingItemIndex].numOfShares
+            holdingCollection[existingItemIndex].holding = newIndivHolding
+            holdingCollection[existingItemIndex].numOfShares = newNumOfShares
+        }
+        else {
             indivHolding = ((indivReturn / currentValue) * 100)
-            holdingItem = ({stockName:pI.stockName,holding:indivHolding})
+            holdingItem = ({stockName:pI.stockName,holding:indivHolding,numOfShares:pI.numOfUnits})
             holdingCollection.push(holdingItem)
-	}
+        }
     }
 
     return holdingCollection
