@@ -1,4 +1,3 @@
-
 const User = require('../models/User')
 // const ProfilePic = require('../models/ProfilePic')
 const {StatusCodes} = require('http-status-codes')
@@ -9,7 +8,7 @@ const path = require('path');
 const { readdir } = require('fs/promises');
 
 
-let {currentData} = require('./testdata')
+let currentData = readPrices()
 const Portfolio = require('../models/Portfolio')
 const NodeCache = require('node-cache');
 
@@ -165,9 +164,9 @@ const getRankings = async (req, res) => {
     {
         let currInfo = []
 
-        let portInfo = retrievePortInfoKernel(userInfo[i]._id, 1, portfolioInfo)
-        currInfo = retrieveCurrInfoKernel(userInfo[i]._id, 1, portfolioInfo)
-        totalValueScore = totalValueKernel(userInfo[i]._id, 1, portfolioInfo, currInfo)
+        let portInfo = retrievePortInfoKernel(userInfo[i]._id, userInfo[i].prefPort, portfolioInfo)
+        currInfo = retrieveCurrInfoKernel(userInfo[i]._id, userInfo[i].prefPort, portfolioInfo)
+        totalValueScore = totalValueKernel(userInfo[i]._id, userInfo[i].prefPort, portfolioInfo, currInfo)
         rankItem = ({userName:userInfo[i].username,score:totalValueScore})
         rankCollection.push(rankItem)
     }
@@ -270,11 +269,19 @@ function totalValueKernel(userID, portID, portfolioInfo, currInfo){
     return sumValue
 }
 
+function readPrices() {
+    let fdata
 
+    try {
+	fdata = fs.readFileSync('storedPrices.js', {encoding:'utf8',flag:'r'})
+    } catch (error) {
+	console.error(error)
+    }
 
+    data = JSON.parse(fdata.toString())
 
-
-
+    return data
+}
 
 module.exports = { 
     getMyProfile,
