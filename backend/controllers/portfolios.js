@@ -4,8 +4,6 @@ const fetch = require('node-fetch')
 const {StatusCodes} = require('http-status-codes')
 const {BadRequestError, UnauthenticatedError} = require('../errors');
 const NodeCache = require('node-cache');
-// Testing Only - Delete Later
-//const Stat = require('../models/Stat')
 const fs = require('fs')
 
 const currentCache = new NodeCache({stdTTL:100,checkperiod:86400});
@@ -197,7 +195,6 @@ const updatePortfolio = async (req, res) => {
 
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
     currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
-    
     // REPLACE THE LINE ABOVE WITH THIS CODE WHEN READY
     // Assemble the list of stock names.
     //let portStockNames = []
@@ -576,7 +573,6 @@ function totalReturnKernel(userID, portID, portfolioInfo, currInfo){
 // be used with generating that pie chart on that one window.
 function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
     const portInfo = retrievePortInfoKernel(userID, portID, portfolioInfo)
-    //const currInfo = retrieveCurrInfoKernel(userID, portID, portfolioInfo)
 
     let returnCollection = []
     for (pI of portInfo){
@@ -598,17 +594,17 @@ function stockReturnKernel(userID, portID, portfolioInfo, currInfo){
 
         }
 	
-        if (returnCollection.find(elem => elem.stockName === pI.stockName)) {
-            existingItemIndex = returnCollection.findIndex(element => element.stockName === pI.stockName)
-            newIndivReturn = indivReturn + returnCollection[existingItemIndex].returnVal
-            newNumOfShares = pI.numOfUnits + returnCollection[existingItemIndex].numOfShares
-            returnCollection[existingItemIndex].returnVal = newIndivReturn
-            returnCollection[existingItemIndex].numOfShares = newNumOfShares
-        }
-        else {
+	if (returnCollection.find(elem => elem.stockName === pI.stockName)) {
+	    existingItemIndex = returnCollection.findIndex(element => element.stockName === pI.stockName)
+	    newIndivReturn = indivReturn + returnCollection[existingItemIndex].returnVal
+	    newNumOfShares = pI.numOfUnits + returnCollection[existingItemIndex].numOfShares
+	    returnCollection[existingItemIndex].returnVal = newIndivReturn
+	    returnCollection[existingItemIndex].numOfShares = newNumOfShares
+	}
+	else {
             returnItem = ({stockName:pI.stockName,returnVal:indivReturn,numOfShares:pI.numOfUnits})
             returnCollection.push(returnItem)
-        }
+	}
     }
 
     return returnCollection
@@ -644,21 +640,21 @@ function stockHoldingKernel(userID, portID, portfolioInfo, currInfo){
 
         indivReturn = (pI.numOfUnits * currentItem[0].currentCost)
 
-        if (holdingCollection.find(elem => elem.stockName === pI.stockName)){
-            // Reclaim the original holding value
-            existingItemIndex = holdingCollection.findIndex(element => element.stockName === pI.stockName)
-            originalReturn = ((holdingCollection[existingItemIndex].holding * currentValue) / 100)
-            newIndivReturn = originalReturn + indivReturn
-            newIndivHolding = ((newIndivReturn / currentValue) * 100)
-            newNumOfShares = pI.numOfUnits + holdingCollection[existingItemIndex].numOfShares
-            holdingCollection[existingItemIndex].holding = newIndivHolding
-            holdingCollection[existingItemIndex].numOfShares = newNumOfShares
-        }
-        else {
+	if (holdingCollection.find(elem => elem.stockName === pI.stockName)){
+	    // Reclaim the original holding value
+	    existingItemIndex = holdingCollection.findIndex(element => element.stockName === pI.stockName)
+	    originalReturn = ((holdingCollection[existingItemIndex].holding * currentValue) / 100)
+	    newIndivReturn = originalReturn + indivReturn
+	    newIndivHolding = ((newIndivReturn / currentValue) * 100)
+	    newNumOfShares = pI.numOfUnits + holdingCollection[existingItemIndex].numOfShares
+	    holdingCollection[existingItemIndex].holding = newIndivHolding
+	    holdingCollection[existingItemIndex].numOfShares = newNumOfShares
+	}
+	else {
             indivHolding = ((indivReturn / currentValue) * 100)
             holdingItem = ({stockName:pI.stockName,holding:indivHolding,numOfShares:pI.numOfUnits})
             holdingCollection.push(holdingItem)
-        }
+	}
     }
 
     return holdingCollection
