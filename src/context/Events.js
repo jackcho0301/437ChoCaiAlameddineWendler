@@ -3,10 +3,6 @@ import { reducer, values } from "./EventsReducer"
 import axios from 'axios'
 import { url } from "../config/constants"
 
-
-
-const URL = "localhost"
-
 export const EventsContext = React.createContext({
     state: values,
     dispatch: () => null
@@ -85,11 +81,11 @@ export const EventsProvider = ({ children }) => {
                 });
         },
 
-        buyStock: async (stockname, numofunits, initcost) => {
+        buyStock: async (stockname, numofunits, initcost, portfolioNumber) => {
             if (initcost === undefined) {
                 initcost = 0
             }
-            await axios.patch(`${url}/api/v1/portfolios/1`,
+            await axios.patch(`${url}/api/v1/portfolios/${portfolioNumber}`,
                 { "stockName": stockname, "numOfUnits": Number(numofunits), "initCost": Number(initcost) }, config)
                 .then(function (response) {
                     DEBUG.buyStock && console.log('Buy Stock response:', response.data);
@@ -100,11 +96,11 @@ export const EventsProvider = ({ children }) => {
                 });
         },
 
-        sellStock: async (stockname, numofunits, cost) => {
+        sellStock: async (stockname, numofunits, cost, portfolioNumber) => {
             // let deleteConfig = structuredClone(config)
             let deleteConfig = JSON.parse(JSON.stringify(config))
             deleteConfig["data"] = { 'stockName': stockname, "numOfUnits": Number(numofunits), "price": cost }
-            await axios.delete(`${url}/api/v1/portfolios/1`, deleteConfig)
+            await axios.delete(`${url}/api/v1/portfolios/${portfolioNumber}`, deleteConfig)
                 .then(function (response) {
                     DEBUG.sellStock && console.log('Sell Stock response:', response.data);
                     dispatch({ type: "soldStock", value: response.data })
@@ -127,20 +123,11 @@ export const EventsProvider = ({ children }) => {
                 });
         },
 
-        getPortfolio: async () => {
-            await axios.get(`${url}/api/v1/portfolios/1`, config
+        getPortfolio: async (portfolioNumber) => {
+            await axios.get(`${url}/api/v1/portfolios/${portfolioNumber}`, config
             )
                 .then(function (response) {
                     console.log(response.data)
-                    // let portfolio = {}
-                    // for (obj in response.data) {
-                    //     const stockName = obj.stockHoldings.stockName
-                    //     if (stockName in portfolio) {
-                    //         portfolio[stockName].holding += obj.stockHoldings.holding
-                    //     } else {
-                    //         portfolio
-                    //     }
-                    // }
                     dispatch({ type: "portfolio", value: response.data })
                     dispatch({type: "portfolioLoaded"})
                 })
@@ -245,7 +232,7 @@ export const EventsProvider = ({ children }) => {
         },
 
         logout: async () => {
-            await axios.post(`http://${URL}:3000/api/v1/auth/logout`, {}, config)
+            await axios.post(`${url}/api/v1/auth/logout`, {}, config)
             .then(function (response) {
               console.log(response);
               window.location.reload()
@@ -256,7 +243,7 @@ export const EventsProvider = ({ children }) => {
           },
 
 	getUserGroupMemberships: async () => {
-	    await axios.get(`http://${URL}:3000/api/v1/groups`, config)
+	    await axios.get(`${url}/api/v1/groups`, config)
 	        .then(function (response) {
 		    console.log(response.data)
 		    dispatch({ type: "group", value: response.data })
@@ -267,7 +254,7 @@ export const EventsProvider = ({ children }) => {
 	},
 	
 	getUserGroupOwnships: async () => {
-            await axios.get(`http://${URL}:3000/api/v1/groupowns`, config)
+            await axios.get(`${url}/api/v1/groupowns`, config)
 		.then(function (response) {
 		    console.log(response.data)
 		    dispatch({ type: "groupOwn", value: response.data })
@@ -278,7 +265,7 @@ export const EventsProvider = ({ children }) => {
 	},
 	
 	createGroup: async groupTitle => {
-	    await axios.post(`http://${URL}:3000/api/v1/groupowns`,
+	    await axios.post(`${url}/api/v1/groupowns`,
                 {"groupTitle":groupTitle}, config)
 		.then (function (response) {
 		    console.log(response);
@@ -290,7 +277,7 @@ export const EventsProvider = ({ children }) => {
 	},
 	
 	addGroupMember: async (name, groupTitle) => {
-	    await axios.post(`http://${URL}:3000/api/v1/groups`, 
+	    await axios.post(`${url}/api/v1/groups`, 
 		{"name":name,"groupTitle":groupTitle}, config)
 		.then (function (response) {
 		    console.log(response);
@@ -302,7 +289,7 @@ export const EventsProvider = ({ children }) => {
 	},
 
 	getTitle: async () => {
-	    await axios.get(`http://${URL}:3000/api/v1/stats/title`, config)
+	    await axios.get(`${url}/api/v1/stats/title`, config)
 		.then(function (response) {
 		    console.log(response.data)
 		    dispatch({ type: "title", value: response.data })
@@ -313,7 +300,7 @@ export const EventsProvider = ({ children }) => {
 	},
 	
 	getStats: async () => {
-	    await axios.get(`http://${URL}:3000/api/v1/stats`, config)
+	    await axios.get(`${url}/api/v1/stats`, config)
 		.then(function (response) {
 		    console.log(response.data)
 		    dispatch({ type: "stats", value: response.data })
@@ -324,7 +311,7 @@ export const EventsProvider = ({ children }) => {
 	},
 
     getMyProfile: async () => {
-        await axios.get(`http://${URL}:3000/api/v1/profile`, config)
+        await axios.get(`${url}/api/v1/profile`, config)
 		.then(function (response) {
 		    console.log(response.data)
 		    dispatch({ type: "profile", value: response.data })
