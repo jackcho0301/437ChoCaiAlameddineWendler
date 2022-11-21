@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import './ProfilePage.css'
 import { EventsContext } from '../context/Events'
-import { Button, IconButton, TextField, Box, InputLabel } from '@mui/material'
+import { Button, IconButton, TextField, Box, InputLabel, MenuItem, FormControl, Select } from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh'
 
 export default function ProfilePage(props) {
@@ -18,7 +18,11 @@ export default function ProfilePage(props) {
     })
     const [addMemberMessage, setAddMemberMessage] = React.useState([{}])
 
-	const [myProfile, setMyProfile] = React.useState(<></>)
+    const [myProfile, setMyProfile] = React.useState(<></>)
+    const [prefPortfolio, setPrefPortfolio] = React.useState(0)
+    const [prefPortfolioParams, setPrefPortfolioParams] = React.useState({
+        portID: ''        
+    })
 
     useEffect(() => {
 	setCurrentGroupMemberships(backend.groupMemberships)
@@ -36,35 +40,72 @@ export default function ProfilePage(props) {
 	setAddMemberMessage(backend.addMemberResponse)
     }, [backend.addMemberResponse])
 
-
-
-	useEffect(() => {
-		console.log("!!" + JSON.stringify(backend.profile))
-		setMyProfile(renderProfile(backend.profile)) 
+    useEffect(() => {
+        console.log("!!" + JSON.stringify(backend.profile))
+	setMyProfile(renderProfile(backend.profile)) 
     }, [backend.profile])
 
-	useEffect(() => {
-		callEvent.getMyProfile()
-	}, [])
+    useEffect(() => {
+	callEvent.getMyProfile()
+	callEvent.getPrefPortfolio()
+    }, [])
 
+    useEffect(() => {
+	setPrefPortfolio(backend.prefPortNumber)
+    }, [backend.prefPortNumber])
 
+    useEffect(() => {
+	callEvent.getMyProfile()
+	callEvent.getPrefPortfolio()
+    }, [prefPortfolio])
 
-	const renderProfile = profile => {
-		return (
-			<div id="profile-info-div">
-				<p><strong>Username:</strong> {profile.username}</p>
-				<img src={profile.profilePicPath} width="100px" length="100px" />
-				<p><strong>Score:</strong> {profile.score}</p>
-				<p><strong>Rank:</strong> {profile.rank}</p>
+    useEffect(() => {
+	callEvent.changePrefPortfolio(prefPortfolioParams.portID)
+    }, [prefPortfolioParams])
+
+    const renderProfile = profile => {
+	return (
+	    <div id="profile-info-div">
+		<p><strong>Username:</strong> {profile.username}</p>
+		<img src={profile.profilePicPath} width="100px" length="100px" />
+		<p><strong>Score:</strong> {profile.score}</p>
+		<p><strong>Rank:</strong> {profile.rank}</p>
 				
-				{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
+		{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
 
-			</div>
+	    </div>
 
-		)
+	)
+    }
+
+    const portfolioSelector = () => {
+        const changePortfolioID = event => {
+	    setPrefPortfolioParams({portID: event.target.value})
 	}
 
-
+	return (
+	    <div className='new-pref-port-select'>
+                <h2>Preferred Portfolio:</h2>
+                <p>{prefPortfolio}</p>
+		<Box>
+		    <FormControl sx={{m:1, minWidth:180}}>
+		        <InputLabel id='pref-port-select-label'>Select Preferred Portfolio</InputLabel>
+		        <Select
+		            labelId='pref-port-select-label'
+		            id='pref-port-select'
+		            label="Portfolio Number"
+		            onChange={changePortfolioID}
+		        >
+		            <MenuItem value={'1'}>1</MenuItem>
+		            <MenuItem value={'2'}>2</MenuItem>
+		            <MenuItem value={'3'}>3</MenuItem>
+		            <MenuItem value={'4'}>4</MenuItem>
+		        </Select>
+		    </FormControl>
+		</Box>
+	    </div>
+	);
+    }
 
     const newMemberInput = () => {
         const changeNewMemberName = event => {
@@ -200,7 +241,7 @@ export default function ProfilePage(props) {
 		    </InputLabel>
 	        </>
 	    }
-
+	    {portfolioSelector()}
 	
 	</div>
     )
