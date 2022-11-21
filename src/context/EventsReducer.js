@@ -31,7 +31,8 @@ export const values = {
     currentStats: {},
     createdPortfolio: {},
     portfolioLoaded: false,
-    profile: {}
+    profile: {},
+    prefPortNumber: ''
 }
 
 export const reducer = (state, action) => {
@@ -136,16 +137,22 @@ export const reducer = (state, action) => {
             }
         }
         case "profile": {
-	          return {
-	              ...state,
-		            profile: action.value
-	          }
-	      }
+	    return {
+	        ...state,
+	        profile: action.value
+	    }
+	}
         case "logout": {
-	          return {
-	              ...state,
-		            logoutResponse: {}
-	          }
-	      }
+	    return {
+	        ...state,
+		logoutResponse: {}
+	    }
+	}
+        case "prefPortNumber": {
+	    return {
+		...state,
+		prefPortNumber: action.value.data
+	    }
+	}
     }
 }

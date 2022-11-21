@@ -310,11 +310,34 @@ export const EventsProvider = ({ children }) => {
 		});
 	},
 
-    getMyProfile: async () => {
-        await axios.get(`${url}/api/v1/profile`, config)
+        getMyProfile: async () => {
+            await axios.get(`${url}/api/v1/profile`, config)
 		.then(function (response) {
 		    console.log(response.data)
 		    dispatch({ type: "profile", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+
+	changePrefPortfolio: async (portID) => {
+	    await axios.post(`${url}/api/v1/portfolios/choice/portnumber`,
+		{"portNumber":portID}, config)
+		.then (function (response) {
+		    console.log(response);
+		    dispatch({ type: "prefPortNumber", value: response.data })
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+	},
+
+	getPrefPortfolio: async () => {
+	    await axios.get(`${url}/api/v1/portfolios/choice/portnumber`, config)
+		.then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "prefPortNumber", value: response.data })
 		})
 		.catch(function (error) {
 		    console.log(error);
