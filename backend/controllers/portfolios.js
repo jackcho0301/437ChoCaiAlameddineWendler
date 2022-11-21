@@ -481,6 +481,37 @@ const sellPortfolioItem = async (req, res) => {
     }
 }
 
+const changePreferredPortfolio = async(req, res) => {
+    const userID = req.user.userId
+    const {portNumber} = req.body
+
+    if ((Number(portNumber) === 1) || (Number(portNumber) === 2) || (Number(portNumber) === 3) || (Number(portNumber) === 4)) {
+        await User.findOneAndUpdate({_id:userID}, {prefPort:Number(portNumber)})
+    }
+
+    updatedUser = await User.find({_id:userID})
+    if (updatedUser) {
+        res.status(200).json({success:true, data: updatedUser[0].prefPort})
+    }
+    else
+    {
+        res.status(200).json({success:false, msg: 'User portfolio choice not update'})
+    }
+}
+
+const getPreferredPortfolio = async(req, res) => {
+    const userID = req.user.userId
+    currentUser = await User.find({_id:userID})
+    
+    if (currentUser) {
+	res.status(200).json({success:true, data: currentUser[0].prefPort})
+    }
+    else
+    {
+	res.status(200).json({success:false, msg: 'Error getting preferred portfolio'})
+    }
+}
+
 // This method will retrieve the portfolio information for an individual user/
 // portfolio combination, represented by integer IDs. It will return a collection
 // of items with the properties: "userID", "portID", "stockName", "numOfUnits",
@@ -738,5 +769,7 @@ module.exports = {
     getPortfolio,
     updatePortfolio,
     sellPortfolioItem,
-    createPortfolio
+    createPortfolio,
+    changePreferredPortfolio,
+    getPreferredPortfolio
 }
