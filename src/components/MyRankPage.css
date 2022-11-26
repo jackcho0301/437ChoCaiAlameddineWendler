@@ -11,3 +11,7 @@
 .my-rank-page * {
     margin: 3%;
 }
+
+.recharts-cartesian-axis {
+    font-size: 14px;
+}
