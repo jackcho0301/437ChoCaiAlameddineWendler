@@ -89,7 +89,7 @@ export default function MyRankPage(props) {
 	else if (score < 500000) {
 	    return 'Congressional Trade \'Consultant\'';
 	}
-	else if (score >= 1000000) {
+	else if (score >= 500000) {
 	    return 'Global Elite'
 	}
     }
