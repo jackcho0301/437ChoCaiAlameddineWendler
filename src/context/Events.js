@@ -63,8 +63,16 @@ export const EventsProvider = ({ children }) => {
         getScores: async () => {
             await axios.get(`${url}/api/v1/portfolios`, config)
                 .then(function (response) {
-                    //   console.log(JSON.stringify(response, 0, 2));
-                    const data = response.data
+                    let data = response.data
+		    if (Array.isArray(state.groupMembers)) {
+			let filteredData = []
+			for (const member of data.data) {
+			    if (state.groupMembers.includes(member.userName)) {
+			        filteredData.push(member)
+			    }
+			}
+			data.data = filteredData
+		    }
                     DEBUG.getScores && console.log('Get Scores response:', data);
                     let ret = data.data.map(user => {
                         return {
@@ -342,6 +350,22 @@ export const EventsProvider = ({ children }) => {
 		.catch(function (error) {
 		    console.log(error);
 		});
+	},
+	
+	getGroupMembers: async (groupName) => {
+	    if (groupName === '') {
+	        dispatch({ type: "groupMembers", value: {} })
+	    }
+	    else {
+	    await axios.get(`${url}/api/v1/groups/${groupName}`, config)
+	        .then(function (response) {
+		    console.log(response.data)
+		    dispatch({ type: "groupMembers", value: response.data })
+		})
+		.catch(function (error) {
+		    console.error(error);
+		});
+	    }
 	},
     }
 

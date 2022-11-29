@@ -32,7 +32,8 @@ export const values = {
     createdPortfolio: {},
     portfolioLoaded: false,
     profile: {},
-    prefPortNumber: ''
+    prefPortNumber: '',
+    groupMembers: {}
 }
 
 export const reducer = (state, action) => {
@@ -152,6 +153,12 @@ export const reducer = (state, action) => {
 	    return {
 		...state,
 		prefPortNumber: action.value.data
+	    }
+	}
+	case "groupMembers": {
+	    return {
+		...state,
+		groupMembers: action.value.data
 	    }
 	}
     }
