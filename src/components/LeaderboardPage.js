@@ -3,7 +3,7 @@ import './LeaderboardPage.css'
 import Leaderboard from './react-leaderboard';
 import LEADERS from '../config/leaders.json'
 import { DataGrid } from '@mui/x-data-grid';
-import { IconButton } from '@mui/material';
+import { IconButton, Box, TextField, Button } from '@mui/material';
 import { UserContext } from '../context/User';
 import { EventsContext } from '../context/Events'
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -23,6 +23,10 @@ export default function LeaderboardPage(props) {
     const [leaderboard, setLeaderboard] = React.useState(null)
     const [scoresLoaded, setScoresLoaded] = React.useState(true)
     const [allowScoresToLoad, setAllowScoresToLoad] = React.useState(true)
+    const [currentGroupMems, setCurrentGroupMems] = React.useState([{}])
+    const [filterGroupParams, setFilterGroupParams] = React.useState({
+        groupName: ''    
+    })
 
     //only refreshing once right now
     const AUTO_REFRESH_MS = 30000;
@@ -44,6 +48,13 @@ export default function LeaderboardPage(props) {
         }
         setAllowScoresToLoad(false)
     }, [scoresLoaded])
+
+    //query when filters are changed
+    useEffect(() => {
+	callEvent.getScores()
+	setLeaderboard(newLeaderboard())
+	setAllowScoresToLoad(false)
+    }, [backend.groupMembers])
 
     //update scores whenever scores are changed
     useEffect(() => {
@@ -85,8 +96,53 @@ export default function LeaderboardPage(props) {
         }
     }, [scoresLoaded])
 
+    const filterByGroup = () => {
+	const changeGroupFilterName = event => {
+	    setFilterGroupParams({
+                groupName: event.target.value
+	    })
+	}
 
-
+	const clearGroupFilterName = event => {
+	    setFilterGroupParams({
+	        groupName: ''
+	    })
+	    callEvent.getGroupMembers('')
+	}
+	
+	return (
+	    <div className='groups-filter'>
+	        <Box
+	            component="form"
+	            noValidate
+	            autoComplete="off"
+	        >
+	            <TextField
+	                id="group-name-filter"
+	                label="New Group Name"
+	                variant="filled"
+	                onChange={event => changeGroupFilterName(event)}
+	            />
+	            <Button
+	                variant="contained"
+	                onClick={() => { 
+			    callEvent.getGroupMembers(filterGroupParams.groupName)
+			}}
+	                disabled={filterGroupParams.groupName == ''}
+	            >
+	                Filter by Group
+	            </Button>
+		    <Button
+		        variant="contained"
+		        onClick={event => clearGroupFilterName(event)}
+		    >
+		        Clear Filter
+		    </Button>
+	        </Box>
+	    </div>
+	);
+    }
+ 
     // leaders.sort(player => {
     //     return player.score
     // })
@@ -100,6 +156,7 @@ export default function LeaderboardPage(props) {
     //     );
 
     return (
+	<div>
         <div id='leaderboard-page'>
             {/* <IconButton
                 variant="contained"
@@ -115,5 +172,7 @@ export default function LeaderboardPage(props) {
                 rowsPerPageOptions={[10]}
             /> */}
         </div>
+	    {filterByGroup()}
+	</div>
     )
 }
