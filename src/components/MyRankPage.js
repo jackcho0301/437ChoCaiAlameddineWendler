@@ -96,7 +96,7 @@ export default function MyRankPage(props) {
 
     useEffect(() => {
 	if (backend.currentTitle.data != undefined) {
-	    setRankTotal(backend.allScores.length + 1)
+	    setRankTotal(backend.allScores.length)
 	    const isUser = (element) => element.name == backend.currentTitle.data.user
 	    const currentUserIndex = backend.allScores.findIndex(isUser)
 	    setRankNumber(currentUserIndex + 1)
