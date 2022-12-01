@@ -161,6 +161,11 @@ export default function MyRankPage(props) {
 		    </ResponsiveContainer>
 	        </>
             }
+	    {(rankStats.length === 0)
+                && <>
+                    <h3>No lifetime stats are available for this user. Check at the end of the quarter!</h3>
+                </>
+            }
 		
 	    <h2>Your Current Title is:</h2>
 	    {(rankTitle != '')
