@@ -434,7 +434,6 @@ export default function PortfolioPage(props) {
 	    </div>
 
             <div className='portfolio-actions'>
-                {!!backend.portfolioLoaded || <Button variant='contained' onClick={() => { callEvent.createPortfolio(); callEvent.getPortfolio(portNumber) }}>New Portfolio</Button>}
 
                 <div className='buy-stock'>
                     <Button
