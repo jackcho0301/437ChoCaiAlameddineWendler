@@ -1,11 +1,23 @@
 //import model
 const User = require('../models/User')
+const Portfolio = require('../models/Portfolio')
 
 const {StatusCodes} = require('http-status-codes')
 const {BadRequestError, UnauthenticatedError} = require('../errors');
 
+const startingMoney = 10000
+
 const register = async (req, res) => {
     const user = await User.create({ ...req.body })
+    // Create the four portfolios
+    let portItem = ({userId:user._id, portId:1, stockName:"dollars", numOfUnits:startingMoney, initCost:1})
+    await Portfolio.create(portItem);
+    portItem = ({userId:user._id, portId:2, stockName:"dollars", numOfUnits:startingMoney, initCost:1})
+    await Portfolio.create(portItem);
+    portItem = ({userId:user._id, portId:3, stockName:"dollars", numOfUnits:startingMoney, initCost:1})
+    await Portfolio.create(portItem);
+    portItem = ({userId:user._id, portId:4, stockName:"dollars", numOfUnits:startingMoney, initCost:1})
+    await Portfolio.create(portItem);
     res.status(StatusCodes.CREATED).json({msg: "register successful", username: user.username})
 }
 
