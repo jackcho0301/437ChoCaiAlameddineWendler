@@ -28,9 +28,11 @@ function App() {
   const [user, modifyUser] = React.useContext(UserContext)
   const [events, callEvent] = React.useContext(EventsContext)
   const cookieExists = document.cookie.match(/^(.*;)?\s*437_auth_session\s*=\s*[^;]+(.*)?$/) != null
+  console.log("cookieExists: " + cookieExists)
   if (cookieExists) {
-      modifyUser({type: "login", value: true})
+    user.loggedIn = true
   }
+
 
 
   useEffect(() => {

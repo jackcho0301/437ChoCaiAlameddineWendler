@@ -62,7 +62,7 @@ app.use(session({ //config object
       maxAge: Number(process.env.SESSION_LIFETIME),
       sameSite: true,
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
   },
   name: process.env.SESSION_NAME,
   resave: false,
