@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
 import './ProfilePage.css'
 import { EventsContext } from '../context/Events'
-import { Button, IconButton, TextField, Box, InputLabel, MenuItem, FormControl, Select } from '@mui/material'
+import { Button, IconButton, TextField, Box, InputLabel, MenuItem, FormControl, Select, Card, CardContent, Typography, Grid, Divider, List, ListItem, ListItemText } from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { makeStyles, createStyles } from '@mui/styles'
 
 export default function ProfilePage(props) {
     const [backend, callEvent] = React.useContext(EventsContext)
@@ -23,6 +24,16 @@ export default function ProfilePage(props) {
     const [prefPortfolioParams, setPrefPortfolioParams] = React.useState({
         portID: ''        
     })
+
+    const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+	    input: {
+		height: 43
+	    }
+	})
+    )
+
+    const classes = useStyles()
 
     useEffect(() => {
 	setCurrentGroupMemberships(backend.groupMemberships)
@@ -65,16 +76,19 @@ export default function ProfilePage(props) {
 
     const renderProfile = profile => {
 	return (
-	    <div id="profile-info-div">
-		<p><strong>Username:</strong> {profile.username}</p>
+	    <Grid item xs={8}>
+	    <Card item xs={{maxWidth: 600}}>
+	    <CardContent id="profile-info-div">
+		<Typography gutterBottom variant="h4"><strong>Username:</strong> {profile.username}</Typography>
 		{/* <img src={profile.profilePicPath} width="100px" length="100px" /> */}
-		<p><strong>Score:</strong> {profile.score}</p>
-		<p><strong>Rank:</strong> {profile.rank}</p>
+		<Typography variant="h5"><strong>Score:</strong> {profile.score}</Typography>
+		<Typography variant="h5"><strong>Rank:</strong> {profile.rank}</Typography>
 				
 		{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
 
-	    </div>
-
+	    </CardContent>
+            </Card>
+	    </Grid>
 	)
     }
 
@@ -84,11 +98,11 @@ export default function ProfilePage(props) {
 	}
 
 	return (
-	    <div className='new-pref-port-select'>
-                <h2>Preferred Portfolio:</h2>
-                <p>{prefPortfolio}</p>
+	    <CardContent id='new-pref-port-select'>
+                <Typography variant="h6"><strong>Preferred Portfolio</strong></Typography>
+                <Typography variant="subtitle1">{prefPortfolio}</Typography>
 		<Box>
-		    <FormControl sx={{m:1, minWidth:180}}>
+		    <FormControl sx={{m:1, minWidth:180}} display="flex" fullWidth="true">
 		        <InputLabel id='pref-port-select-label'>Select Preferred Portfolio</InputLabel>
 		        <Select
 		            labelId='pref-port-select-label'
@@ -103,7 +117,7 @@ export default function ProfilePage(props) {
 		        </Select>
 		    </FormControl>
 		</Box>
-	    </div>
+	    </CardContent>
 	);
     }
 
@@ -123,15 +137,18 @@ export default function ProfilePage(props) {
 	
 	return (
             <div className='new-member-input'>
+		<Typography align="left" variant="h6"><strong>To Add a Member to an Existing Group:</strong></Typography>
 		<Box
+		    sx={{ m: 2 }}
 		    component="form"
 		    noValidate
 		    autoComplete="off"
 		>
-	            <TextField label="Group Name" variant="filled" onChange={event => changeNewMemberGroup(event)}/>
-	            <TextField label="New Group Member" variant="filled" onChange={event => changeNewMemberName(event)}/>
+	            <TextField InputProps={{ className: classes.input}} label="Group Name" onChange={event => changeNewMemberGroup(event)}/>
+	            <TextField InputProps={{ className: classes.input}} label="New Group Member" onChange={event => changeNewMemberName(event)}/>
 	            <Button 
 		        variant="contained"
+		        size="large"
 		        onClick={() => {callEvent.addGroupMember(addGroupMemberParams.name, addGroupMemberParams.title)}}
 		        disabled={addGroupMemberParams.name == '' || addGroupMemberParams.title == ''}
 		    >Add Member</Button>
@@ -142,27 +159,27 @@ export default function ProfilePage(props) {
 
 
     const refreshGroupControls = (
-        <div className='groups-text-and-refresh'>
-	    <h1>Groups I Belong To</h1>
+        <CardContent className='groups-text-and-refresh'>
+	    <Typography variant="h6"><strong>Groups I Belong To</strong></Typography>
 	    <IconButton
 	        onClick={callEvent.getUserGroupMemberships}
 	        className='refresh-group-membership'
 	    >
-	    <RefreshIcon fontSize='large' />
+	    <RefreshIcon />
 	    </IconButton>    
-	</div>
+	</CardContent>
     )
 
     const refreshGroupOwnships = (
-    	<div className='ownships-text-and-refresh'>
-	    <h1>Groups I Own</h1>
+    	<CardContent className='ownships-text-and-refresh'>
+	    <Typography variant="h6"><strong>Groups I Own</strong></Typography>
 	    <IconButton
 	        onClick={callEvent.getUserGroupOwnships}
 	        className='refresh-group-ownship'
 	    >
-	    <RefreshIcon fontSize='large' />
+	    <RefreshIcon />
 	    </IconButton>
-	</div>
+	</CardContent>
     )
  
     const newGroupInput = () => {
@@ -173,19 +190,21 @@ export default function ProfilePage(props) {
 	}
 	return (
             <div className='new-group-input'>
+		<Typography align="left" variant="h6"><strong>To Add a New Group:</strong></Typography>
 	        <Box
+		    sx={{ m: 2 }}
 	            component="form"
 	            noValidate
 	            autoComplete="off"
 	        >
-	            <TextField
+	            <TextField InputProps={{ className: classes.input }}
 	                id="new-group-name"
 	                label="New Group Name"
-	                variant="filled"
 		        onChange={event => changeNewGroupName(event)}
 	            />
 	            <Button
 	                variant="contained"
+		        size="large"
 		        onClick={() => { callEvent.createGroup(createGroupParams.title) }}
 		        disabled={createGroupParams.title == ''}
 	            >
@@ -198,50 +217,67 @@ export default function ProfilePage(props) {
 
     return (
         <div class='profile-page' id='profile-page'>
-
-			{myProfile}
-
-            {refreshGroupControls}
-            {(currentGroupMemberships.success != undefined && currentGroupMemberships.success)
-	        && <>
-	    	    <div className='current-mems-return'>
-	    	        <ul>
-	    		    {
-	    		        currentGroupMemberships.data.map((mem, i) => <li>{mem}</li>)
+	    <h1>My Profile</h1>
+	    <Grid container spacing={2} sx={{mb: 2}} direction="row" justifyContent="center" alignItems="center">
+	    {myProfile}
+	    </Grid>
+	    <Grid container spacing={2} direction="row" justifyContent="center" alignItems="center">
+	    <Grid item xs={3}>
+	    <Card>
+                {refreshGroupControls}
+                {(currentGroupMemberships.success != undefined && currentGroupMemberships.success)
+	            && <>
+	    	        <List className='current-mems-return'>
+	    	            {
+    		                currentGroupMemberships.data.map((mem, i) => <ListItem><ListItemText primary={mem}/></ListItem>)
 	    		    }
-	    		</ul>
-	    	    </div>
-	    	</>
-	    }
-	    {refreshGroupOwnships}
-	    {(currentGroupOwnships.success != undefined && currentGroupOwnships.success)
-		&& <>
-	            <div className='current-owns-return'>
-			<ul>
+	    	        </List>
+	    	    </>
+	        }
+	    </Card>
+	    </Grid>
+	    <Grid item xs={3}>
+	    <Card>
+	        {refreshGroupOwnships}
+	        {(currentGroupOwnships.success != undefined && currentGroupOwnships.success)
+		    && <>
+	                <List className='current-owns-return'>
 			    { 
-			        currentGroupOwnships.data.map((own, i) => <li>{own}</li>)
+			        currentGroupOwnships.data.map((own, i) => <ListItem><ListItemText primary={own}/></ListItem>)
 			    }  
-		        </ul>
-		    </div>
-		</>
-	    }
-	    {newMemberInput()}
-	    {(addMemberMessage.msg != undefined)
-		&& <>
-	            <InputLabel>
-			{addMemberMessage.msg}
-		    </InputLabel>
-		</>
-	    }
-	    {newGroupInput()}
-            {(createGroupMessage.msg != undefined)
-		&& <>
-		    <InputLabel>
-		        {createGroupMessage.msg}
-		    </InputLabel>
-	        </>
-	    }
-	    {portfolioSelector()}
+		        </List>
+		    </>
+	        }
+	    </Card>
+	    </Grid>
+	    <Grid item xs={7} sm={7}>
+	    <Card>
+	        {newMemberInput()}
+	        {(addMemberMessage.msg != undefined)
+		    && <>
+	                <InputLabel>
+			    {addMemberMessage.msg}
+		        </InputLabel>
+		    </>
+	        }
+	    </Card>
+	    <Card>
+	        {newGroupInput()}
+                {(createGroupMessage.msg != undefined)
+		    && <>
+		        <InputLabel>
+		            {createGroupMessage.msg}
+		        </InputLabel>
+	            </>
+	        }
+	    </Card>
+	    </Grid>
+	    <Grid item xs={3}>
+	    <Card>
+	        {portfolioSelector()}
+	    </Card>
+	    </Grid>
+	    </Grid>
 	
 	</div>
     )
