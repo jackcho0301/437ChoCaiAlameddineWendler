@@ -1,8 +1,10 @@
 #leaderboard-page {
     display: flex;
     justify-content: center;
-    margin-top: 5vh;
-
+    /* margin-top: 5vh; */
+    margin-top: 0;
+    padding-top: 0;
+    top: 0;
 }
 
 .leaderboard-next-button {
@@ -20,4 +22,23 @@
     color: white;
     width: 2em !important;
     height: 2em !important;
+}
+
+#filter-by-group-btn, #clear-filter-btn{
+
+    margin-left: 10px;
+}
+
+#filter-by-group-btn, #clear-filter-btn{
+    height: 55px;
+}
+
+#leaderboard-wrapper{
+    position: relative;
+    top: 100px;
+}
+
+#filter-wrapper{
+    margin-bottom: 0;
+    padding-bottom: 0;
 }

@@ -1,5 +1,5 @@
 .home-page {
-    background-image: url('images/background.jpeg');
+    background-image: url('/images/background.jpeg');
     background-color: #cccccc;
     height: 100vh;
     display: flex;

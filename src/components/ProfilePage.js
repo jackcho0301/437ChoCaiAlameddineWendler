@@ -67,7 +67,7 @@ export default function ProfilePage(props) {
 	return (
 	    <div id="profile-info-div">
 		<p><strong>Username:</strong> {profile.username}</p>
-		<img src={profile.profilePicPath} width="100px" length="100px" />
+		{/* <img src={profile.profilePicPath} width="100px" length="100px" /> */}
 		<p><strong>Score:</strong> {profile.score}</p>
 		<p><strong>Rank:</strong> {profile.rank}</p>
 				
