@@ -25,17 +25,17 @@ const register = async (req, res) => {
 const login =  async (req, res) => {
     const {username, password} = req.body;
     if (!username || !password) {
-        throw new BadRequestError('Please provide username and password');
+        return res.status(StatusCodes.OK).json({msg: 'Please provide username and password'});
     }
     const user = await User.findOne({username});
     if (!user) {
-        throw new UnauthenticatedError('Invalid credentials');
+        return res.status(StatusCodes.OK).json({msg: 'Invalid credentials'});
     }
 
     //compare password
     const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect) {
-        throw new UnauthenticatedError ("invalid credentials");
+        return res.status(StatusCodes.OK).json({msg: 'Invalid credentials'});
     }
 
     //save user id to req.session
