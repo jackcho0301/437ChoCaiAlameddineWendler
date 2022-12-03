@@ -41,16 +41,16 @@ const getGroupMembers = async (req, res) => {
     }
 }
 
-// This method will insert a new group membership into the group 
+// This method will insert a new group membership into the group
 // collection. Ideally, at least for this incarnation, it should only
 // be called by the owner of the group. However, note that there is
 // no such restriction. All that is required for this to work is a
 // body.
 // {
-// 	"name": (The string of the user you wish to make a member
-// 	of a group)
-// 	"groupTitle": (The string of the group you wish to make 
-// 	the "name" a member of)
+//      "name": (The string of the user you wish to make a member
+//      of a group)
+//      "groupTitle": (The string of the group you wish to make
+//      the "name" a member of)
 // }
 const putGroupMembership = async (req, res) => {
     const {name,groupTitle} = req.body
@@ -64,18 +64,29 @@ const putGroupMembership = async (req, res) => {
     else {
         const newMemberId = newMemberInfo[0]._id
 
-	// Note that there is no enforcement of group existence here.
-	// The new member will be inserted into a new group if it 
-	// doesn't exist. Therefore, this should only ever be called
-	// by the owner, who can verify the names of their owned groups.
-        const membership = new Group({
-	    userId: newMemberId,
-	    groupName: groupTitle,
-	});
+        // First verify the group exists.
+        const queryGroup = await Group.find({groupName:groupTitle})
+        // Nothing will return if the group doesn't exist.
+        if (queryGroup.length === 0) {
+            return res.status(200).json({success:false, msg:"Group not found."})
+        }
 
-	await membership.save();
+        const membershipExists = await Group.exists({userId: newMemberId, groupName: groupTitle})
 
-	return res.status(200).json({success:true, msg:`New member added to ${groupTitle}.`})
+        if (!membershipExists)
+        {
+            const membership = new Group({
+                userId: newMemberId,
+                groupName: groupTitle,
+            });
+
+            await membership.save();
+        }
+        else {
+            return res.status(200).json({success:false, msg:"Name is already a member of specified group."})
+        }
+
+        return res.status(200).json({success:true, msg:`New member added to ${groupTitle}.`})
     }
 }
 

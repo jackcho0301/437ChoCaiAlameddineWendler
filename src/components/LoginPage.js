@@ -22,6 +22,14 @@ export default function LoginPage(props) {
     const [passwordVerify, setPasswordVerify] = React.useState('')
     const [events, callEvent] = React.useContext(EventsContext)
 
+    const isLoginValid = () => {
+        const conditions = [
+            credentials.username.length >= 3,
+            credentials.password.length >= 6
+        ]
+        return conditions.every(x => x)
+    }
+
     const isRegistrationValid = () => {
         const conditions = [
             credentials.password == passwordVerify,
@@ -33,14 +41,25 @@ export default function LoginPage(props) {
 
     const setLoggedIn = () => {
         DEBUG.loggedIn && console.log('credentials: ', credentials)
-        props.setUserLoggedIn(credentials.username, credentials.password)
-        Swal.fire({
-            title: 'Logged in!',
-            icon: 'success',
-            iconColor: 'rgb(0, 207, 0)',
-            showConfirmButton: false,
-            timer: 1000
-        })
+        if (isLoginValid()) {
+            props.setUserLoggedIn(credentials.username, credentials.password)
+            Swal.fire({
+                title: 'Logged in!',
+                icon: 'success',
+                iconColor: 'rgb(0, 207, 0)',
+                showConfirmButton: false,
+                timer: 1000
+            })
+        }
+        else {
+            Swal.fire({
+                title: 'Login failed!',
+                icon: 'error',
+                iconColor: 'rgb(255, 0, 0)',
+                showConfirmButton: false,
+                timer: 1000
+            })
+        }
     }
 
     const registerUser = () => {

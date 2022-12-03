@@ -33,7 +33,9 @@ export const values = {
     portfolioLoaded: false,
     profile: {},
     prefPortNumber: '',
-    groupMembers: {}
+    groupMembers: {},
+    buyMessage: '',
+    sellMessage: ''
 }
 
 export const reducer = (state, action) => {
@@ -59,18 +61,38 @@ export const reducer = (state, action) => {
         case "boughtStock": {
             let bought = state.boughtStock
             bought.push(action.value.data)
-            return {
-                ...state,
-                boughtStock: bought
-            }
+	    if (action.value.msg !== undefined) {
+                return {
+                    ...state,
+                    boughtStock: bought,
+		    buyMessage: action.value.msg
+                }
+	    }
+	    else {
+		return {
+		    ...state,
+		    boughtStock: bought,
+		    buyMessage: ''
+		}
+	    }
         }
         case "soldStock": {
             let sold = state.soldStock
             sold.push(action.value.data)
-            return {
-                ...state,
-                soldStock: sold
-            }
+	    if (action.value.msg !== undefined) {
+                return {
+                    ...state,
+                    soldStock: sold,
+		    sellMessage: action.value.msg
+                }
+	    }
+	    else {
+		return {
+		    ...state,
+		    soldStock: sold,
+		    sellMessage: ''
+		}
+	    }
         }
         case "dollarsAdded": {
             let added = state.dollarsAdded

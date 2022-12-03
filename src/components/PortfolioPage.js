@@ -434,10 +434,10 @@ export default function PortfolioPage(props) {
 	    </div>
 
             <div className='portfolio-actions'>
-                {!!backend.portfolioLoaded || <Button variant='contained' onClick={() => { callEvent.createPortfolio(); callEvent.getPortfolio(portNumber) }}>New Portfolio</Button>}
 
                 <div className='buy-stock'>
                     <Button
+                        className="buy-sell-btn"
                         variant='contained'
                         onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value/buyStockParams.number, portNumber)}
                         disabled={!buyValueString}
@@ -445,9 +445,17 @@ export default function PortfolioPage(props) {
                         Buy
                     </Button>
                     {buySellControls(true)}
-                </div>
+	        </div>
+	            {(backend.buyMessage !== '')
+                        && <>
+		            <InputLabel>
+			        {backend.buyMessage}
+			    </InputLabel>
+			</>
+		    }
                 <div className='sell-stock'>
                     <Button
+                        className="buy-sell-btn"
                         variant='contained'
                         onClick={handleSellStock}
                         disabled={!sellValueString}
@@ -455,7 +463,14 @@ export default function PortfolioPage(props) {
                         Sell
                     </Button>
                     {buySellControls(false)}
-                </div>
+	        </div>
+	            {(backend.sellMessage != '')
+			&& <>
+			    <InputLabel>
+				{backend.sellMessage}
+			    </InputLabel>
+		        </>
+		    }
 
 
             </div>

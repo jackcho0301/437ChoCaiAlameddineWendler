@@ -96,7 +96,7 @@ export default function MyRankPage(props) {
 
     useEffect(() => {
 	if (backend.currentTitle.data != undefined) {
-	    setRankTotal(backend.allScores.length + 1)
+	    setRankTotal(backend.allScores.length)
 	    const isUser = (element) => element.name == backend.currentTitle.data.user
 	    const currentUserIndex = backend.allScores.findIndex(isUser)
 	    setRankNumber(currentUserIndex + 1)
@@ -160,6 +160,11 @@ export default function MyRankPage(props) {
 		        </LineChart>
 		    </ResponsiveContainer>
 	        </>
+            }
+	    {(rankStats.length === 0)
+                && <>
+                    <h3>No lifetime stats are available for this user. Check at the end of the quarter!</h3>
+                </>
             }
 		
 	    <h2>Your Current Title is:</h2>

@@ -1,7 +1,23 @@
 .profile-page {
     padding-top: 10vh;
+    justify-content: center;
+    align-items: center;
+}
+
+body {
+    background-color: aliceblue;
 }
 
 #profile-info-div {
     font-size: 25px;
+}
+
+.groups-text-and-refresh {
+    display: flex;
+    flex-direction: row;
+}
+
+.ownships-text-and-refresh {
+    display: flex;
+    flex-direction: row;
 }

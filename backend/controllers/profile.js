@@ -48,9 +48,7 @@ const getMyProfile = async (req, res) => {
         profilePicPath = req.protocol + '://' + req.get('host') + "/" + req.user.userId + ".png"
     }
 
-    
-
-
+    currentData = readPrices()
 
     const {rankCollection} = await getRankings(req,res)
 

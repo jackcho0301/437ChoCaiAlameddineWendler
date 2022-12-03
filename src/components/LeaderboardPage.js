@@ -111,7 +111,7 @@ export default function LeaderboardPage(props) {
 	}
 	
 	return (
-	    <div className='groups-filter'>
+	    <div id="filter-wrapper">
 	        <Box
 	            component="form"
 	            noValidate
@@ -119,11 +119,12 @@ export default function LeaderboardPage(props) {
 	        >
 	            <TextField
 	                id="group-name-filter"
-	                label="New Group Name"
+	                label="Group Name"
 	                variant="filled"
 	                onChange={event => changeGroupFilterName(event)}
 	            />
 	            <Button
+                    id="filter-by-group-btn"
 	                variant="contained"
 	                onClick={() => { 
 			    callEvent.getGroupMembers(filterGroupParams.groupName)
@@ -133,6 +134,7 @@ export default function LeaderboardPage(props) {
 	                Filter by Group
 	            </Button>
 		    <Button
+                id="clear-filter-btn"
 		        variant="contained"
 		        onClick={event => clearGroupFilterName(event)}
 		    >
@@ -156,7 +158,8 @@ export default function LeaderboardPage(props) {
     //     );
 
     return (
-	<div>
+	<div id="leaderboard-wrapper">
+         {filterByGroup()}
         <div id='leaderboard-page'>
             {/* <IconButton
                 variant="contained"
@@ -172,7 +175,7 @@ export default function LeaderboardPage(props) {
                 rowsPerPageOptions={[10]}
             /> */}
         </div>
-	    {filterByGroup()}
+	   
 	</div>
     )
 }
