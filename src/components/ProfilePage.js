@@ -80,7 +80,7 @@ export default function ProfilePage(props) {
 	    <Card item xs={{maxWidth: 600}}>
 	    <CardContent id="profile-info-div">
 		<Typography gutterBottom variant="h4"><strong>Username:</strong> {profile.username}</Typography>
-		<img src={profile.profilePicPath} width="100px" length="100px" />
+		{/* <img src={profile.profilePicPath} width="100px" length="100px" /> */}
 		<Typography variant="h5"><strong>Score:</strong> {profile.score}</Typography>
 		<Typography variant="h5"><strong>Rank:</strong> {profile.rank}</Typography>
 				
