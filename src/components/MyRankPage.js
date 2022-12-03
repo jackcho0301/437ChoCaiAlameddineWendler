@@ -2,6 +2,10 @@ import React, { useEffect } from 'react'
 import './MyRankPage.css'
 import { EventsContext } from '../context/Events'
 import { LineChart, ResponsiveContainer, Legend, Tooltip, Line, XAxis, YAxis, CartesianGrid } from 'recharts'
+import { Grid, Card, CardContent, Typography, Paper, Box } from '@mui/material'
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
+import { green, amber } from '@mui/material/colors'
 
 export default function MyRankPage(props) {
     const [backend, callEvent] = React.useContext(EventsContext)
@@ -89,7 +93,7 @@ export default function MyRankPage(props) {
 	else if (score < 500000) {
 	    return 'Congressional Trade \'Consultant\'';
 	}
-	else if (score >= 500000) {
+	else if (score >= 1000000) {
 	    return 'Global Elite'
 	}
     }
@@ -142,37 +146,50 @@ export default function MyRankPage(props) {
     return (
         <div class='my-rank-page' id='my-rank-page'>
 	    <header></header>
-            <h2>Your Current Quarter Rank is:</h2>
-	    {(rankNumber != 0 && rankTotal != 0)
-	        && <>
-		    <h1>{rankNumber} out of {rankTotal}</h1>
-		</>
-	    }
-	    <h2>Your Lifetime Rank History is:</h2>
-		
-            {(rankStats.length > 1)
-	        && <>
-		    <ResponsiveContainer width="100%" aspect={3}>
-		        <LineChart data={rankStats.map(stat => ({quarterEnd: formatStatDate(stat.quarterEnd), finalValue: stat.finalValue}))} margin={{right: 300}}>
-		            <XAxis dataKey="quarterEnd" interval={"preserveStartEnd"} />
-		            <YAxis></YAxis>
-		            <Line isAnimationActive={false} dataKey="finalValue" stroke="black" dot={{stroke:"darkblue", strokeWidth:2, r:10}} />
-		        </LineChart>
-		    </ResponsiveContainer>
-	        </>
-            }
-	    {(rankStats.length === 0)
-                && <>
-                    <h3>No lifetime stats are available for this user. Check at the end of the quarter!</h3>
-                </>
-            }
-		
-	    <h2>Your Current Title is:</h2>
-	    {(rankTitle != '')
-		&& <>
-		    <h1>{rankTitle}</h1>
-                </>
-	    }
-        </div>
+	    <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center">
+	    <Card item sx={{ width: '75%' }}>
+	        <CardContent display="flex" fullWidth="true">
+                <Typography variant="h5"><strong>Your Current Quarter Rank is:</strong></Typography>
+	        {(rankNumber != 0 && rankTotal != 0)
+	            && <>
+			<Box display="flex" fullWidth="true">
+                            <AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }}/>
+		            <Typography sx={{ flexGrow: 1}} variant="h3"><strong>{rankNumber} out of {rankTotal}</strong></Typography>
+			    <AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }}/>
+			</Box>
+		    </>
+	        }
+	        <Typography variant="h5"><strong>Your Lifetime Rank History is:</strong></Typography>
+                {(rankStats.length > 1)
+	            && <>
+		        <ResponsiveContainer width="100%" aspect={3}>
+		            <LineChart data={rankStats.map(stat => ({quarterEnd: formatStatDate(stat.quarterEnd), finalValue: stat.finalValue}))} margin={{right: 300}}>
+		                <XAxis dataKey="quarterEnd" interval={"preserveStartEnd"} />
+		                <YAxis></YAxis>
+		                <Line isAnimationActive={false} dataKey="finalValue" stroke="black" dot={{stroke:"darkblue", strokeWidth:2, r:10}} />
+		            </LineChart>
+		        </ResponsiveContainer>
+	            </>
+                }
+	        {(rankStats.length === 0)
+		    && <>
+	                <Typography variant="h6">No lifetime stats are available for this user. Check at the end of the quarter!</Typography>
+	            </>
+	        }
+	        <p />
+	        <Typography variant="h5"><strong>Your Current Title is:</strong></Typography>
+	        {(rankTitle != '')
+		    && <>
+			<Box display="flex" fullWidth="true">
+			    <AttachMoneyIcon fontSize="large" sx={{ color: green[800] }}/>
+		            <Typography sx={{ flexGrow: 1}} variant="h3"><strong>{rankTitle}</strong></Typography>
+			    <AttachMoneyIcon fontSize="large" sx={{ color: green[800] }}/>
+			</Box>
+                    </>
+	        }
+	        </CardContent>
+	    </Card>
+	    </Grid>
+	</div>
     )
 }
