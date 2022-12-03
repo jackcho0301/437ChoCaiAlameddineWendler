@@ -56,9 +56,7 @@ const createPortfolio = async (req, res) => {
 }
 
 // This is the API for the leaderboard and should be called whenever the
-// user inspects the rankings page. Right now, it doesn't expect any sort
-// of body--it will always default to return everyone's ranking. Later, 
-// we can enhance the body to return filtered results.
+// user inspects the rankings page.
 const getRankings = async (req, res) => {
     const portfolioInfo = await Portfolio.find();
     const userInfo = await User.find();
@@ -69,10 +67,10 @@ const getRankings = async (req, res) => {
     {
         let currInfo = []
 
-        let portInfo = retrievePortInfoKernel(userInfo[i]._id, 1, portfolioInfo)
-        currInfo = retrieveCurrInfoKernel(userInfo[i]._id, 1, portfolioInfo)
+        let portInfo = retrievePortInfoKernel(userInfo[i]._id, userInfo[i].prefPort, portfolioInfo)
+        currInfo = retrieveCurrInfoKernel(userInfo[i]._id, userInfo[i].prefPort, portfolioInfo)
 
-        totalValueScore = totalValueKernel(userInfo[i]._id, 1, portfolioInfo, currInfo)
+        totalValueScore = totalValueKernel(userInfo[i]._id, userInfo[i].prefPort, portfolioInfo, currInfo)
         rankItem = ({userName:userInfo[i].username,score:totalValueScore})
         rankCollection.push(rankItem)
 
@@ -357,7 +355,7 @@ const updatePortfolio = async (req, res) => {
     }
     else
     {
-        res.status(200).json({success:false, msg:'Error while posting new stock purchase'})
+        res.status(200).json({success:false, msg:'Error while posting new stock purchase.'})
     }
 }
 
@@ -477,7 +475,7 @@ const sellPortfolioItem = async (req, res) => {
     }
     else
     {
-        res.status(200).json({success:false, msg:'Error while selling stock'})
+        res.status(200).json({success:false, msg:'Unable to perform the sale with the given ticker and share number.'})
     }
 }
 
