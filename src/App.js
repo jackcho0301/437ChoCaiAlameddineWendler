@@ -23,12 +23,14 @@ const DEBUG = {
 }
 
 
-
 function App() {
   const [pageState, setPageState] = useState(PAGES)
   const [user, modifyUser] = React.useContext(UserContext)
   const [events, callEvent] = React.useContext(EventsContext)
-
+  const cookieExists = document.cookie.match(/^(.*;)?\s*437_auth_session\s*=\s*[^;]+(.*)?$/) != null
+  if (cookieExists) {
+      modifyUser({type: "login", value: true})
+  }
 
 
   useEffect(() => {
@@ -45,11 +47,15 @@ function App() {
   }
 
   const setUserLoggedIn = (username, password) => {
-    modifyUser({type: "login", value: true})
-    modifyUser({type: "username", value: username})
-    // user.api('login', [username, password])
     callEvent.login(username, password)
   }
+
+  useEffect(() => {
+      if (events.loggedInUser !== '') {
+          modifyUser({type: "login", value: true})
+	  modifyUser({type: "username", value: events.loggedInUser})
+      }
+  }, [events.loggedInUser])
 
   const isCookie = cookie => {
     return document.cookie.match(`/^(.*;)?\s*${cookie}\s*=\s*[^;]+(.*)?$/`)
