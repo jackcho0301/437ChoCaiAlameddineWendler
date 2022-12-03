@@ -437,6 +437,7 @@ export default function PortfolioPage(props) {
 
                 <div className='buy-stock'>
                     <Button
+                        className="buy-sell-btn"
                         variant='contained'
                         onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value/buyStockParams.number, portNumber)}
                         disabled={!buyValueString}
@@ -454,6 +455,7 @@ export default function PortfolioPage(props) {
 		    }
                 <div className='sell-stock'>
                     <Button
+                        className="buy-sell-btn"
                         variant='contained'
                         onClick={handleSellStock}
                         disabled={!sellValueString}

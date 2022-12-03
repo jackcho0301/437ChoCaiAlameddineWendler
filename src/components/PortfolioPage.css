@@ -129,3 +129,12 @@
 .stock-display {
     width: 80vw;
 }
+
+.buy-sell-btn {
+    border: 1px solid red;
+    height: 80px;
+    top: 30px;
+    width: 100px;
+    
+
+}
