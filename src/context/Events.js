@@ -41,7 +41,9 @@ export const EventsProvider = ({ children }) => {
             )
                 .then(function (response) {
                     DEBUG.login && console.log('Login response:', response);
-                    dispatch({ type: "login", value: response })
+		    if (response.data.username !== undefined) {
+                        dispatch({ type: "login", value: response })
+		    }
                 })
                 .catch(function (error) {
                     console.log(error);
