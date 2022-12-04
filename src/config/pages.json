@@ -7,10 +7,6 @@
         "text": "My Portfolio",
         "active": false
     },
-    "ranking": {
-        "text": "My Ranking",
-        "active": false
-    },
     "leaderboard": {
         "text": "Top Earners",
         "active": false
