@@ -5,7 +5,6 @@ import PAGES from './config/pages.json'
 import LoginPage from './components/LoginPage'
 import LeaderboardPage from './components/LeaderboardPage'
 import HomePage from './components/HomePage'
-import MyRankPage from './components/MyRankPage'
 import PortfolioPage from './components/PortfolioPage'
 import HelpPage from './components/HelpPage'
 import LogoutPage from './components/LogoutPage'
@@ -103,8 +102,6 @@ function App() {
             <HomePage />}
           {pageState.portfolio.active &&
             <PortfolioPage />}
-          {pageState.ranking.active &&
-            <MyRankPage />}
           {pageState.leaderboard.active &&
             <LeaderboardPage />}
           {pageState.help.active &&
