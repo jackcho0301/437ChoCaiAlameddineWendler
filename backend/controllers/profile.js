@@ -72,14 +72,7 @@ const getMyProfile = async (req, res) => {
         }
     }
 
-    
-
-    
-
-
-
-    res.status(200).json({username: username, score: score, rank: rank, profilePicPath})
-
+    res.status(200).json({username: username, score: score, rank: rank, rankTotal: rankCollection.length, profilePicPath})
     
 }
 
