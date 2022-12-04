@@ -46,6 +46,7 @@ export default function PortfolioPage(props) {
 
     const commaSeparate = num => {
         try {
+            num = Number(num)
             return num.toLocaleString('en', { useGrouping: true })
         } catch {
             return num
@@ -66,9 +67,9 @@ export default function PortfolioPage(props) {
             if (action.type === 'pie-chart') {
                 try {
                     return returns.map(item => {
-                        let fillOptions={}
-                        const name = item.stockName == 'dollars' ? 'Cash' : item.stockName
-                        
+                        let fillOptions = {}
+                        const name = item.stockName == 'dollars' ? 'US Dollars' : item.stockName
+
                         return {
                             x: name,
                             y: Math.round(item.returnVal / 100),
@@ -81,11 +82,12 @@ export default function PortfolioPage(props) {
                 }
             } else if (action.type == 'table') {
                 return returns.map(item => {
-                    const name = item.stockName == 'dollars' ? 'Cash' : item.stockName
+                    const name = item.stockName == 'dollars' ? 'US Dollars' : item.stockName
                     return [
                         name,
+                        commaSeparate(Math.round(item.numOfShares * 100) / 100),
                         '$' + commaSeparate((item.returnVal).toFixed(2)),
-                        `${stockHoldings[item.stockName]/100}%`,
+                        `${stockHoldings[item.stockName] / 100}%`,
                     ]
                 })
             }
@@ -94,16 +96,16 @@ export default function PortfolioPage(props) {
 
         const cashSort = payload => {
             let cashSecond = payload.sort((a, b) => {
-                if (a.x == "Cash") {
+                if (a.x == "US Dollars") {
                     return -1;
-                } else if (b.x == "Cash") {
+                } else if (b.x == "US Dollars") {
                     return 1;
                 } else {
                     return (a.x < b.x ? -1 : 1);
                 }
             })
 
-            if(cashSecond.length > 1) {
+            if (cashSecond.length > 1) {
                 [cashSecond[0], cashSecond[1]] = [cashSecond[1], cashSecond[0]]
             }
 
@@ -112,9 +114,9 @@ export default function PortfolioPage(props) {
 
         const cashSortArray = payload => {
             return payload.sort((a, b) => {
-                if (a[0] == "Cash") {
+                if (a[0] == "US Dollars") {
                     return -1;
-                } else if (b[0] == "Cash") {
+                } else if (b[0] == "US Dollars") {
                     return 1;
                 } else {
                     return (a[0] < b[0] ? -1 : 1);
@@ -125,12 +127,21 @@ export default function PortfolioPage(props) {
 
         switch (action.type) {
             case 'table': {
+                const options = {
+                    filterType: "dropdown",
+                    responsive: "stacked",
+                    filter: false,
+                    download: false,
+                    print: false,
+                    customToolbarSelect: () => {}
+                  };
                 return (
                     <MUIDataTable
                         // title="Current Portfolio"
                         className='stock-data-table'
                         data={cashSortArray(getPortfolioData(action.payload))}
-                        columns={["Stock", "Holding Value", "Holding Percent"]}
+                        columns={["Stock", "Shares", "Holding Value", "Exposure"]}
+                        options={options}
                     />
                 )
             }
@@ -188,10 +199,10 @@ export default function PortfolioPage(props) {
         const moneyInvested = 10000
         setPortfolioStats({
             // cost: portfolio.coi,
-            // return: portfolio.totalReturnVal,
+            return: portfolio.totalVal - moneyInvested,
             // roi: portfolio.roiPercent
             cost: moneyInvested,
-            return: portfolio.totalVal - moneyInvested,
+            // return: portfolio.totalVal - moneyInvested,
             roi: Math.round((portfolio.totalVal - moneyInvested) / moneyInvested * 100)
         })
     }, [JSON.stringify(backend.boughtStock), JSON.stringify(backend.soldStock), JSON.stringify(backend.dollarsAdded), JSON.stringify(backend.currentPortfolio)])
@@ -300,7 +311,7 @@ export default function PortfolioPage(props) {
 
 
     const handleSellStock = () => {
-        callEvent.sellStock(sellStockParams.ticker, sellStockParams.number, sellValue.value/sellStockParams.number, portNumber)
+        callEvent.sellStock(sellStockParams.ticker, sellStockParams.number, sellValue.value / sellStockParams.number, portNumber)
     }
 
     const calculateSellPrice = () => {
@@ -336,19 +347,20 @@ export default function PortfolioPage(props) {
 
 
     const handlePortSelect = (event) => {
-	setPortNumber(event.target.value)
-	callEvent.getPortfolio(event.target.value)
+        setPortNumber(event.target.value)
+        callEvent.getPortfolio(event.target.value)
     }
 
     return (
         <div className='portfolio-page'>
             {/* placeholder, will be moved to user dropdown */}
             <div style={{
-                marginLeft: '20px',
+                // marginLeft: '20px',
                 backgroundColor: 'aliceblue',
-                width: '100%'
+                width: '100%',
+                height: '170px'
             }}>
-                <h1>Current Portfolio</h1>
+                <h1 style={{fontSize: '40px'}}>Current Portfolio</h1>
             </div>
 
             {(currentReturnsPortfolio != undefined && currentReturnsPortfolio.length > 0)
@@ -362,7 +374,7 @@ export default function PortfolioPage(props) {
                         <div
                             className='inner-portfolio-return'
                             style={{
-                                marginRight: '30px'
+                                // marginRight: '30px'
                             }}
                         >
                             <div>
@@ -379,6 +391,74 @@ export default function PortfolioPage(props) {
                             </div>
                         </div>
                     </div>
+                    <Box /* component={Paper}*/ className='select-portfolio-box'>
+                        <FormControl sx={{ m: 1, minWidth: 180 }}>
+                            <InputLabel id='portfolio-selector-label'>Select Portfolio</InputLabel>
+                            <Select
+                                labelId='portfolio-selector-label'
+                                id='portfolio-selector'
+                                value={portNumber}
+                                label="Portfolio Number"
+                                defaultValue={'1'}
+                                onChange={handlePortSelect}
+                            >
+                                <MenuItem value={'1'}>1</MenuItem>
+                                <MenuItem value={'2'}>2</MenuItem>
+                                <MenuItem value={'3'}>3</MenuItem>
+                                <MenuItem value={'4'}>4</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+
+                    <div className='portfolio-actions'>
+
+                        <Paper sx={{bgcolor: 'azure'}}>
+                            <div className='buy-stock'>
+                                {buySellControls(true)}
+                                <Button
+                                    className="buy-sell-btn"
+                                    variant='contained'
+                                    onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value / buyStockParams.number, portNumber)}
+                                    disabled={!buyValueString}
+                                >
+                                    Buy
+                                </Button>
+                            </div>
+                            {(backend.buyMessage !== '')
+                                && <>
+                                    <InputLabel>
+                                        {backend.buyMessage}
+                                    </InputLabel>
+                                </>
+                            }
+                        </Paper>
+                        <Paper sx={{bgcolor: 'azure'}}>
+                            <div className='sell-stock'>
+                                {buySellControls(false)}
+
+                                <Button
+                                    className="buy-sell-btn"
+                                    variant='contained'
+                                    onClick={handleSellStock}
+                                    disabled={!sellValueString}
+                                >
+                                    Sell
+                                </Button>
+                            </div>
+                            {(backend.sellMessage != '')
+                                && <>
+                                    <InputLabel>
+                                        {backend.sellMessage}
+                                    </InputLabel>
+                                </>
+                            }
+                        </Paper>
+
+
+
+                    </div>
+
+
                     <div className='stock-display'>
                         {currentPortfolio}
                     </div>
@@ -395,11 +475,11 @@ export default function PortfolioPage(props) {
                 >
                     Chart
                 </Button>
-                <Divider
+                {/* <Divider
                     orientation='vertical'
                     className='sign-in-register-divider'
                     flexItem
-                />
+                /> */}
                 <Button
                     variant='contained'
                     style={{  // TODO: refactor to makestyles
@@ -412,68 +492,10 @@ export default function PortfolioPage(props) {
                 </Button>
 
             </div>}
-	    <div>
-	        <Box>
-	            <FormControl sx={{m:1, minWidth:180}}>
-	                <InputLabel id='portfolio-selector-label'>Select Portfolio</InputLabel>
-	                <Select
-	                    labelId='portfolio-selector-label'
-	                    id='portfolio-selector'
-                            value={portNumber}
-	                    label="Portfolio Number"
-	                    defaultValue={'1'}
-	                    onChange={handlePortSelect}
-	                >
-	                    <MenuItem value={'1'}>1</MenuItem>
-	                    <MenuItem value={'2'}>2</MenuItem>
-	                    <MenuItem value={'3'}>3</MenuItem>
-	                    <MenuItem value={'4'}>4</MenuItem>
-	                </Select>
-	            </FormControl>
-	        </Box>
-	    </div>
-
-            <div className='portfolio-actions'>
-
-                <div className='buy-stock'>
-                    <Button
-                        className="buy-sell-btn"
-                        variant='contained'
-                        onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value/buyStockParams.number, portNumber)}
-                        disabled={!buyValueString}
-                    >
-                        Buy
-                    </Button>
-                    {buySellControls(true)}
-	        </div>
-	            {(backend.buyMessage !== '')
-                        && <>
-		            <InputLabel>
-			        {backend.buyMessage}
-			    </InputLabel>
-			</>
-		    }
-                <div className='sell-stock'>
-                    <Button
-                        className="buy-sell-btn"
-                        variant='contained'
-                        onClick={handleSellStock}
-                        disabled={!sellValueString}
-                    >
-                        Sell
-                    </Button>
-                    {buySellControls(false)}
-	        </div>
-	            {(backend.sellMessage != '')
-			&& <>
-			    <InputLabel>
-				{backend.sellMessage}
-			    </InputLabel>
-		        </>
-		    }
-
-
+            <div>
             </div>
+
+
 
 
         </div>

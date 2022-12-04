@@ -18,7 +18,7 @@ export default function Header(props) {
         <div id='header-div'>
             <AppBar
                 position='static'
-                sx={{ bgcolor: "black" }}
+                // sx={{ bgcolor: "black" }}
             >
                 <div id='header-contents'>
                     <div id='menu-wrapper'>

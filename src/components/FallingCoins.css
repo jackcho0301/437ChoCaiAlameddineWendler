@@ -1,0 +1,9 @@
+#gimmick {
+    display:block;
+    pointer-events:none;
+    position: absolute;
+    top:0;
+    left:0;
+}
+
+/* taken from https://jsfiddle.net/z3roj35k/1/ */

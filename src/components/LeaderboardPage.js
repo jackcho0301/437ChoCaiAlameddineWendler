@@ -7,6 +7,7 @@ import { IconButton, Box, TextField, Button } from '@mui/material';
 import { UserContext } from '../context/User';
 import { EventsContext } from '../context/Events'
 import RefreshIcon from '@mui/icons-material/Refresh';
+import Swal from 'sweetalert2';
 
 const DEBUG = {
     allScores: true,
@@ -27,9 +28,11 @@ export default function LeaderboardPage(props) {
     const [filterGroupParams, setFilterGroupParams] = React.useState({
         groupName: ''    
     })
+    const [textFieldValue, setTextFieldValue] = React.useState('')
+    const [currentFilter, setCurrentFilter] = React.useState(false)
 
     //only refreshing once right now
-    const AUTO_REFRESH_MS = 30000;
+    const AUTO_REFRESH_MS = 3000000;
 
     useEffect(() => {
       const interval = setInterval(() => {
@@ -98,12 +101,15 @@ export default function LeaderboardPage(props) {
 
     const filterByGroup = () => {
 	const changeGroupFilterName = event => {
+        setTextFieldValue(event.target.value)
 	    setFilterGroupParams({
                 groupName: event.target.value
 	    })
 	}
 
 	const clearGroupFilterName = event => {
+        setTextFieldValue('')
+        setCurrentFilter(false)
 	    setFilterGroupParams({
 	        groupName: ''
 	    })
@@ -122,14 +128,33 @@ export default function LeaderboardPage(props) {
 	                label="Group Name"
 	                variant="filled"
 	                onChange={event => changeGroupFilterName(event)}
+                    value={textFieldValue}
 	            />
 	            <Button
                     id="filter-by-group-btn"
 	                variant="contained"
 	                onClick={() => { 
-			    callEvent.getGroupMembers(filterGroupParams.groupName)
+                        callEvent.getGroupMembers(filterGroupParams.groupName).then(res => {
+                            if(res) {
+                                setCurrentFilter(true)
+                                Swal.fire({
+                                    title: 'Group Filter Set',
+                                    timer: 1000,
+                                    icon: 'success'
+                                })
+                            } else {
+                                setCurrentFilter(false)
+                                setTextFieldValue('')
+                                Swal.fire({
+                                    title: 'Group Not Found',
+                                    timer: 1000,
+                                    icon: 'error'
+                                })
+                            }
+                        })
+			    
 			}}
-	                disabled={filterGroupParams.groupName == ''}
+	                disabled={!filterGroupParams.groupName}
 	            >
 	                Filter by Group
 	            </Button>
@@ -137,8 +162,9 @@ export default function LeaderboardPage(props) {
                 id="clear-filter-btn"
 		        variant="contained"
 		        onClick={event => clearGroupFilterName(event)}
+                disabled={!currentFilter}
 		    >
-		        Clear Filter
+		        Clear Current Filter
 		    </Button>
 	        </Box>
 	    </div>

@@ -29,9 +29,14 @@ function App() {
   const [events, callEvent] = React.useContext(EventsContext)
   const cookieExists = document.cookie.match(/^(.*;)?\s*437_auth_session\s*=\s*[^;]+(.*)?$/) != null
   console.log("cookieExists: " + cookieExists)
-  if (cookieExists) {
-    user.loggedIn = true
-  }
+  useEffect(() => {
+    if (cookieExists) {
+      callEvent.setPersistentUser()
+      modifyUser({ type: "login", value: true })
+      modifyUser({ type: "username", value: events.loggedInUser })
+    }
+  }, [cookieExists])
+
 
 
 
@@ -49,14 +54,33 @@ function App() {
   }
 
   const setUserLoggedIn = (username, password) => {
-    callEvent.login(username, password)
+    callEvent.login(username, password).then(res => {
+      if (events.loggedInUser || res) {
+        Swal.fire({
+          title: 'Logged in!',
+          icon: 'success',
+          iconColor: 'rgb(0, 207, 0)',
+          showConfirmButton: false,
+          timer: 1000
+        })
+      }
+      else {
+        Swal.fire({
+          title: 'Login failed!',
+          icon: 'error',
+          iconColor: 'rgb(255, 0, 0)',
+          showConfirmButton: false,
+          timer: 1000
+        })
+      }
+    })
   }
 
   useEffect(() => {
-      if (events.loggedInUser !== '') {
-          modifyUser({type: "login", value: true})
-	  modifyUser({type: "username", value: events.loggedInUser})
-      }
+    if (events.loggedInUser !== '') {
+      modifyUser({ type: "login", value: true })
+      modifyUser({ type: "username", value: events.loggedInUser })
+    }
   }, [events.loggedInUser])
 
   const isCookie = cookie => {
@@ -76,25 +100,25 @@ function App() {
             setPage={setPageActive} />
           {/* <Box sx={{m: 2}}/> */}
           {pageState.home.active &&
-            <HomePage/>}
+            <HomePage />}
           {pageState.portfolio.active &&
-            <PortfolioPage/>}
+            <PortfolioPage />}
           {pageState.ranking.active &&
-            <MyRankPage/>}
+            <MyRankPage />}
           {pageState.leaderboard.active &&
-            <LeaderboardPage/>}
+            <LeaderboardPage />}
           {pageState.help.active &&
-            <HelpPage/>}
+            <HelpPage />}
           {pageState.logout.active &&
-            <LogoutPage/>}
-	        {pageState.profile.active &&
-	          <ProfilePage/>}
+            <LogoutPage />}
+          {pageState.profile.active &&
+            <ProfilePage />}
 
         </div>
       )
     }
     else {
-      return <LoginPage setUserLoggedIn={setUserLoggedIn}/>
+      return <LoginPage setUserLoggedIn={setUserLoggedIn} cookie={cookieExists} />
     }
   }
 

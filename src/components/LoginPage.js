@@ -8,8 +8,8 @@ import PasswordChecklist from "react-password-checklist"
 
 
 const DEBUG = {
-    username: false,
-    loggedIn: false
+    username: true,
+    loggedIn: true
 }
 
 
@@ -22,14 +22,6 @@ export default function LoginPage(props) {
     const [passwordVerify, setPasswordVerify] = React.useState('')
     const [events, callEvent] = React.useContext(EventsContext)
 
-    const isLoginValid = () => {
-        const conditions = [
-	    credentials.username.length >= 3,
-	    credentials.password.length >= 6,
-	    events.loggedInUser !== ''
-	]
-	return conditions.every(x => x)
-    }
 
     const isRegistrationValid = () => {
         const conditions = [
@@ -43,24 +35,6 @@ export default function LoginPage(props) {
     const setLoggedIn = () => {
         DEBUG.loggedIn && console.log('credentials: ', credentials)
 	props.setUserLoggedIn(credentials.username, credentials.password)
-	if (isLoginValid()) {
-	    Swal.fire({
-	        title: 'Logged in!',
-	        icon: 'success',
-	        iconColor: 'rgb(0, 207, 0)',
-	        showConfirmButton: false,
-	        timer: 1000
-	    })
-	}
-	else {
-	    Swal.fire({
-	        title: 'Login failed!',
-		icon: 'error',
-		iconColor: 'rgb(255, 0, 0)',
-		showConfirmButton: false,
-	        timer: 1000
-	    })
-	}
     }
 
     const registerUser = () => {
@@ -216,7 +190,7 @@ export default function LoginPage(props) {
                     {!isRegisterSelected ? 'Sign In' : 'Register'}
                 </Button>
                 {isRegisterSelected ||
-                    <a href='' id='forgot-password'>Forgot Password?</a>}
+                    <a id='forgot-password'>Forgot Password?</a>}
             </div>
         </div>
     )

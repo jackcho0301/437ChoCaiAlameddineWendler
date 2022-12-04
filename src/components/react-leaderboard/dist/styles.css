@@ -114,7 +114,7 @@ table td {
 }
 
 #lBoard {
-  width: 100vw;
+  width: 80vw;
 }
 
 form {
@@ -123,23 +123,23 @@ form {
 
 .rank-header {
   font-weight: 850;
-  font-size: 2em;
+  font-size: 25px;
 }
 
 .ranking {
-  font-weight: 600;
+  font-weight: 850;
 } 
 
 .rank {
-  font-weight: 500;
+  font-weight: 850;
 }
 
 .name {
-  font-weight: 750;
+  font-weight: 400;
 }
 
 .score {
-  font-weight: 750;
+  font-weight: 400;
 }
 
 #forgot-password 
@@ -151,21 +151,24 @@ table {
 }
 table td, table th {
   border: 1px solid #4A4A4A;
-  padding: 20px;
+  padding: 15px;
 }
 table tbody td {
-  font-size: 24px;
+  font-size: 20px;
   color: black;
 }
 table tr:nth-child(even) {
-  background: rgb(85,150,255);
+  background: rgb(200,230,200);
+}
+table tr:nth-child(odd) {
+  background: white;
 }
 table thead {
   background: #000000;
   border-bottom: 3px solid #000000;
 }
 table thead th {
-  font-size: 50px;
+  font-size: 40px;
   font-weight: bold;
   color: #E6E6E6;
   text-align: center;

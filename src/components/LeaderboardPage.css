@@ -33,12 +33,17 @@
     height: 55px;
 }
 
+/* #group-name-filter {
+    margin-top: 8vh
+} */
+
 #leaderboard-wrapper{
     position: relative;
-    top: 100px;
+    top: 5vh;
 }
 
 #filter-wrapper{
     margin-bottom: 0;
     padding-bottom: 0;
+    margin-top: 8vh
 }

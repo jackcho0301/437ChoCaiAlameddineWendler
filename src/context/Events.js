@@ -36,18 +36,22 @@ export const EventsProvider = ({ children }) => {
 
     const communicationEvents = {
         login: async (username, password) => {
+            let success = false
             await axios.post(`${url}/api/v1/auth/login`,
                 { username: username, password: password }, config
             )
                 .then(function (response) {
                     DEBUG.login && console.log('Login response:', response);
-		    if (response.data.username !== undefined) {
+                    if (response.data.username) {
                         dispatch({ type: "login", value: response })
-		    }
+                        success = true
+                    }
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
+
+                return success
         },
         register: async (username, password) => {
             await axios.post(`${url}/api/v1/auth/register`,
@@ -66,15 +70,15 @@ export const EventsProvider = ({ children }) => {
             await axios.get(`${url}/api/v1/portfolios`, config)
                 .then(function (response) {
                     let data = response.data
-		    if (Array.isArray(state.groupMembers)) {
-			let filteredData = []
-			for (const member of data.data) {
-			    if (state.groupMembers.includes(member.userName)) {
-			        filteredData.push(member)
-			    }
-			}
-			data.data = filteredData
-		    }
+                    if (Array.isArray(state.groupMembers)) {
+                        let filteredData = []
+                        for (const member of data.data) {
+                            if (state.groupMembers.includes(member.userName)) {
+                                filteredData.push(member)
+                            }
+                        }
+                        data.data = filteredData
+                    }
                     DEBUG.getScores && console.log('Get Scores response:', data);
                     let ret = data.data.map(user => {
                         return {
@@ -139,7 +143,7 @@ export const EventsProvider = ({ children }) => {
                 .then(function (response) {
                     console.log(response.data)
                     dispatch({ type: "portfolio", value: response.data })
-                    dispatch({type: "portfolioLoaded"})
+                    dispatch({ type: "portfolioLoaded" })
                 })
                 .catch(function (error) {
                     console.error(error);
@@ -156,7 +160,7 @@ export const EventsProvider = ({ children }) => {
             )
                 .then(function (response) {
                     console.log(response);
-                    dispatch({type: 'createPortfolio', value: response.data})
+                    dispatch({ type: 'createPortfolio', value: response.data })
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -243,132 +247,140 @@ export const EventsProvider = ({ children }) => {
 
         logout: async () => {
             await axios.post(`${url}/api/v1/auth/logout`, {}, config)
-            .then(function (response) {
-              console.log(response);
-              window.location.reload()
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-          },
+                .then(function (response) {
+                    console.log(response);
+                    window.location.reload()
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
 
-	getUserGroupMemberships: async () => {
-	    await axios.get(`${url}/api/v1/groups`, config)
-	        .then(function (response) {
-		    console.log(response.data)
-		    dispatch({ type: "group", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
-	
-	getUserGroupOwnships: async () => {
+        getUserGroupMemberships: async () => {
+            await axios.get(`${url}/api/v1/groups`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "group", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        getUserGroupOwnships: async () => {
             await axios.get(`${url}/api/v1/groupowns`, config)
-		.then(function (response) {
-		    console.log(response.data)
-		    dispatch({ type: "groupOwn", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
-	
-	createGroup: async groupTitle => {
-	    await axios.post(`${url}/api/v1/groupowns`,
-                {"groupTitle":groupTitle}, config)
-		.then (function (response) {
-		    console.log(response);
-		    dispatch({ type: "createGroupRes", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
-	
-	addGroupMember: async (name, groupTitle) => {
-	    await axios.post(`${url}/api/v1/groups`, 
-		{"name":name,"groupTitle":groupTitle}, config)
-		.then (function (response) {
-		    console.log(response);
-		    dispatch({ type: "addMemberRes", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "groupOwn", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
 
-	getTitle: async () => {
-	    await axios.get(`${url}/api/v1/stats/title`, config)
-		.then(function (response) {
-		    console.log(response.data)
-		    dispatch({ type: "title", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
-	
-	getStats: async () => {
-	    await axios.get(`${url}/api/v1/stats`, config)
-		.then(function (response) {
-		    console.log(response.data)
-		    dispatch({ type: "stats", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
+        createGroup: async groupTitle => {
+            await axios.post(`${url}/api/v1/groupowns`,
+                { "groupTitle": groupTitle }, config)
+                .then(function (response) {
+                    console.log(response);
+                    dispatch({ type: "createGroupRes", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        addGroupMember: async (name, groupTitle) => {
+            await axios.post(`${url}/api/v1/groups`,
+                { "name": name, "groupTitle": groupTitle }, config)
+                .then(function (response) {
+                    console.log(response);
+                    dispatch({ type: "addMemberRes", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        getTitle: async () => {
+            await axios.get(`${url}/api/v1/stats/title`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "title", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        getStats: async () => {
+            await axios.get(`${url}/api/v1/stats`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "stats", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
 
         getMyProfile: async () => {
             await axios.get(`${url}/api/v1/profile`, config)
-		.then(function (response) {
-		    console.log(response.data)
-		    dispatch({ type: "profile", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "profile", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
 
-	changePrefPortfolio: async (portID) => {
-	    await axios.post(`${url}/api/v1/portfolios/choice/portnumber`,
-		{"portNumber":portID}, config)
-		.then (function (response) {
-		    console.log(response);
-		    dispatch({ type: "prefPortNumber", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
+        changePrefPortfolio: async (portID) => {
+            await axios.post(`${url}/api/v1/portfolios/choice/portnumber`,
+                { "portNumber": portID }, config)
+                .then(function (response) {
+                    console.log(response);
+                    dispatch({ type: "prefPortNumber", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
 
-	getPrefPortfolio: async () => {
-	    await axios.get(`${url}/api/v1/portfolios/choice/portnumber`, config)
-		.then(function (response) {
-		    console.log(response.data)
-		    dispatch({ type: "prefPortNumber", value: response.data })
-		})
-		.catch(function (error) {
-		    console.log(error);
-		});
-	},
-	
-	getGroupMembers: async (groupName) => {
-	    if (groupName === '') {
-	        dispatch({ type: "groupMembers", value: {} })
-	    }
-	    else {
-	    await axios.get(`${url}/api/v1/groups/${groupName}`, config)
-	        .then(function (response) {
-		    console.log(response.data)
-		    dispatch({ type: "groupMembers", value: response.data })
-		})
-		.catch(function (error) {
-		    console.error(error);
-		});
-	    }
-	},
+        getPrefPortfolio: async () => {
+            await axios.get(`${url}/api/v1/portfolios/choice/portnumber`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "prefPortNumber", value: response.data })
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+
+        getGroupMembers: async (groupName) => {
+            if (groupName === '') {
+                dispatch({ type: "groupMembers", value: {} })
+            }
+            else {
+                let success = false
+                await axios.get(`${url}/api/v1/groups/${groupName}`, config)
+                    .then(function (response) {
+                        console.log(response.data)
+                        dispatch({ type: "groupMembers", value: response.data })
+                        if (response.data.success) {
+                            success = true
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error(error);
+                    });
+                return success
+            }
+        },
+        setPersistentUser: () => {
+            dispatch({ type: 'login', value: { data: { username: 'persistentSession' } } })
+        }
     }
 
     return (

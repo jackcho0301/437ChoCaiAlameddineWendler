@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
-    margin-top: 10vh;
+    margin-top: 8vh;
     align-items: center;
 }
 
@@ -115,7 +115,7 @@
 .portfolio-display-mode {
     display: flex;
     justify-content: center;
-    border: 1px solid gray;
+    /* border: 1px solid gray; */
     width: 20vw;
     margin-top: 20px;
 }
@@ -137,4 +137,10 @@
     width: 100px;
     
 
+}
+
+.select-portfolio-box {
+    position: absolute;
+    top: 160px;
+    right: auto;
 }

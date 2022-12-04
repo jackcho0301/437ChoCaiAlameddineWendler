@@ -179,19 +179,15 @@ var Leaderboard = function (_Component) {
           _react2.default.createElement(
             'tbody',
             { className: 'ranking' },
-            _react2.default.createElement(
-              'tr',
-              null,
-              _react2.default.createElement(
-                'td',
-                { colSpan: '10000' },
-                // _react2.default.createElement(
-                //   'h1',
-                //   null,
-                //   title
-                // )
-              )
-            ),
+            //   _react2.default.createElement(
+            //     'td',
+            //     { colSpan: '10000' },
+            //     // _react2.default.createElement(
+            //     //   'h1',
+            //     //   null,
+            //     //   title
+            //     // )
+            // ),
             // _react2.default.createElement(
             //   'tr',
             //   null,
@@ -245,7 +241,7 @@ var Leaderboard = function (_Component) {
                   { className: 'data score' },
                   // user.score <-- default
                   // user.score.toLocaleString('en', {useGrouping:true})
-                  user.score != undefined ? user.score.toLocaleString('en', {useGrouping:true}): user.score
+                  user.score != undefined ? Math.round(user.score).toLocaleString('en', {useGrouping:true}): user.score
 
                 ) : null
               );

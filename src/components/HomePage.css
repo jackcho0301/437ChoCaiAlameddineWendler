@@ -1,21 +1,45 @@
 .home-page {
-    background-image: url('/images/background.jpeg');
-    background-color: #cccccc;
+    /* background-image: url('/images/background.jpeg');
+    background-color: #cccccc; */
     height: 100vh;
     display: flex;
-    background-position: center;
+    flex-direction: column;
+    /* background-position: center;
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: cover; */
     object-fit: contain;
     opacity: 0.6;
+
+    background: linear-gradient(-45deg, white, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 5s ease infinite;
 }
 
 .home-titles {
-    font-size: larger;
-    color: #f5f5f5;
+    font-size: 30px;
 }
 
 .column-title {
-    font-size: medium;
-    color: #f5f5f5;
+    font-size: 20px;
+}
+
+.site-title {
+    font-size: 50px;
+    color: darkgreen;
+}
+
+.features-row * {
+    margin: 20px;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
