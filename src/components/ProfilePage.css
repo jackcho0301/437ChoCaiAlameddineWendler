@@ -6,6 +6,11 @@
 
 #profile-info-div {
     font-size: 25px;
+    background-color: rgb(220,240,220);
+}
+
+#profile-info-div > * {
+    margin: 1%;
 }
 
 .groups-text-and-refresh {
@@ -16,4 +21,25 @@
 .ownships-text-and-refresh {
     display: flex;
     flex-direction: row;
+}
+
+/* .emphasis {
+    font-size: 25px;
+} */
+
+.new-member-input, .new-group-input {
+    padding: 1%;
+}
+/* 
+.new-member-input {
+    margin-bottom: 20px;
+} */
+
+/* .new-pref-port-select {
+    display: flex;
+} */
+
+.ownships-text-and-refresh, .groups-text-and-refresh{
+    display: flex;
+    justify-content: center;
 }

@@ -11,6 +11,10 @@
         "text": "Top Earners",
         "active": false
     },
+    "groups": {
+        "text": "Groups",
+        "active": false
+    },
     "help": {
         "text": "FAQs",
         "active": false

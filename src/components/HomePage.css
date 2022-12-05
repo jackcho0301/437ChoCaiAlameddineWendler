@@ -2,6 +2,7 @@
     /* background-image: url('/images/background.jpeg');
     background-color: #cccccc; */
     height: 100vh;
+    width: 100vw;
     display: flex;
     flex-direction: column;
     /* background-position: center;
@@ -13,10 +14,17 @@
     background: linear-gradient(-45deg, white, #23d5ab);
     background-size: 400% 400%;
     animation: gradient 5s ease infinite;
+
+    align-items: center;
+
 }
 
 .home-titles {
     font-size: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -20px;
 }
 
 .column-title {
@@ -24,12 +32,15 @@
 }
 
 .site-title {
-    font-size: 50px;
-    color: darkgreen;
+    font-size: 7vw;
+    color: green;
+    margin-top: 10vw;
 }
 
 .features-row * {
-    margin: 20px;
+    margin: 30px;
+    font-weight: bold;
+    color: green;
 }
 
 @keyframes gradient {

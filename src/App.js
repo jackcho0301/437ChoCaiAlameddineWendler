@@ -9,6 +9,7 @@ import PortfolioPage from './components/PortfolioPage'
 import HelpPage from './components/HelpPage'
 import LogoutPage from './components/LogoutPage'
 import ProfilePage from './components/ProfilePage'
+import GroupPage from './components/GroupPage'
 import Swal from 'sweetalert2'
 import './Swal.css'
 import { UserContext } from "./context/User"
@@ -110,6 +111,10 @@ function App() {
             <LogoutPage />}
           {pageState.profile.active &&
             <ProfilePage />}
+          {pageState.groups.active &&
+            <GroupPage />}
+          {/* {pageState.ranking.active &&
+            <MyRankPage />} */}
 
         </div>
       )

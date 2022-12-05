@@ -66,6 +66,7 @@
 .buy-stock,
 .sell-stock {
     display: flex;
+    align-items: center;
 }
 
 /* .preview-buy-table-head-row {
@@ -132,9 +133,10 @@
 
 .buy-sell-btn {
     border: 1px solid red;
-    height: 80px;
-    top: 30px;
-    width: 100px;
+    /* height: 72px;
+    top: 26px;
+    width: 100px; */
+    height: 56px
     
 
 }

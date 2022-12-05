@@ -53,6 +53,8 @@ export default function PortfolioPage(props) {
         }
     }
 
+    const [controlsActive, setControlsActive] = React.useState(false)
+
     const [currentPortfolio, reduceCurrentPortfolio] = React.useReducer((currentPortfolio, action) => {
         const stockHoldings = {}
         try {
@@ -133,8 +135,8 @@ export default function PortfolioPage(props) {
                     filter: false,
                     download: false,
                     print: false,
-                    customToolbarSelect: () => {}
-                  };
+                    customToolbarSelect: () => { }
+                };
                 return (
                     <MUIDataTable
                         // title="Current Portfolio"
@@ -276,35 +278,44 @@ export default function PortfolioPage(props) {
         }
 
         return (
-            <Box
-                component="form"
-                //   sx={{
-                //     '& > :not(style)': { m: 1, width: '25ch' },
-                //   }}
-                noValidate
-                autoComplete="off"
-            >
-                <TextField
-                    // id="stock-ticker"
-                    label="Ticker"
-                    variant="filled"
-                    onChange={event => changeTicker(event)}
-                    inputProps={{ style: { textTransform: "uppercase" } }}
-                />
-                <TextField
-                    // id="stock-number"
-                    label="Number of Shares"
-                    variant="filled"
-                    onChange={event => changeNumber(event)}
-                />
-                <TextField
-                    className='preview-value'
-                    label={isBuy ? "Buy Price" : "Sale Value"}
-                    variant="filled"
-                    value={isBuy ? buyValueString : sellValueString}
-                    disabled
-                />
-            </Box>
+            <>
+                <Box
+                    component="form"
+                    //   sx={{
+                    //     '& > :not(style)': { m: 1, width: '25ch' },
+                    //   }}
+                    noValidate
+                    autoComplete="off"
+                >
+                    <TextField
+                        // id="stock-ticker"
+                        label="Ticker"
+                        variant="filled"
+                        size="small"
+                        onChange={event => changeTicker(event)}
+                        inputProps={{ style: { textTransform: "uppercase", height: '10px' } }}
+                    />
+                    <TextField
+                        // id="stock-number"
+                        label="Number of Shares"
+                        size="small"
+                        variant="filled"
+                        onChange={event => changeNumber(event)}
+                        inputProps={{ style: { height: '10px' } }}
+
+                    />
+                    <TextField
+                        className='preview-value'
+                        label={isBuy ? "Buy Price" : "Sale Value"}
+                        size="small"
+                        variant="filled"
+                        value={isBuy ? buyValueString : sellValueString}
+                        inputProps={{ style: { height: '10px' } }}
+
+                        disabled
+                    />
+                </Box>
+            </>
         );
     }
 
@@ -360,7 +371,7 @@ export default function PortfolioPage(props) {
                 width: '100%',
                 height: '170px'
             }}>
-                <h1 style={{fontSize: '40px'}}>Current Portfolio</h1>
+                <h1 style={{ fontSize: '40px' }}>Your Portfolio</h1>
             </div>
 
             {(currentReturnsPortfolio != undefined && currentReturnsPortfolio.length > 0)
@@ -410,9 +421,17 @@ export default function PortfolioPage(props) {
                         </FormControl>
                     </Box>
 
-                    <div className='portfolio-actions'>
+                    <div className='portfolio-actions' hidden={!controlsActive}>
+                        <Button
+                            onClick={() => setControlsActive(false)}
+                            variant='contained'
+                            color={'error'}
+                            style={{ marginTop: '30px' }}
+                        >
+                            Hide Controls
+                        </Button>
 
-                        <Paper sx={{bgcolor: 'azure'}}>
+                        <Paper sx={{ bgcolor: 'azure' }}>
                             <div className='buy-stock'>
                                 {buySellControls(true)}
                                 <Button
@@ -432,7 +451,7 @@ export default function PortfolioPage(props) {
                                 </>
                             }
                         </Paper>
-                        <Paper sx={{bgcolor: 'azure'}}>
+                        <Paper sx={{ bgcolor: 'azure' }}>
                             <div className='sell-stock'>
                                 {buySellControls(false)}
 
@@ -457,43 +476,60 @@ export default function PortfolioPage(props) {
 
 
                     </div>
+                    {backend.portfolioLoaded && <div className='portfolio-display-mode'>
+                        <Button
+                            variant='contained'
+                            style={{
+                                backgroundColor: displayMode == 'pie-chart' ? 'black' : 'rgb(245,245,245)',
+                                color: displayMode == 'pie-chart' ? 'white' : 'black'
+                            }}
+                            onClick={() => setDisplayMode('pie-chart')}
+                        >
+                            Chart
+                        </Button>
+                        {/* <Divider
+                    orientation='vertical'
+                    className='sign-in-register-divider'
+                    flexItem
+                /> */}
+                        <Button
+                            variant='contained'
+                            style={{  // TODO: refactor to makestyles
+                                backgroundColor: displayMode == 'pie-chart' ? 'rgb(245,245,245)' : 'black',
+                                color: displayMode == 'pie-chart' ? 'black' : 'white'
+                            }}
+                            onClick={() => setDisplayMode('table')}
+                        >
+                            Table
+                        </Button>
 
+                    </div>}
 
                     <div className='stock-display'>
                         {currentPortfolio}
                     </div>
 
                 </>}
-            {backend.portfolioLoaded && <div className='portfolio-display-mode'>
-                <Button
-                    variant='contained'
-                    style={{
-                        backgroundColor: displayMode == 'pie-chart' ? 'black' : 'rgb(245,245,245)',
-                        color: displayMode == 'pie-chart' ? 'white' : 'black'
-                    }}
-                    onClick={() => setDisplayMode('pie-chart')}
-                >
-                    Chart
-                </Button>
-                {/* <Divider
-                    orientation='vertical'
-                    className='sign-in-register-divider'
-                    flexItem
-                /> */}
-                <Button
-                    variant='contained'
-                    style={{  // TODO: refactor to makestyles
-                        backgroundColor: displayMode == 'pie-chart' ? 'rgb(245,245,245)' : 'black',
-                        color: displayMode == 'pie-chart' ? 'black' : 'white'
-                    }}
-                    onClick={() => setDisplayMode('table')}
-                >
-                    Table
-                </Button>
 
-            </div>}
             <div>
             </div>
+
+            {/* <Button
+                onClick={() => controlsActive ? setControlsActive(false) : setControlsActive(true)}
+                variant='contained'
+                color={controlsActive ? 'error' : 'primary'}
+                style={{marginTop: '30px'}}
+            >
+                {`${controlsActive ? 'Hide Controls' : 'Modify Portfolio'}`}
+            </Button> */}
+            <Button
+                onClick={() => setControlsActive(true)}
+                variant='contained'
+                color={'primary'}
+                style={{ marginTop: '30px', visibility: controlsActive ? 'hidden' : 'visible'}}
+            >
+                Modify Portfolio
+            </Button>
 
 
 
