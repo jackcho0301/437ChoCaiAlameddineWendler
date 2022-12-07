@@ -453,7 +453,7 @@ const sellPortfolioItem = async (req, res) => {
 				else {
 				    // All of this entry must be sold plus more from another entry.
 				    saleValue += (stockItem[j].numOfUnits * Number(currItem[0].currentCost))
-				    numOfUnits = numOfUnits = stockItem[j].numOfUnits
+				    numOfUnits = numOfUnits - stockItem[j].numOfUnits
 				    await Portfolio.deleteOne({_id: stockItem[j]._id})
 				}
 			    }
