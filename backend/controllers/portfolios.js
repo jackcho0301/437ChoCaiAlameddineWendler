@@ -429,41 +429,42 @@ const sellPortfolioItem = async (req, res) => {
 			    numOfOwnedUnits += stockItem[i].numOfUnits
 			}
 
-			// Can the sale be made for that amount?
-			if (numOfOwnedUnits >= numOfUnits) {
-			    // Start looping through the entries.
-			    for (let j = 0; j < stockItem.length; j++) {
-			        // Get the units just for this entry
-				remainingUnitsToSell = numOfUnits - stockItem[j].numOfUnits
-                
-				// Calculate sale value based on how much stock there is.
-				if (remainingUnitsToSell < 0) {
-				    // Selling part of this entry will satisfy the sale.
-				    saleValue += (numOfUnits * Number(currItem[0].currentCost))
-				    newUnits = stockItem[j].numOfUnits - numOfUnits
-				    await Portfolio.findOneAndUpdate({userId: stockItem[j].userId, portId: stockItem[j].portId, stockName: stockItem[j].stockName}, {numOfUnits: newUnits})
-				    break
-				}
-				else if (remainingUnitsToSell == 0) {
-				    // Selling all of this entry will satisfy the sale.
-				    saleValue += (numOfUnits * Number(currItem[0].currentCost))
-				    await Portfolio.deleteOne({_id: stockItem[j]._id})
-				    break
-				}
-				else {
-				    // All of this entry must be sold plus more from another entry.
-				    saleValue += (stockItem[j].numOfUnits * Number(currItem[0].currentCost))
-				    numOfUnits = numOfUnits - stockItem[j].numOfUnits
-				    await Portfolio.deleteOne({_id: stockItem[j]._id})
-				}
-			    }
-                            
-                    	    // Add this money to the user's dollars value.
-                    	    currentFunds = await Portfolio.find({userId: userID, portId: portID, stockName: "dollars"});
-                    	    let newAvailableFunds = currentFunds[0].numOfUnits + saleValue
-                    	    await Portfolio.findOneAndUpdate({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"}, {numOfUnits: newAvailableFunds})
-                    	    totalSaleValue += saleValue
-		        }
+                        // Can the sale be made for that amount?
+                        if (numOfOwnedUnits >= numOfUnits) {
+                            remainingUnitsToSell = numOfUnits
+                            // Start looping through the entries.
+                            for (let j = 0; j < stockItem.length; j++) {
+                                // Get the units just for this entry
+                                currentUnitsToSell = remainingUnitsToSell
+                                remainingUnitsToSell -= stockItem[j].numOfUnits
+
+                                // Calculate sale value based on how much stock there is.
+                                if (remainingUnitsToSell < 0) {
+                                    // Selling part of this entry will satisfy the sale.
+                                    saleValue += (currentUnitsToSell * Number(currItem[0].currentCost))
+                                    newUnits = stockItem[j].numOfUnits - currentUnitsToSell
+                                    await Portfolio.findOneAndUpdate({userId: stockItem[j].userId, portId: stockItem[j].portId, stockName: stockItem[j].stockName}, {numOfUnits: newUnits})
+                                    break
+                                }
+                                else if (remainingUnitsToSell == 0) {
+                                    // Selling all of this entry will satisfy the sale.
+                                    saleValue += (currentUnitsToSell * Number(currItem[0].currentCost))
+                                    await Portfolio.deleteOne({_id: stockItem[j]._id})
+                                    break
+                                }
+                                else {
+                                    // All of this entry must be sold plus more from another entry.
+                                    saleValue += (stockItem[j].numOfUnits * Number(currItem[0].currentCost))
+                                    await Portfolio.deleteOne({_id: stockItem[j]._id})
+                                }
+                            }
+
+                            // Add this money to the user's dollars value.
+                            currentFunds = await Portfolio.find({userId: userID, portId: portID, stockName: "dollars"});
+                            let newAvailableFunds = currentFunds[0].numOfUnits + saleValue
+                            await Portfolio.findOneAndUpdate({userId: stockItem[0].userId, portId: stockItem[0].portId, stockName: "dollars"}, {numOfUnits: newAvailableFunds})
+                            totalSaleValue += saleValue
+                        }
                     }
 		}
             }
