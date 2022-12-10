@@ -385,20 +385,20 @@ export default function PortfolioPage(props) {
                         <div
                             className='inner-portfolio-return'
                             style={{
-                                // marginRight: '30px'
+                                fontSize: '25px'
                             }}
                         >
                             <div>
                                 <h3>Total Invested</h3>
-                                <p>${commaSeparate(portfolioStats.cost)}</p>
+                                <p style={{fontSize: '30px'}}>${commaSeparate(portfolioStats.cost)}</p>
                             </div>
                             <div>
                                 <h3>Total Profit</h3>
-                                <p>${commaSeparate(portfolioStats.return)}</p>
+                                <p style={{fontSize: '30px'}}>${commaSeparate(portfolioStats.return)}</p>
                             </div>
                             <div>
                                 <h3>Total ROI</h3>
-                                <p>{commaSeparate(portfolioStats.roi)}%</p>
+                                <p style={{fontSize: '30px'}}>{commaSeparate(portfolioStats.roi)}%</p>
                             </div>
                         </div>
                     </div>
