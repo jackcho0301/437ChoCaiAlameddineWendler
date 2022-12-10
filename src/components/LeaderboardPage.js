@@ -3,7 +3,7 @@ import './LeaderboardPage.css'
 import Leaderboard from './react-leaderboard';
 import LEADERS from '../config/leaders.json'
 import { DataGrid } from '@mui/x-data-grid';
-import { IconButton, Box, TextField, Button } from '@mui/material';
+import { IconButton, Box, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { UserContext } from '../context/User';
 import { EventsContext } from '../context/Events'
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -24,6 +24,7 @@ export default function LeaderboardPage(props) {
     const [leaderboard, setLeaderboard] = React.useState(null)
     const [scoresLoaded, setScoresLoaded] = React.useState(true)
     const [allowScoresToLoad, setAllowScoresToLoad] = React.useState(true)
+    const [groups, setGroups] = React.useState([{}])
     const [currentGroupMems, setCurrentGroupMems] = React.useState([{}])
     const [filterGroupParams, setFilterGroupParams] = React.useState({
         groupName: ''    
@@ -41,6 +42,10 @@ export default function LeaderboardPage(props) {
       }, AUTO_REFRESH_MS);
     
       return () => clearInterval(interval);
+    }, [])
+	
+    useEffect(() => {
+        callEvent.getGroups()
     }, [])
 
     //query when refresh button clicked
@@ -71,6 +76,10 @@ export default function LeaderboardPage(props) {
         DEBUG.leaders && console.log('leaders:', leaders)
         setLeaderboard(newLeaderboard())
     }, [leaders])
+	
+    useEffect(() => {
+        setGroups(backend.groups)
+    }, [backend.groups])
 
     // leaderboard component won't re-render on prop change so we need to re-render it hackily
     const newLeaderboard = () => {
@@ -124,12 +133,22 @@ export default function LeaderboardPage(props) {
 	            autoComplete="off"
 	        >
 	            <TextField
-	                id="group-name-filter"
-	                label="Group Name"
-	                variant="filled"
-	                onChange={event => changeGroupFilterName(event)}
-                    value={textFieldValue}
-	            />
+                    {(groups.success != undefined && groups.success)
+                        && <FormControl sx={{minWidth: 160}}>
+                            <InputLabel>Group Name</InputLabel>
+                            <Select
+                                id="group-name-filter"
+                                label="Group Name"
+                                autoWidth
+                                onChange={event => changeGroupFilterName(event)}
+                                value={textFieldValue}
+                            >
+                            {
+                                groups.data.map((grp,i) => <MenuItem value={grp}>{grp}</MenuItem>)
+                            }
+                            </Select>
+                        </FormControl>
+                    }
 	            <Button
                     id="filter-by-group-btn"
 	                variant="contained"
