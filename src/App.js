@@ -111,11 +111,6 @@ function App() {
             <LogoutPage />}
           {pageState.profile.active &&
             <ProfilePage />}
-          {pageState.groups.active &&
-            <GroupPage />}
-          {/* {pageState.ranking.active &&
-            <MyRankPage />} */}
-
         </div>
       )
     }
