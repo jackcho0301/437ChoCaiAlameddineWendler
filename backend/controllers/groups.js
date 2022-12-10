@@ -90,8 +90,21 @@ const putGroupMembership = async (req, res) => {
     }
 }
 
+const allGroups = async(req, res) => {
+    const groupsInfo = await Group.exists()
+
+    let groupNames = []
+
+    for (infoItem of groupsInfo){
+        groupNames.push(infoItem.groupName)
+    }
+
+    return res.status(200).json({success:true,data:groupNames})
+}
+
 module.exports = {
     getUserGroupMemberships,
     getGroupMembers,
-    putGroupMembership
+    putGroupMembership,
+    allGroups
 }
