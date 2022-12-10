@@ -461,9 +461,9 @@ export default function ProfilePage(props) {
 			<Grid container spacing={2} sx={{ mb: 2 }} direction="row" justifyContent="center" alignItems="center">
 				{myProfile}
 			</Grid>
-			{/* <Grid container spacing={5} direction="row" justifyContent="center" alignItems="center">
+			<Grid container spacing={5} direction="row" justifyContent="center" alignItems="center">
 				<Grid item xs={3}>
-					<Card>
+					<Card item sx={{backgroundColor: 'rgb(220,240,220)'}}>
 						<center>{refreshGroupControls}</center>
 						{(currentGroupMemberships.success != undefined && currentGroupMemberships.success)
 							&& <>
@@ -477,7 +477,7 @@ export default function ProfilePage(props) {
 					</Card>
 				</Grid>
 				<Grid item xs={3}>
-					<Card>
+					<Card item sx={{backgroundColor: 'rgb(220,240,220)'}}>
 					<center>{refreshGroupOwnships}</center>
 						{(currentGroupOwnships.success != undefined && currentGroupOwnships.success)
 							&& <>
@@ -491,8 +491,7 @@ export default function ProfilePage(props) {
 					</Card>
 				</Grid>
 				<Grid item xs={7} sm={7}>
-
-					<Card>
+					<Card item sx={{backgroundColor: 'rgb(220,240,220)'}}>
 						{newGroupInput()}
 						{(createGroupMessage.msg != undefined)
 							&& <>
@@ -504,7 +503,7 @@ export default function ProfilePage(props) {
 					</Card>
 				</Grid>
 				<Grid item xs={7} sm={7}>
-					<Card>
+					<Card item sx={{backgroundColor: 'rgb(220,240,220)'}}>
 						{newMemberInput()}
 						{(addMemberMessage.msg != undefined)
 							&& <>
@@ -515,10 +514,7 @@ export default function ProfilePage(props) {
 						}
 					</Card>
 				</Grid>
-
-
-			</Grid> */}
-
+			</Grid>
 		</div>
 	)
 }
