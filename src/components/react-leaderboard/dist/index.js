@@ -241,7 +241,7 @@ var Leaderboard = function (_Component) {
                   { className: 'data score' },
                   // user.score <-- default
                   // user.score.toLocaleString('en', {useGrouping:true})
-                  user.score != undefined ? Math.round(user.score).toLocaleString('en', {useGrouping:true}): user.score
+                  user.score != undefined ? '$'+Math.round(user.score).toLocaleString('en', {useGrouping:true}): '$'+user.score
 
                 ) : null
               );
