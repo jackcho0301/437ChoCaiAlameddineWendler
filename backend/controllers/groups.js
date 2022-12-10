@@ -91,7 +91,7 @@ const putGroupMembership = async (req, res) => {
 }
 
 const allGroups = async(req, res) => {
-    const groupsInfo = await Group.exists()
+    const groupsInfo = await Group.find()
 
     let groupNames = []
 
