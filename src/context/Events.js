@@ -21,6 +21,7 @@ const DEBUG = {
     addGroupMember: true,
     getTitle: true,
     getMyProfile: true,
+    getGroups: true
 }
 
 
@@ -380,6 +381,16 @@ export const EventsProvider = ({ children }) => {
         },
         setPersistentUser: () => {
             dispatch({ type: 'login', value: { data: { username: 'persistentSession' } } })
+        },
+        getGroups: async () => {
+            await axios.get(`${url}/api/v1/groups/groups/all`, config)
+                .then(function (response) {
+                    console.log(response.data)
+                    dispatch({ type: "groups", value: response.data })
+                })
+                .catch(function (error) {
+                    console.error(error);
+                });
         }
     }
 
