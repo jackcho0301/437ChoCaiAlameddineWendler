@@ -12,7 +12,8 @@ const DEBUG = {
     createGroup: true,
     addGroupMembership: true,
     getTitle: true,
-    getStats: true
+    getStats: true,
+    getGroups: true
 }
 
 export const values = {
@@ -35,7 +36,8 @@ export const values = {
     prefPortNumber: '',
     groupMembers: {},
     buyMessage: '',
-    sellMessage: ''
+    sellMessage: '',
+    groups: {}
 }
 
 export const reducer = (state, action) => {
@@ -127,6 +129,12 @@ export const reducer = (state, action) => {
             return {
                 ...state,
                 groupOwnships: action.value
+            }
+        }
+	case "groups" {
+            return {
+		...state,
+		groups: action.value
             }
         }
         case "createGroupRes": {
