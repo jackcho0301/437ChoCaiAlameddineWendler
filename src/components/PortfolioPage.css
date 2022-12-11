@@ -6,12 +6,8 @@
     align-items: center;
 }
 
-/* .portfolio-page Button {
-    height: ;
-} */
-
 .refresh-portfolio {
-    color: blue !important;
+    color: aliceblue !important;
 }
 
 .portfolio-text-and-refresh {
@@ -59,7 +55,7 @@
     /* display: flex;
     justify-content: center;
     align-items: center; */
-    background-color: azure;
+    background-color: beige;
 
 }
 
@@ -82,20 +78,6 @@
     font-weight: 700;
     color: white !important
 }
-
-/* .preview-buy-table tr {
-    height: 10px;
-}
-
-.preview-buy-table tr td {
-    height: auto !important;
-} */
-
-/* .preview-value {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-} */
 
 .preview-value input {
     font-weight: 850;

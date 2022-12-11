@@ -151,26 +151,9 @@ export default function PortfolioPage(props) {
                 return (
                     <VictoryPie
                         data={cashSort(getPortfolioData(action.payload))}
-                        // style={{
-                        //     data: {
-                        //       fill: ({ datum }) => datum.fill,
-                        //     }
-                        //   }}
                         colorScale={"qualitative"}
-                        // style={{
-                        //     data: {
-                        //         fill: ({ x }) => {
-                        //             if (x == 'dollars') {
-                        //                 return 'green'
-                        //             }
-                        //         }
-                        //     }
-                        // }}
                         height={750}
                         width={2000}
-                    // backgroundStyle={{ fill: "tomato", opacity: 0.6 }}
-                    // backgroundPadding={{ bottom: 5, top: 5 }}
-
                     />
                 )
             }
@@ -281,9 +264,6 @@ export default function PortfolioPage(props) {
             <>
                 <Box
                     component="form"
-                    //   sx={{
-                    //     '& > :not(style)': { m: 1, width: '25ch' },
-                    //   }}
                     noValidate
                     autoComplete="off"
                 >
@@ -291,15 +271,15 @@ export default function PortfolioPage(props) {
                         // id="stock-ticker"
                         label="Ticker"
                         variant="filled"
-                        size="small"
+		        size="small"
                         onChange={event => changeTicker(event)}
                         inputProps={{ style: { textTransform: "uppercase", height: '10px' } }}
                     />
                     <TextField
                         // id="stock-number"
                         label="Number of Shares"
-                        size="small"
                         variant="filled"
+		        size="small"
                         onChange={event => changeNumber(event)}
                         inputProps={{ style: { height: '10px' } }}
 
@@ -307,8 +287,8 @@ export default function PortfolioPage(props) {
                     <TextField
                         className='preview-value'
                         label={isBuy ? "Buy Price" : "Sale Value"}
-                        size="small"
                         variant="filled"
+		        size="small"
                         value={isBuy ? buyValueString : sellValueString}
                         inputProps={{ style: { height: '10px' } }}
 
@@ -364,10 +344,8 @@ export default function PortfolioPage(props) {
 
     return (
         <div className='portfolio-page'>
-            {/* placeholder, will be moved to user dropdown */}
             <div style={{
-                // marginLeft: '20px',
-                backgroundColor: 'aliceblue',
+                backgroundColor: 'beige',
                 width: '100%',
                 height: '170px'
             }}>
@@ -376,12 +354,7 @@ export default function PortfolioPage(props) {
 
             {(currentReturnsPortfolio != undefined && currentReturnsPortfolio.length > 0)
                 && <>
-                    {/* <h3 style={{ marginBottom: 0 }}>Display Mode</h3> */}
-
-
                     <div className='portfolio-return'>
-                        {/* <h2>Portfolio Return</h2> */}
-                        {/* <p>{JSON.stringify(currentHoldingPortfolio, null, 2)}</p> */}
                         <div
                             className='inner-portfolio-return'
                             style={{
@@ -402,7 +375,7 @@ export default function PortfolioPage(props) {
                             </div>
                         </div>
                     </div>
-                    <Box /* component={Paper}*/ className='select-portfolio-box'>
+                    <Box className='select-portfolio-box'>
                         <FormControl sx={{ m: 1, minWidth: 180 }}>
                             <InputLabel id='portfolio-selector-label'>Select Portfolio</InputLabel>
                             <Select
@@ -431,7 +404,7 @@ export default function PortfolioPage(props) {
                             Hide Controls
                         </Button>
 
-                        <Paper sx={{ bgcolor: 'azure' }}>
+                        <Paper sx={{ backgroundColor: 'white' }}>
                             <div className='buy-stock'>
                                 {buySellControls(true)}
                                 <Button
@@ -451,7 +424,7 @@ export default function PortfolioPage(props) {
                                 </>
                             }
                         </Paper>
-                        <Paper sx={{ bgcolor: 'azure' }}>
+                        <Paper sx={{ backgroundColor: 'white' }}>
                             <div className='sell-stock'>
                                 {buySellControls(false)}
 
@@ -480,22 +453,17 @@ export default function PortfolioPage(props) {
                         <Button
                             variant='contained'
                             style={{
-                                backgroundColor: displayMode == 'pie-chart' ? 'black' : 'rgb(245,245,245)',
+                                backgroundColor: displayMode == 'pie-chart' ? 'black' : 'white',
                                 color: displayMode == 'pie-chart' ? 'white' : 'black'
                             }}
                             onClick={() => setDisplayMode('pie-chart')}
                         >
                             Chart
                         </Button>
-                        {/* <Divider
-                    orientation='vertical'
-                    className='sign-in-register-divider'
-                    flexItem
-                /> */}
                         <Button
                             variant='contained'
                             style={{  // TODO: refactor to makestyles
-                                backgroundColor: displayMode == 'pie-chart' ? 'rgb(245,245,245)' : 'black',
+                                backgroundColor: displayMode == 'pie-chart' ? 'white' : 'black',
                                 color: displayMode == 'pie-chart' ? 'black' : 'white'
                             }}
                             onClick={() => setDisplayMode('table')}
@@ -514,14 +482,6 @@ export default function PortfolioPage(props) {
             <div>
             </div>
 
-            {/* <Button
-                onClick={() => controlsActive ? setControlsActive(false) : setControlsActive(true)}
-                variant='contained'
-                color={controlsActive ? 'error' : 'primary'}
-                style={{marginTop: '30px'}}
-            >
-                {`${controlsActive ? 'Hide Controls' : 'Modify Portfolio'}`}
-            </Button> */}
             <Button
                 onClick={() => setControlsActive(true)}
                 variant='contained'
@@ -530,9 +490,6 @@ export default function PortfolioPage(props) {
             >
                 Modify Portfolio
             </Button>
-
-
-
 
         </div>
     )
