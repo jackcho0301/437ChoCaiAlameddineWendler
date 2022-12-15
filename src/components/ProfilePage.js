@@ -224,6 +224,7 @@ export default function ProfilePage(props) {
 
 	const renderProfile = profile => {
 		return (
+			<Grid container spacing={2} sx={{ mb: 2 }} direction="row" justifyContent="center" alignItems="center">
 			<Grid item xs={8}>
 				<Card item xs={{ maxWidth: 600 }}>
 					<CardContent id="profile-info-div">
@@ -235,7 +236,6 @@ export default function ProfilePage(props) {
 							<Typography sx={{ flexGrow: 1, }} variant="h4"><strong><span className='green'>{rankNumber}</span> out of {rankTotal}</strong></Typography>
 							<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
 						</Box>
-
 						<Typography variant="h5" sx={{ marginTop: '10px' }}><strong>Score: <span className='emphasis'>{Math.round(profile.score)}</span></strong></Typography>
 						{/* <Typography variant="h5"><strong>Rank:</strong> {profile.rank} out of {profile.rankTotal}</Typography> */}
 						<Typography variant="h5">
@@ -251,8 +251,14 @@ export default function ProfilePage(props) {
 									}
 								</span></strong>
 						</Typography>
+			                        <AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
 						<br />
-
+			                 </CardContent>
+			         </Card>
+			</Grid>
+			<Grid item xs={8}>
+			         <Card item xs={{ maxWidth: 600 }}>
+                                         <CardContent id="lifetime-info-div">
 						{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
 						<Typography variant="h5"><strong>Your Lifetime Rank History is:</strong></Typography>
 						{(rankStats.length > 1)
@@ -271,10 +277,16 @@ export default function ProfilePage(props) {
 								<Typography variant="subtitle1">No lifetime stats are available for this user. Check at the end of the quarter!</Typography>
 							</>
 						}
-						<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
+			                </CardContent>
+			        </Card>
+			</Grid>
+			<Grid item xs={8}>
+			        <Card item xs={{ maxWidth: 600 }}>
+			                <CardContent id="selector-div">
 						{portfolioSelector()}
 					</CardContent>
 				</Card>
+			</Grid>
 			</Grid>
 		)
 	}
@@ -458,9 +470,7 @@ export default function ProfilePage(props) {
 		<div class='profile-page' id='profile-page'>
 			{/* <h1>My Profile</h1> */}
 			{/* {myRankDisplay()} */}
-			<Grid container spacing={2} sx={{ mb: 2 }} direction="row" justifyContent="center" alignItems="center">
-				{myProfile}
-			</Grid>
+			{myProfile}
 			<Grid container spacing={5} direction="row" justifyContent="center" alignItems="center">
 				<Grid item xs={3}>
 					<Card item sx={{backgroundColor: 'rgb(220,240,220)'}}>
@@ -491,6 +501,7 @@ export default function ProfilePage(props) {
 					</Card>
 				</Grid>
 				<Grid item xs={7} sm={7}>
+
 					<Card item sx={{backgroundColor: 'rgb(220,240,220)'}}>
 						{newGroupInput()}
 						{(createGroupMessage.msg != undefined)
@@ -514,7 +525,10 @@ export default function ProfilePage(props) {
 						}
 					</Card>
 				</Grid>
+
+
 			</Grid>
+
 		</div>
 	)
 }

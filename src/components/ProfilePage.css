@@ -13,6 +13,14 @@
     margin: 1%;
 }
 
+#lifetime-info-div {
+    background-color: rgb(220,240,220);
+}
+
+#selector-div {
+    background-color: rgb(220,240,220);
+}
+
 .groups-text-and-refresh {
     display: flex;
     flex-direction: row;
