@@ -13,28 +13,32 @@
 
     background: linear-gradient(-45deg, white, #23d5ab);
     background-size: 400% 400%;
-    animation: gradient 5s ease infinite;
+    animation: gradient 3.5s ease infinite;
 
     align-items: center;
 
 }
 
 .home-titles {
-    font-size: 30px;
+    font-size: 50px;
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: -20px;
 }
 
+.home-titles * {
+    margin: 10px;
+}
+
 .column-title {
-    font-size: 20px;
+    font-size: 27px;
 }
 
 .site-title {
     font-size: 7vw;
-    color: green;
-    margin-top: 10vw;
+    /* color: green; */
+    /* margin-top: 10vw; */
 }
 
 .features-row * {
@@ -53,4 +57,12 @@
     100% {
         background-position: 0% 50%;
     }
+}
+
+.my-portfolio-button {
+    /* color: green !important; */
+    font-size: 20px !important;
+    font-weight: bold !important;
+    /* text-decoration: underline !important; */
+    margin: 0 10px !important
 }

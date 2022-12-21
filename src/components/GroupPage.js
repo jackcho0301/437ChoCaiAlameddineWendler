@@ -3,13 +3,14 @@ import './ProfilePage.css'
 import './GroupPage.css'
 // import './MyRankPage.css'
 import { EventsContext } from '../context/Events'
-import { Button, IconButton, TextField, Box, InputLabel, MenuItem, FormControl, Select, Card, CardContent, Typography, Grid, Divider, List, ListItem, ListItemText } from '@mui/material'
+import { Button, IconButton, TextField, Box, InputLabel, MenuItem, FormControl, Select, Card, CardContent, Typography, Grid, Divider, List, ListItem, ListItemText, Modal, Paper, Dialog, Popover } from '@mui/material'
 import { LineChart, ResponsiveContainer, Legend, Tooltip, Line, XAxis, YAxis, CartesianGrid } from 'recharts'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import { makeStyles, createStyles } from '@mui/styles'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import { green, amber } from '@mui/material/colors'
+import Swal from 'sweetalert2'
 
 export default function GroupPage(props) {
 	const [backend, callEvent] = React.useContext(EventsContext)
@@ -44,11 +45,20 @@ export default function GroupPage(props) {
 
 	const [groupsChanged, setGroupsChanged] = React.useState(false)
 
+	const [newGroupModalOpen, setNewGroupModalOpen] = React.useState(false)
+	const [newMemberModalOpen, setNewMemberModalOpen] = React.useState(false)
+
+
 	const useStyles = makeStyles((theme) =>
 		createStyles({
 			input: {
 				height: 43
-			}
+			},
+			popoverRoot: {
+				display: 'flex',
+				justifyContent: 'center',
+				alignItems: 'center'
+			},
 		})
 	)
 
@@ -225,57 +235,114 @@ export default function GroupPage(props) {
 
 	const renderProfile = profile => {
 		return (
-			<Grid item xs={8}>
-				<Card item xs={{ maxWidth: 600 }}>
-					<CardContent id="profile-info-div">
-						<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
-						<Typography sx={{ textTransform: 'capitalize' }} gutterBottom variant="h3"><strong>{profile.username}</strong> </Typography>
-						<img src={profile.profilePicPath} width="100px" length="100px" />
-						<Box display="flex" fullWidth="true">
-							<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
-							<Typography sx={{ flexGrow: 1, }} variant="h4"><strong><span className='green'>{rankNumber}</span> out of {rankTotal}</strong></Typography>
-							<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
-						</Box>
+			// <Grid item xs={8}>
+			// 	<Card item xs={{ maxWidth: 600 }}>
+			// 		<CardContent id="profile-info-div">
+			// 			<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
+			// 			<Typography sx={{ textTransform: 'capitalize' }} gutterBottom variant="h3"><strong>{profile.username}</strong> </Typography>
+			// 			<img src={profile.profilePicPath} width="100px" length="100px" />
+			// 			<Box display="flex" fullWidth="true">
+			// 				<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
+			// 				<Typography sx={{ flexGrow: 1, }} variant="h4"><strong><span className='green'>{rankNumber}</span> out of {rankTotal}</strong></Typography>
+			// 				<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
+			// 			</Box>
 
-						<Typography variant="h5" sx={{ marginTop: '10px' }}><strong>Score: <span className='emphasis'>{Math.round(profile.score)}</span></strong></Typography>
-						{/* <Typography variant="h5"><strong>Rank:</strong> {profile.rank} out of {profile.rankTotal}</Typography> */}
-						<Typography variant="h5">
-							<strong>Title:
-								<span className='emphasis'>
-									{(rankTitle != '')
-										&& <>
-											<AttachMoneyIcon fontSize="small" sx={{ color: green[800] }} />
-											<span /*style={{color: 'green'}}*/><strong>{rankTitle}</strong></span>
-											<AttachMoneyIcon fontSize="small" sx={{ color: green[800] }} />
-										</>
+			// 			<Typography variant="h5" sx={{ marginTop: '10px' }}><strong>Score: <span className='emphasis'>{Math.round(profile.score)}</span></strong></Typography>
+			// 			{/* <Typography variant="h5"><strong>Rank:</strong> {profile.rank} out of {profile.rankTotal}</Typography> */}
+			// 			<Typography variant="h5">
+			// 				<strong>Title:
+			// 					<span className='emphasis'>
+			// 						{(rankTitle != '')
+			// 							&& <>
+			// 								<AttachMoneyIcon fontSize="small" sx={{ color: green[800] }} />
+			// 								<span /*style={{color: 'green'}}*/><strong>{rankTitle}</strong></span>
+			// 								<AttachMoneyIcon fontSize="small" sx={{ color: green[800] }} />
+			// 							</>
 
+			// 						}
+			// 					</span></strong>
+			// 			</Typography>
+			// 			<br />
+
+			// 			{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
+			// 			<Typography variant="h5"><strong>Your Lifetime Rank History is:</strong></Typography>
+			// 			{(rankStats.length > 1)
+			// 				&& <>
+			// 					<ResponsiveContainer width="100%" aspect={3}>
+			// 						<LineChart data={rankStats.map(stat => ({ quarterEnd: formatStatDate(stat.quarterEnd), finalValue: stat.finalValue }))} margin={{ right: 30, left: 30 }}>
+			// 							<XAxis dataKey="quarterEnd" interval={"preserveStartEnd"} />
+			// 							<YAxis></YAxis>
+			// 							<Line isAnimationActive={false} dataKey="finalValue" stroke="black" dot={{ stroke: "darkblue", strokeWidth: 2, r: 10 }} />
+			// 						</LineChart>
+			// 					</ResponsiveContainer>
+			// 				</>
+			// 			}
+			// 			{(rankStats.length === 0)
+			// 				&& <>
+			// 					<Typography variant="subtitle1">No lifetime stats are available for this user. Check at the end of the quarter!</Typography>
+			// 				</>
+			// 			}
+			// 			<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
+			// 			{portfolioSelector()}
+			// 		</CardContent>
+			// 	</Card>
+			// </Grid>
+			<Grid container spacing={5} direction="row" justifyContent="center" alignItems="center">
+				<Grid item xs={3}>
+					<Card item sx={{ backgroundColor: 'rgb(220,240,220)' }}>
+						<center>{refreshGroupControls}</center>
+						{(currentGroupMemberships.success != undefined && currentGroupMemberships.success)
+							&& <>
+								<List sx={{ listStyleType: 'disc', pl: 4 }} className='current-mems-return'>
+									{
+										currentGroupMemberships.data.map((mem, i) => <ListItem sx={{ display: 'list-item' }}><ListItemText primary={mem} /></ListItem>)
 									}
-								</span></strong>
-						</Typography>
-						<br />
+								</List>
+							</>
+						}
+					</Card>
+				</Grid>
+				<Grid item xs={3}>
+					<Card item sx={{ backgroundColor: 'rgb(220,240,220)' }}>
+						<center>{refreshGroupOwnships}</center>
+						{(currentGroupOwnships.success != undefined && currentGroupOwnships.success)
+							&& <>
+								<List sx={{ listStyleType: 'disc', pl: 4 }} className='current-owns-return'>
+									{
+										currentGroupOwnships.data.map((own, i) => <ListItem sx={{ display: 'list-item' }}><ListItemText primary={own} /></ListItem>)
+									}
+								</List>
+							</>
+						}
+					</Card>
+				</Grid>
+				<Grid item xs={7} sm={7}>
 
-						{/* <img src="http://localhost:3000/6355a789f60cadf72eb90954.png" width="100px" length="100px" /> */}
-						<Typography variant="h5"><strong>Your Lifetime Rank History is:</strong></Typography>
-						{(rankStats.length > 1)
+					<Card item sx={{ backgroundColor: 'rgb(220,240,220)' }}>
+						{newGroupInput()}
+						{(createGroupMessage.msg != undefined)
 							&& <>
-								<ResponsiveContainer width="100%" aspect={3}>
-									<LineChart data={rankStats.map(stat => ({ quarterEnd: formatStatDate(stat.quarterEnd), finalValue: stat.finalValue }))} margin={{ right: 30, left: 30 }}>
-										<XAxis dataKey="quarterEnd" interval={"preserveStartEnd"} />
-										<YAxis></YAxis>
-										<Line isAnimationActive={false} dataKey="finalValue" stroke="black" dot={{ stroke: "darkblue", strokeWidth: 2, r: 10 }} />
-									</LineChart>
-								</ResponsiveContainer>
+								<InputLabel>
+									{createGroupMessage.msg}
+								</InputLabel>
 							</>
 						}
-						{(rankStats.length === 0)
+					</Card>
+				</Grid>
+				<Grid item xs={7} sm={7}>
+					<Card item sx={{ backgroundColor: 'rgb(220,240,220)' }}>
+						{newMemberInput()}
+						{(addMemberMessage.msg != undefined)
 							&& <>
-								<Typography variant="subtitle1">No lifetime stats are available for this user. Check at the end of the quarter!</Typography>
+								<InputLabel>
+									{addMemberMessage.msg}
+								</InputLabel>
 							</>
 						}
-						<AutoAwesomeIcon fontSize="large" sx={{ color: amber[400] }} />
-						{portfolioSelector()}
-					</CardContent>
-				</Card>
+					</Card>
+				</Grid>
+
+
 			</Grid>
 		)
 	}
@@ -325,24 +392,63 @@ export default function GroupPage(props) {
 
 		return (
 			<div className='new-member-input'>
-				<Typography variant="h6"><strong>Add Member to Existing Group</strong></Typography>
+			
+								<Button
+					onClick={() => setNewMemberModalOpen(true)}
+					variant='contained'
+				>				<Typography variant="h6"><strong>Add Member to Existing Group</strong></Typography>
+				</Button>
+				<Popover
+					open={newMemberModalOpen}
+					onClose={() => setNewMemberModalOpen(false)}
+					anchorReference={"none"}
+					classes={{
+						root: classes.popoverRoot,
+					}}
+					PaperProps={{
+						style: { width: '480px', height: '270px' },
+					}}
+					BackdropProps={{ invisible: false }}
+				>
+					{/* <Paper> */}
+					<Box
+						sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}
+						component="form"
+						noValidate
+						autoComplete="off"
+					>
+						<h1>Add User to Group</h1>
+
+<TextField style={{ margin: '15px 0', width: '80%' }} InputProps={{ className: classes.input }} label="Group Name" onChange={event => changeNewMemberGroup(event)} />
+					<TextField style={{ margin: '0 0 20px 0', width: '80%' }} InputProps={{ className: classes.input }} label="New Group Member" onChange={event => changeNewMemberName(event)} />
+					<Button
+						variant="contained"
+						style={{width: '100%', position: 'absolute', bottom: 0}}
+						size="large"
+						onClick={() => { callEvent.addGroupMember(addGroupMemberParams.name, addGroupMemberParams.title); setGroupsChanged(!groupsChanged); setNewMemberModalOpen(false) }}
+						disabled={addGroupMemberParams.name == '' || addGroupMemberParams.title == ''}
+					>Add Member</Button>
+					</Box>
+				</Popover>
+
+				{/* <Typography variant="h6"><strong>Add Member to Existing Group</strong></Typography>
 				<Box
 					sx={{ m: 2 }}
 					component="form"
 					noValidate
 					autoComplete="off"
 				>
-					<TextField style={{margin: '0 10px'}} InputProps={{ className: classes.input }} label="Group Name" onChange={event => changeNewMemberGroup(event)} />
-					<TextField style={{margin: '0 10px'}} InputProps={{ className: classes.input }} label="New Group Member" onChange={event => changeNewMemberName(event)} />
-                    <Button
+					<TextField style={{ margin: '0 10px' }} InputProps={{ className: classes.input }} label="Group Name" onChange={event => changeNewMemberGroup(event)} />
+					<TextField style={{ margin: '0 10px' }} InputProps={{ className: classes.input }} label="New Group Member" onChange={event => changeNewMemberName(event)} />
+					<Button
 						variant="contained"
-                        style={{margin: '0 10px'}}
+						style={{ margin: '0 10px' }}
 						size="large"
 						onClick={() => { callEvent.addGroupMember(addGroupMemberParams.name, addGroupMemberParams.title); setGroupsChanged(!groupsChanged) }}
 						disabled={addGroupMemberParams.name == '' || addGroupMemberParams.title == ''}
 					>Add Member</Button>
-				</Box>
-				</div>
+				</Box> */}
+			</div>
 		);
 	}
 
@@ -371,6 +477,52 @@ export default function GroupPage(props) {
 		</CardContent>
 	)
 
+	const useIsMount = () => {
+		const isMountRef = React.useRef(true);
+		useEffect(() => {
+		  isMountRef.current = false;
+		}, []);
+		return isMountRef.current;
+	  };
+	const isMount = useIsMount();
+
+
+	useEffect(() => {
+		if(createGroupMessage.msg != undefined && !isMount) {
+			if(createGroupMessage.msg === 'New group created.') {
+				Swal.fire({title: 'New group created', icon: 'success', showConfirmButton: false, timer: 1000})
+			} else {
+				Swal.fire({
+					title: 'Could not create group', 
+					text: createGroupMessage.msg, 
+					icon: 'error', 
+					timer: 2000
+				})
+			}
+		}
+	}, [createGroupMessage])
+
+	useEffect(() => {
+		if(addMemberMessage.msg != undefined && !isMount) {
+			if(addMemberMessage.msg.includes('New member added to')) {
+				Swal.fire({
+					title: 'User added to group', 
+					icon: 'success', 
+					showConfirmButton: false, 
+					timer: 1000
+				})
+			} else {
+				Swal.fire({
+					title: 'Could not add user to group', 
+					text: addMemberMessage.msg, 
+					icon: 'error', 
+					timer: 2000
+				})
+			}
+		}
+	}, [addMemberMessage])
+
+
 	const newGroupInput = () => {
 		const changeNewGroupName = event => {
 			setCreateGroupParams({
@@ -379,29 +531,81 @@ export default function GroupPage(props) {
 		}
 		return (
 			<div className='new-group-input'>
-				<Typography variant="h6"><strong>Add a New Group</strong></Typography>
-				<Box
-					sx={{ m: 2 }}
-					component="form"
-					noValidate
-					autoComplete="off"
+				<Button
+					onClick={() => setNewGroupModalOpen(true)}
+					variant='contained'
+				><Typography variant="h6"><strong>Add a New Group</strong></Typography></Button>
+				<Popover
+					open={newGroupModalOpen}
+					onClose={() => setNewGroupModalOpen(false)}
+					anchorReference={"none"}
+					classes={{
+						root: classes.popoverRoot,
+					}}
+					PaperProps={{
+						style: { width: '480px', height: '200px' },
+					}}
+					BackdropProps={{ invisible: false }}
 				>
-					<TextField InputProps={{ className: classes.input }}
-						id="new-group-name"
-						label="New Group Name"
-						onChange={event => changeNewGroupName(event)}
-						style={{margin: '0 10px'}}
-						
-					/>
-					<Button
-						variant="contained"
-						size="large"
-						onClick={() => { callEvent.createGroup(createGroupParams.title); setGroupsChanged(!groupsChanged) }}
-						disabled={createGroupParams.title == ''}
+					{/* <Paper> */}
+					<Box
+						sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}
+						component="form"
+						noValidate
+						autoComplete="off"
 					>
-						Create Group
-					</Button>
-				</Box>
+						<h1>Create a New Group</h1>
+						<TextField InputProps={{ className: classes.input }}
+							id="new-group-name"
+							label="New Group Name"
+							onChange={event => changeNewGroupName(event)}
+							style={{ fontSize: '20px', marginTop: '10px', width: '80%'}}
+
+						/>
+						<Button
+							variant="contained"
+							size="large"
+							onClick={() => { callEvent.createGroup(createGroupParams.title); setGroupsChanged(!groupsChanged); setNewGroupModalOpen(false) }}
+							disabled={createGroupParams.title == ''}
+							style={{width: '100%', position: 'absolute', bottom: 0}}
+						>
+							Create Group
+						</Button>
+					</Box>
+
+					{/* Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+						<CardHeader title='Create a New Group'/>
+						<CardContent>
+						<TextField InputProps={{ className: classes.input }}
+							id="new-group-name"
+							label="New Group Name"
+							onChange={event => changeNewGroupName(event)}
+							style={{ margin: '20px 10px', fontSize: '20px' }}
+
+						/>
+						</CardContent>
+						<CardActions>
+						<Button
+							variant="contained"
+							size="large"
+							onClick={() => { callEvent.createGroup(createGroupParams.title); setGroupsChanged(!groupsChanged) }}
+							disabled={createGroupParams.title == ''}
+						>
+							Create Group
+						</Button>
+						</CardActions>
+
+
+						</Card> */}
+					{/* </Paper> */}
+					{/* {(createGroupMessage.msg != undefined)
+							&& <>
+								<InputLabel>
+									{createGroupMessage.msg}
+								</InputLabel>
+							</>
+						} */}
+				</Popover>
 			</div>
 		);
 	}
@@ -461,6 +665,23 @@ export default function GroupPage(props) {
 			{/* <h1>My Profile</h1> */}
 			{/* {myRankDisplay()} */}
 			<Grid container spacing={5} direction="row" justifyContent="center" alignItems="center">
+							{/* <Grid item xs={7} sm={7}>
+
+				{newGroupInput()}
+
+			</Grid>
+			<Grid item xs={7} sm={7}>
+				<Card>
+					{newMemberInput()}
+					{(addMemberMessage.msg != undefined)
+						&& <>
+							<InputLabel>
+								{addMemberMessage.msg}
+							</InputLabel>
+						</>
+					}
+				</Card>
+			</Grid> */}
 				<Grid item xs={3}>
 					<Card>
 						<center>{refreshGroupControls}</center>
@@ -477,7 +698,7 @@ export default function GroupPage(props) {
 				</Grid>
 				<Grid item xs={3}>
 					<Card>
-					<center>{refreshGroupOwnships}</center>
+						<center>{refreshGroupOwnships}</center>
 						{(currentGroupOwnships.success != undefined && currentGroupOwnships.success)
 							&& <>
 								<List sx={{ listStyleType: 'disc', pl: 4 }} className='current-owns-return'>
@@ -491,28 +712,11 @@ export default function GroupPage(props) {
 				</Grid>
 				<Grid item xs={7} sm={7}>
 
-					<Card>
 						{newGroupInput()}
-						{(createGroupMessage.msg != undefined)
-							&& <>
-								<InputLabel>
-									{createGroupMessage.msg}
-								</InputLabel>
-							</>
-						}
-					</Card>
+
 				</Grid>
 				<Grid item xs={7} sm={7}>
-					<Card>
 						{newMemberInput()}
-						{(addMemberMessage.msg != undefined)
-							&& <>
-								<InputLabel>
-									{addMemberMessage.msg}
-								</InputLabel>
-							</>
-						}
-					</Card>
 				</Grid>
 
 

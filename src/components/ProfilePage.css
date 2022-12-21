@@ -6,7 +6,7 @@
 
 #profile-info-div {
     font-size: 25px;
-    background-color: rgb(220,240,220);
+    /* background-color: rgb(220,240,220); */
 }
 
 #profile-info-div > * {
@@ -14,11 +14,11 @@
 }
 
 #lifetime-info-div {
-    background-color: rgb(220,240,220);
+    /* background-color: rgb(220,240,220); */
 }
 
 #selector-div {
-    background-color: rgb(220,240,220);
+    /* background-color: rgb(220,240,220); */
 }
 
 .groups-text-and-refresh {

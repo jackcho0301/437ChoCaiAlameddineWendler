@@ -16,8 +16,11 @@ export default function HelpPage(props) {
                 }}>
                     <div className='container-fluid'>
                         <div className='titleHolder'>
-                            <h1>Frequently Asked Questions</h1>
+                            <h1 style={{fontSize: '40px !important'}}>Frequently Asked Questions</h1>
                             <p></p>
+                            <br/>
+                            <br/>
+
                         </div>
                         <Collapse 
                         activeKey={openPanel} 

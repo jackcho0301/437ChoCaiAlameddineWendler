@@ -100,7 +100,11 @@ function App() {
             setPage={setPageActive} />
           {/* <Box sx={{m: 2}}/> */}
           {pageState.home.active &&
-            <HomePage />}
+            <HomePage 
+            goToPortfolio={() => {setPageActive('portfolio')}}
+            goToProfile={() => {setPageActive('profile')}}
+            goToFaq={() => {setPageActive('help')}}
+            />}
           {pageState.portfolio.active &&
             <PortfolioPage />}
           {pageState.leaderboard.active &&
@@ -111,6 +115,8 @@ function App() {
             <LogoutPage />}
           {pageState.profile.active &&
             <ProfilePage />}
+          {pageState.groups.active &&
+            <GroupPage />}
         </div>
       )
     }

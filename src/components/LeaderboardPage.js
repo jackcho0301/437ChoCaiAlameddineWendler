@@ -132,16 +132,30 @@ export default function LeaderboardPage(props) {
 	            noValidate
 	            autoComplete="off"
 	        >
-	            <TextField
-                    {(groups.success != undefined && groups.success)
+                    {groups.success
                         && <FormControl sx={{minWidth: 160}}>
-                            <InputLabel>Group Name</InputLabel>
+                            <InputLabel>Group</InputLabel>
                             <Select
                                 id="group-name-filter"
                                 label="Group Name"
                                 autoWidth
                                 onChange={event => changeGroupFilterName(event)}
                                 value={textFieldValue}
+                                style={{overflow: 'auto'}}
+                                MenuProps={{
+                                    anchorOrigin: {
+                                      vertical: "bottom",
+                                      horizontal: "left"
+                                    },
+                                    transformOrigin: {
+                                      vertical: "bottom",
+                                      horizontal: "left"
+                                    },
+                                    id: 'dropdown',
+                                    getContentAnchorEl: null
+                                  }}
+                                // SelectDisplayProps={{ style: { height: '80vh' } }}
+
                             >
                             {
                                 groups.data.map((grp,i) => <MenuItem value={grp}>{grp}</MenuItem>)

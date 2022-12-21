@@ -2,11 +2,13 @@ import React, { useEffect } from 'react'
 import './PortfolioPage.css'
 import { EventsContext } from '../context/Events'
 import { UserContext } from '../context/User'
-import { Button, IconButton, TextField, Box, Paper, Typography, Card, CardContent, TableRow, TableHead, TableCell, TableBody, Table, TableContainer, Divider, InputLabel, MenuItem, FormControl, Select } from '@mui/material'
+import { Button, IconButton, TextField, Box, Paper, Typography, Card, CardContent, TableRow, TableHead, TableCell, TableBody, Table, TableContainer, Divider, InputLabel, MenuItem, FormControl, Select, Popover } from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh';
 import MUIDataTable from "mui-datatables";
 import { StocksContext } from '../context/Stocks'
 import { VictoryPie, VictoryChart } from 'victory'
+import { makeStyles, createStyles } from '@mui/styles'
+
 
 const DEBUG = {
     stockParams: false,
@@ -14,7 +16,26 @@ const DEBUG = {
     transactionValue: false
 }
 
+const useStyles = makeStyles((theme) =>
+createStyles({
+    popoverRoot: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    input: {
+        style: {
+            height: '50px',
+            textTransform: "uppercase"
+        }
+
+    },
+})
+)
+
 export default function PortfolioPage(props) {
+    const classes = useStyles()
+
     const [user, modifyUser] = React.useContext(UserContext)
     const [backend, callEvent] = React.useContext(EventsContext)
     const [currentReturnsPortfolio, setCurrentReturnsPortfolio] = React.useState([{}])
@@ -164,6 +185,9 @@ export default function PortfolioPage(props) {
 
     const [portNumber, setPortNumber] = React.useState('1');
 
+    const [buyModalOpen, setBuyModalOpen] = React.useState(false)
+    const [sellModalOpen, setSellModalOpen] = React.useState(false)
+
     useEffect(() => {
         callEvent.getPortfolio(portNumber)
         callEvent.getStats()
@@ -187,6 +211,7 @@ export default function PortfolioPage(props) {
             return: portfolio.totalVal - moneyInvested,
             // roi: portfolio.roiPercent
             cost: moneyInvested,
+            val: portfolio.totalVal,
             // return: portfolio.totalVal - moneyInvested,
             roi: Math.round((portfolio.totalVal - moneyInvested) / moneyInvested * 100)
         })
@@ -260,26 +285,57 @@ export default function PortfolioPage(props) {
                 })
         }
 
+        const button = () => {
+            if (isBuy) {
+                return (
+                    <Button
+                        className="buy-sell-btn"
+                        variant='contained'
+                        onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value / buyStockParams.number, portNumber)}
+                        disabled={!buyValueString}
+                        style={{width: '100%', position: 'absolute', bottom: 0}}
+                    >
+                        Buy
+                    </Button>
+                )
+            }
+            else {
+                return (
+
+                    <Button
+                        className="buy-sell-btn"
+                        variant='contained'
+                        onClick={handleSellStock}
+                        disabled={!sellValueString}
+                        style={{width: '100%', position: 'absolute', bottom: 0}}
+                    >
+                        Sell
+                    </Button>
+                )
+            }
+        }
+
         return (
             <>
                 <Box
                     component="form"
                     noValidate
                     autoComplete="off"
+                    sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}
                 >
                     <TextField
                         // id="stock-ticker"
                         label="Ticker"
                         variant="filled"
-		        size="small"
+                        size="small"
                         onChange={event => changeTicker(event)}
-                        inputProps={{ style: { textTransform: "uppercase", height: '10px' } }}
+                        inputProps={{ style: { textTransform: "uppercase", height: '10px', margin: '25px 0', width: '80%' } }}
                     />
                     <TextField
                         // id="stock-number"
                         label="Number of Shares"
                         variant="filled"
-		        size="small"
+                        size="small"
                         onChange={event => changeNumber(event)}
                         inputProps={{ style: { height: '10px' } }}
 
@@ -288,15 +344,64 @@ export default function PortfolioPage(props) {
                         className='preview-value'
                         label={isBuy ? "Buy Price" : "Sale Value"}
                         variant="filled"
-		        size="small"
+                        size="small"
                         value={isBuy ? buyValueString : sellValueString}
                         inputProps={{ style: { height: '10px' } }}
 
                         disabled
                     />
+                    {button()}
                 </Box>
             </>
         );
+    }
+
+    const portfolioActions = type => {
+        return (
+
+            <div className='portfolio-actions'>
+                {/* <Button
+                onClick={() => setControlsActive(false)}
+                variant='contained'
+                color={'error'}
+                style={{ marginTop: '30px' }}
+            >
+                Hide Controls
+            </Button> */}
+
+                {type === 'buy' &&
+                    <div className='buy-stock'>
+                        {buySellControls(true)}
+                        {(backend.buyMessage !== '')
+                        && <>
+                            <InputLabel>
+                                {backend.buyMessage}
+                            </InputLabel>
+                        </>
+                    }
+
+                    </div>
+
+}
+                {type === 'sell' &&
+                        <div className='sell-stock'>
+                            {buySellControls(false)}
+                            {(backend.sellMessage != '')
+                            && <>
+                                <InputLabel>
+                                    {backend.sellMessage}
+                                </InputLabel>
+                            </>
+                        }
+
+                        </div>
+
+                }
+
+
+
+            </div>
+        )
     }
 
 
@@ -345,13 +450,14 @@ export default function PortfolioPage(props) {
     return (
         <div className='portfolio-page'>
             <div style={{
-                backgroundColor: 'beige',
+                backgroundColor: 'azure',
                 width: '100%',
                 height: '170px'
             }}>
-                <h1 style={{ fontSize: '40px' }}>Your Portfolio</h1>
+                <h1 style={{ fontSize: '40px' }}>Portfolio {portNumber}</h1>
+                <h1 style={{ marginBottom: 0 }}>${commaSeparate(portfolioStats.val)}</h1>
             </div>
-
+            <hr style={{ borderTop: '5px solid black', width: '100vw', margin: 0 }} />
             {(currentReturnsPortfolio != undefined && currentReturnsPortfolio.length > 0)
                 && <>
                     <div className='portfolio-return'>
@@ -362,23 +468,28 @@ export default function PortfolioPage(props) {
                             }}
                         >
                             <div>
-                                <h3>Total Invested</h3>
-                                <p style={{fontSize: '30px'}}>${commaSeparate(portfolioStats.cost)}</p>
+                                <h3>Invested</h3>
+                                <p style={{ fontSize: '30px' }}>${commaSeparate(portfolioStats.cost)}</p>
                             </div>
                             <div>
-                                <h3>Total Profit</h3>
-                                <p style={{fontSize: '30px'}}>${commaSeparate(portfolioStats.return)}</p>
+                                <h3>Profit</h3>
+                                <p style={{ fontSize: '30px' }}>${commaSeparate(portfolioStats.return)}</p>
                             </div>
                             <div>
-                                <h3>Total ROI</h3>
-                                <p style={{fontSize: '30px'}}>{commaSeparate(portfolioStats.roi)}%</p>
+                                <h3>ROI</h3>
+                                <p style={{ fontSize: '30px' }}>{commaSeparate(portfolioStats.roi)}%</p>
                             </div>
+
                         </div>
                     </div>
                     <Box className='select-portfolio-box'>
                         <FormControl sx={{ m: 1, minWidth: 180 }}>
-                            <InputLabel id='portfolio-selector-label'>Select Portfolio</InputLabel>
-                            <Select
+                            {/* <InputLabel id='portfolio-selector-label'>Select Portfolio</InputLabel> */}
+                            {/* <div> */}
+                            {/* <h3>Score</h3> */}
+                            {/* <p style={{ fontSize: '30px', fontWeight: 'bold' }}>${commaSeparate(portfolioStats.val)}</p> */}
+                            {/* </div> */}
+                            {/* <Select
                                 labelId='portfolio-selector-label'
                                 id='portfolio-selector'
                                 value={portNumber}
@@ -390,65 +501,9 @@ export default function PortfolioPage(props) {
                                 <MenuItem value={'2'}>2</MenuItem>
                                 <MenuItem value={'3'}>3</MenuItem>
                                 <MenuItem value={'4'}>4</MenuItem>
-                            </Select>
+                            </Select> */}
                         </FormControl>
                     </Box>
-
-                    <div className='portfolio-actions' hidden={!controlsActive}>
-                        <Button
-                            onClick={() => setControlsActive(false)}
-                            variant='contained'
-                            color={'error'}
-                            style={{ marginTop: '30px' }}
-                        >
-                            Hide Controls
-                        </Button>
-
-                        <Paper sx={{ backgroundColor: 'white' }}>
-                            <div className='buy-stock'>
-                                {buySellControls(true)}
-                                <Button
-                                    className="buy-sell-btn"
-                                    variant='contained'
-                                    onClick={() => callEvent.buyStock(buyStockParams.ticker, buyStockParams.number, buyValue.value / buyStockParams.number, portNumber)}
-                                    disabled={!buyValueString}
-                                >
-                                    Buy
-                                </Button>
-                            </div>
-                            {(backend.buyMessage !== '')
-                                && <>
-                                    <InputLabel>
-                                        {backend.buyMessage}
-                                    </InputLabel>
-                                </>
-                            }
-                        </Paper>
-                        <Paper sx={{ backgroundColor: 'white' }}>
-                            <div className='sell-stock'>
-                                {buySellControls(false)}
-
-                                <Button
-                                    className="buy-sell-btn"
-                                    variant='contained'
-                                    onClick={handleSellStock}
-                                    disabled={!sellValueString}
-                                >
-                                    Sell
-                                </Button>
-                            </div>
-                            {(backend.sellMessage != '')
-                                && <>
-                                    <InputLabel>
-                                        {backend.sellMessage}
-                                    </InputLabel>
-                                </>
-                            }
-                        </Paper>
-
-
-
-                    </div>
                     {backend.portfolioLoaded && <div className='portfolio-display-mode'>
                         <Button
                             variant='contained'
@@ -482,14 +537,56 @@ export default function PortfolioPage(props) {
             <div>
             </div>
 
-            <Button
-                onClick={() => setControlsActive(true)}
-                variant='contained'
-                color={'primary'}
-                style={{ marginTop: '30px', visibility: controlsActive ? 'hidden' : 'visible'}}
-            >
-                Modify Portfolio
-            </Button>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <Button
+                    onClick={() => { setControlsActive(true); setBuyModalOpen(true) }}
+                    variant='contained'
+                    color={'primary'}
+                    size='large'
+                    style={{ margin: '30px 10px 0 0', visibility: controlsActive ? 'visible' : 'visible' }}
+                >
+                    Buy
+                </Button>
+                <Popover
+                    open={buyModalOpen}
+                    onClose={() => setBuyModalOpen(false)}
+                    anchorReference={"none"}
+                    classes={{
+                        root: classes.popoverRoot,
+                    }}
+                    PaperProps={{
+                        style: { width: '300px', height: '400px' },
+                    }}
+                    BackdropProps={{ invisible: false }}
+                >
+                    <h1>Buy Stock</h1>
+                    {portfolioActions('buy')}
+                </Popover>
+                <Button
+                    onClick={() => { setControlsActive(true); setSellModalOpen(true) }}
+                    variant='contained'
+                    color={'primary'}
+                    size='large'
+                    style={{ margin: '30px 0 0 10px', visibility: controlsActive ? 'visible' : 'visible' }}
+                >
+                    Sell
+                </Button>
+                <Popover
+                    open={sellModalOpen}
+                    onClose={() => setSellModalOpen(false)}
+                    anchorReference={"none"}
+                    classes={{
+                        root: classes.popoverRoot,
+                    }}
+                    PaperProps={{
+                        style: { width: '480px', height: '500px' },
+                    }}
+                    BackdropProps={{ invisible: false }}
+                >
+                    {portfolioActions('sell')}
+                </Popover>
+            </div>
+
 
         </div>
     )

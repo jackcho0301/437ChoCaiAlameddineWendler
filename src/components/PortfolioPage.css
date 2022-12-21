@@ -7,7 +7,7 @@
 }
 
 .refresh-portfolio {
-    color: aliceblue !important;
+    color: blue !important;
 }
 
 .portfolio-text-and-refresh {
@@ -55,7 +55,7 @@
     /* display: flex;
     justify-content: center;
     align-items: center; */
-    background-color: beige;
+    background-color: azure;
 
 }
 
@@ -118,7 +118,8 @@
     /* height: 72px;
     top: 26px;
     width: 100px; */
-    height: 56px
+    height: 56px;
+    margin: 0
     
 
 }

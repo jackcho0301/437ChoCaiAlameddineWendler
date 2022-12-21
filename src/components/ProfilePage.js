@@ -308,6 +308,7 @@ export default function ProfilePage(props) {
 							id='pref-port-select'
 							label="Portfolio Number"
 							onChange={changePortfolioID}
+							placeholder={prefPortfolio}
 						>
 							<MenuItem value={'1'}>1</MenuItem>
 							<MenuItem value={'2'}>2</MenuItem>
@@ -421,7 +422,7 @@ export default function ProfilePage(props) {
 			<Card item sx={{ width: '75%', backgroundColor: 'rgb(220,240,220)' }}>
 				<Typography gutterBottom variant="h4"><strong>Username:</strong> {backend.profile.username}</Typography>
 				<img src={backend.profile.profilePicPath} width="100px" length="100px" />
-				<Typography variant="h5"><strong>Score:</strong> {backend.profile.score}</Typography>
+				<Typography variant="h5"><strong>Score:</strong> ${backend.profile.score}</Typography>
 				<CardContent display="flex" fullWidth="true">
 					<Typography variant="h5"><strong>Your Current Quarter Rank is:</strong></Typography>
 					{(rankNumber != 0 && rankTotal != 0)
@@ -471,7 +472,7 @@ export default function ProfilePage(props) {
 			{/* <h1>My Profile</h1> */}
 			{/* {myRankDisplay()} */}
 			{myProfile}
-			<Grid container spacing={5} direction="row" justifyContent="center" alignItems="center">
+			{/* <Grid container spacing={5} direction="row" justifyContent="center" alignItems="center">
 				<Grid item xs={3}>
 					<Card item sx={{backgroundColor: 'rgb(220,240,220)'}}>
 						<center>{refreshGroupControls}</center>
@@ -527,7 +528,7 @@ export default function ProfilePage(props) {
 				</Grid>
 
 
-			</Grid>
+			</Grid> */}
 
 		</div>
 	)

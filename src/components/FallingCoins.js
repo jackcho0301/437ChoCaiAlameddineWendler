@@ -26,10 +26,10 @@ export default function FallingCoins(el) {
         drawloop();
     }
     var coins = []
-    var start = Date.now()
+    // var start = Date.now()
 
     function drawloop() {
-        if ((focused) && (Date.now() - start < 6000)) {
+        if ((focused)) {
             requestAnimationFrame(drawloop);
         }
 	else {

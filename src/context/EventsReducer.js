@@ -131,7 +131,7 @@ export const reducer = (state, action) => {
                 groupOwnships: action.value
             }
         }
-	case "groups" {
+	case "groups": {
             return {
 		...state,
 		groups: action.value
